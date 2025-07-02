@@ -1,0 +1,69 @@
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  .icon {
+    font-size: 0.875rem;
+  }
+
+  .text {
+    font-size: 0.75rem;
+  }
+
+  // Status: Em Andamento
+  &.inProgress {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+    border: 1px solid rgba(255, 140, 0, 0.2);
+  }
+
+  // Status: Enviado
+  &.submitted {
+    background: rgba(0, 120, 212, 0.1);
+    color: #0078d4;
+    border: 1px solid rgba(0, 120, 212, 0.2);
+  }
+
+  // Status: Em Análise
+  &.review {
+    background: rgba(135, 100, 184, 0.1);
+    color: #8764b8;
+    border: 1px solid rgba(135, 100, 184, 0.2);
+  }
+
+  // Status: Aprovado
+  &.approved {
+    background: rgba(16, 124, 16, 0.1);
+    color: #107c10;
+    border: 1px solid rgba(16, 124, 16, 0.2);
+  }
+
+  // Status: Rejeitado
+  &.rejected {
+    background: rgba(209, 52, 56, 0.1);
+    color: #d13438;
+    border: 1px solid rgba(209, 52, 56, 0.2);
+  }
+
+  // Status: Pendente Informações
+  &.pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+  }
+
+  // Status padrão
+  &.default {
+    background: rgba(96, 94, 92, 0.1);
+    color: #605e5c;
+    border: 1px solid rgba(96, 94, 92, 0.2);
+  }
+}

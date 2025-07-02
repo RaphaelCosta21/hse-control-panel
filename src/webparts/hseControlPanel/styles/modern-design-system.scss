@@ -1,0 +1,183 @@
+// Modern Design System - HSE Control Panel
+// Sistema de design moderno e consistente
+
+// === CORES PRINCIPAIS ===
+:root {
+  // HSE Brand Colors
+  --hse-primary: #0078d4;
+  --hse-primary-dark: #106ebe;
+  --hse-primary-light: #329bdf;
+  --hse-secondary: #004578;
+  
+  // Semantic Colors
+  --color-success: #107c10;
+  --color-warning: #ff8c00;
+  --color-error: #d13438;
+  --color-info: #0078d4;
+  
+  // Status Colors (específicos para formulários)
+  --status-draft: #8764b8;
+  --status-submitted: #0078d4;
+  --status-under-review: #ff8c00;
+  --status-approved: #107c10;
+  --status-rejected: #d13438;
+  --status-pending-info: #8764b8;
+  
+  // Risk Level Colors
+  --risk-level-1: #107c10;  // Verde - Baixo
+  --risk-level-2: #ffaa44;  // Amarelo - Médio
+  --risk-level-3: #ff8c00;  // Laranja - Alto
+  --risk-level-4: #d13438;  // Vermelho - Muito Alto
+  
+  // Grayscale
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  
+  // Background Colors
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f5f5f5;
+  
+  // Border Colors
+  --border-light: #e1e5e9;
+  --border-medium: #d0d7de;
+  --border-dark: #8c959f;
+}
+
+// === TIPOGRAFIA ===
+:root {
+  // Font Families
+  --font-family-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-family-mono: 'Courier New', Courier, monospace;
+  
+  // Font Sizes
+  --font-size-xs: 0.75rem;    // 12px
+  --font-size-sm: 0.875rem;   // 14px
+  --font-size-base: 1rem;     // 16px
+  --font-size-lg: 1.125rem;   // 18px
+  --font-size-xl: 1.25rem;    // 20px
+  --font-size-2xl: 1.5rem;    // 24px
+  --font-size-3xl: 1.875rem;  // 30px
+  --font-size-4xl: 2.25rem;   // 36px
+  
+  // Font Weights
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // Line Heights
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+}
+
+// === ESPAÇAMENTO ===
+:root {
+  --spacing-xs: 0.25rem;    // 4px
+  --spacing-sm: 0.5rem;     // 8px
+  --spacing-md: 0.75rem;    // 12px
+  --spacing-base: 1rem;     // 16px
+  --spacing-lg: 1.5rem;     // 24px
+  --spacing-xl: 2rem;       // 32px
+  --spacing-2xl: 3rem;      // 48px
+  --spacing-3xl: 4rem;      // 64px
+}
+
+// === SOMBRAS ===
+:root {
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+// === TRANSIÇÕES ===
+:root {
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+// === BORDER RADIUS ===
+:root {
+  --radius-sm: 0.25rem;   // 4px
+  --radius-md: 0.375rem;  // 6px
+  --radius-lg: 0.5rem;    // 8px
+  --radius-xl: 0.75rem;   // 12px
+  --radius-2xl: 1rem;     // 16px
+  --radius-full: 9999px;
+}
+
+// === CLASSES UTILITÁRIAS ===
+
+// Text Utilities
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+// Color Utilities
+.text-primary { color: var(--hse-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-gray-500 { color: var(--gray-500); }
+.text-gray-700 { color: var(--gray-700); }
+.text-gray-900 { color: var(--gray-900); }
+
+// Background Utilities
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-error { background-color: var(--color-error); }
+
+// Spacing Utilities
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-base { padding: var(--spacing-base); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+.m-xs { margin: var(--spacing-xs); }
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.m-base { margin: var(--spacing-base); }
+.m-lg { margin: var(--spacing-lg); }
+.m-xl { margin: var(--spacing-xl); }
+
+// Shadow Utilities
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+// Border Radius Utilities
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+
+// Transition Utilities
+.transition-fast { transition: all var(--transition-fast); }
+.transition-base { transition: all var(--transition-base); }
+.transition-slow { transition: all var(--transition-slow); }

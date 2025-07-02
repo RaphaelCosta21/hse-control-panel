@@ -1,0 +1,154 @@
+.modalContainer {
+  .modalContent {
+    padding: 32px;
+    min-width: 700px;
+    max-width: 900px;
+    max-height: 80vh;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+
+    .modalHeader {
+      margin-bottom: 24px;
+
+      .headerIcon {
+        font-size: 24px;
+        color: var(--ms-color-themePrimary);
+      }
+
+      .title {
+        margin: 0;
+        color: var(--ms-color-neutralPrimary);
+        font-weight: 600;
+      }
+
+      .subtitle {
+        margin: 4px 0 0 0;
+        color: var(--ms-color-neutralSecondary);
+      }
+    }
+
+    .pivotTabs {
+      margin-bottom: 16px;
+    }
+
+    .tabContent {
+      padding: 16px 0;
+      min-height: 300px;
+    }
+
+    .formSection {
+      background-color: var(--ms-color-neutralLighter);
+      padding: 20px;
+      border-radius: 6px;
+      border-left: 4px solid var(--ms-color-themePrimary);
+    }
+
+    .formActions {
+      padding: 16px 0;
+      border-top: 1px solid var(--ms-color-neutralLight);
+    }
+
+    .historyHeader {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--ms-color-neutralLight);
+
+      .historyTitle {
+        font-weight: 600;
+        color: var(--ms-color-neutralPrimary);
+      }
+    }
+
+    .invitesContainer {
+      .invitesList {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid var(--ms-color-neutralLight);
+        border-radius: 4px;
+        background-color: var(--ms-color-white);
+
+        :global(.ms-DetailsHeader) {
+          background-color: var(--ms-color-neutralLighter);
+          font-weight: 600;
+        }
+
+        :global(.ms-DetailsRow) {
+          &:hover {
+            background-color: var(--ms-color-neutralLighter);
+          }
+        }
+      }
+
+      .invitesCount {
+        margin-top: 8px;
+        color: var(--ms-color-neutralSecondary);
+        font-style: italic;
+        text-align: center;
+        display: block;
+      }
+    }
+
+    .emailIcon {
+      color: var(--ms-color-themePrimary);
+      font-size: 14px;
+    }
+
+    .userIcon {
+      color: var(--ms-color-teal);
+      font-size: 14px;
+    }
+
+    .dateIcon {
+      color: var(--ms-color-orange);
+      font-size: 14px;
+    }
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .modalContainer {
+    .modalContent {
+      padding: 20px;
+      min-width: 90vw;
+      max-width: 95vw;
+
+      .formSection {
+        padding: 16px;
+      }
+
+      .tabContent {
+        min-height: 250px;
+      }
+
+      .invitesContainer {
+        .invitesList {
+          max-height: 300px;
+        }
+      }
+    }
+  }
+}
+
+/* Tema escuro */
+@media (prefers-color-scheme: dark) {
+  .modalContainer {
+    .modalContent {
+      background-color: var(--ms-color-neutralDark);
+      color: var(--ms-color-white);
+
+      .formSection {
+        background-color: var(--ms-color-neutralQuaternaryAlt);
+      }
+
+      .invitesContainer {
+        .invitesList {
+          background-color: var(--ms-color-neutralDark);
+          border-color: var(--ms-color-neutralQuaternary);
+        }
+      }
+    }
+  }
+}

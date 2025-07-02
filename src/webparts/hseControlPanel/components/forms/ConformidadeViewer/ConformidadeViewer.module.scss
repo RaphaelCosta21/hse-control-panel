@@ -1,0 +1,73 @@
+.conformidadeViewer {
+  padding: 16px;
+
+  .summaryCards {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .summaryCard {
+    background: var(--white);
+    border: 1px solid var(--neutralLight);
+    border-radius: 4px;
+    padding: 16px;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .cardLabel {
+      color: var(--neutralSecondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .cardValueSuccess {
+      color: #107c10;
+      font-weight: 600;
+    }
+
+    .cardValueError {
+      color: #d13438;
+      font-weight: 600;
+    }
+
+    .cardValueNeutral {
+      color: var(--neutralSecondary);
+      font-weight: 600;
+    }
+  }
+
+  .sectionTitle {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--neutralPrimary);
+  }
+
+  .conformidadeTable {
+    background: var(--white);
+    border: 1px solid var(--neutralLight);
+    border-radius: 4px;
+
+    :global {
+      .ms-DetailsHeader {
+        background: var(--neutralLighter);
+        border-bottom: 1px solid var(--neutralLight);
+      }
+
+      .ms-DetailsRow {
+        border-bottom: 1px solid var(--neutralLighterAlt);
+
+        &:hover {
+          background: var(--neutralLighterAlt);
+        }
+      }
+
+      .ms-DetailsRow-cell {
+        padding: 12px 8px;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}

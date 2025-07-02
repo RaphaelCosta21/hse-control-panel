@@ -1,0 +1,44 @@
+.riskBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  .level {
+    font-size: 0.875rem;
+    font-weight: 800;
+  }
+
+  .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  // Grau de Risco 1 - Baixo (Verde)
+  &.level1 {
+    background: #107c10;
+    color: white;
+  }
+
+  // Grau de Risco 2 - Médio (Amarelo)
+  &.level2 {
+    background: #ffaa44;
+    color: white;
+  }
+
+  // Grau de Risco 3 - Alto (Laranja)
+  &.level3 {
+    background: #ff8c00;
+    color: white;
+  }
+
+  // Grau de Risco 4 - Muito Alto (Vermelho)
+  &.level4 {
+    background: #d13438;
+    color: white;
+  }
+}

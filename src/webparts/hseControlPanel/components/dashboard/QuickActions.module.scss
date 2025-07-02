@@ -1,0 +1,99 @@
+@import "~@fluentui/react/dist/sass/References.scss";
+
+.quickActions {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #edebe9;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #323130;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.actionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.actionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  width: 100%;
+  height: 44px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid #d1d1d1;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  // Primary button specific styles
+  &.ms-Button--primary {
+    background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+    border: none;
+
+    &:hover {
+      background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
+    }
+  }
+
+  // Default button specific styles
+  &.ms-Button--default {
+    background: white;
+
+    &:hover {
+      background: #f3f2f1;
+      border-color: #0078d4;
+    }
+  }
+}
+
+.actionDescription {
+  font-size: 0.85rem;
+  color: #605e5c;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .quickActions {
+    padding: 1rem;
+  }
+
+  .actionsGrid {
+    gap: 0.75rem;
+  }
+
+  .actionButton {
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .actionDescription {
+    font-size: 0.8rem;
+  }
+}

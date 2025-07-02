@@ -1,0 +1,117 @@
+.formFilters {
+  background: var(--colorNeutralBackground1);
+  border: 1px solid var(--colorNeutralStroke2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+
+  .filtersRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+
+    .filterGroup {
+      display: flex;
+      flex-direction: column;
+      min-width: 160px;
+
+      .filterLabel {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--colorNeutralForeground2);
+        margin-bottom: 4px;
+      }
+
+      .filterDropdown {
+        min-width: 160px;
+
+        :global(.ms-Dropdown-container) {
+          .ms-Dropdown {
+            border-radius: 4px;
+            border: 1px solid var(--colorNeutralStroke1);
+
+            &:hover {
+              border-color: var(--colorNeutralStroke1Hover);
+            }
+
+            &:focus {
+              border-color: var(--colorBrandBackground);
+            }
+          }
+        }
+      }
+
+      .datePicker {
+        min-width: 140px;
+
+        :global(.ms-DatePicker-textField) {
+          .ms-TextField-fieldGroup {
+            border-radius: 4px;
+            border: 1px solid var(--colorNeutralStroke1);
+
+            &:hover {
+              border-color: var(--colorNeutralStroke1Hover);
+            }
+
+            &.is-focused {
+              border-color: var(--colorBrandBackground);
+            }
+          }
+        }
+      }
+    }
+
+    .filterActions {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+
+      .resetButton {
+        min-width: 120px;
+        background: var(--colorNeutralBackground1);
+        border: 1px solid var(--colorNeutralStroke1);
+        color: var(--colorNeutralForeground1);
+
+        &:hover {
+          background: var(--colorNeutralBackground1Hover);
+          border-color: var(--colorNeutralStroke1Hover);
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .formFilters {
+    .filtersRow {
+      flex-direction: column;
+      align-items: stretch;
+
+      .filterGroup {
+        min-width: 100%;
+      }
+
+      .filterActions {
+        margin-left: 0;
+        margin-top: 8px;
+
+        .resetButton {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .formFilters {
+    .filtersRow {
+      .filterGroup {
+        min-width: 140px;
+        flex: 1;
+      }
+    }
+  }
+}

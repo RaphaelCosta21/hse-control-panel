@@ -1,0 +1,51 @@
+.progressIndicator {
+  width: 100%;
+
+  .labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+
+    .label {
+      font-weight: 600;
+      color: var(--neutralPrimary);
+    }
+
+    .percentage {
+      font-weight: 600;
+      color: var(--themePrimary);
+    }
+  }
+
+  .progressBar {
+    :global {
+      .ms-ProgressIndicator-itemProgress {
+        background-color: var(--themePrimary);
+        border-radius: 2px;
+      }
+
+      .ms-ProgressIndicator-progressTrack {
+        background-color: var(--neutralLighter);
+        border-radius: 2px;
+      }
+    }
+  }
+
+  .description {
+    color: var(--neutralSecondary);
+    margin-top: 4px;
+  }
+
+  &.small .progressBar :global .ms-ProgressIndicator-progressTrack {
+    height: 4px;
+  }
+
+  &.medium .progressBar :global .ms-ProgressIndicator-progressTrack {
+    height: 6px;
+  }
+
+  &.large .progressBar :global .ms-ProgressIndicator-progressTrack {
+    height: 8px;
+  }
+}

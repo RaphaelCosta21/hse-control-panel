@@ -1,0 +1,22 @@
+.dateRangePicker {
+  background-color: var(--neutral-background-1);
+  border: 1px solid var(--neutral-stroke-accessible-rest);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.dateRangeSeparator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+  color: var(--neutral-foreground-2);
+}
+
+.quickRangeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}

@@ -1,0 +1,73 @@
+.statusChart {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e1e5e9;
+
+  h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #323130;
+  }
+
+  .chartContainer {
+    margin-bottom: 20px;
+  }
+
+  .tooltip {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 4px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+
+    p {
+      margin: 0;
+      color: #323130;
+    }
+  }
+
+  .chartStats {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 16px;
+    border-top: 1px solid #f3f2f1;
+
+    .statItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .statLabel {
+        font-size: 0.75rem;
+        color: #8a8886;
+        font-weight: 500;
+      }
+
+      .statValue {
+        font-size: 1.125rem;
+        color: #323130;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .statusChart {
+    .chartStats {
+      flex-direction: column;
+      gap: 12px;
+
+      .statItem {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  }
+}

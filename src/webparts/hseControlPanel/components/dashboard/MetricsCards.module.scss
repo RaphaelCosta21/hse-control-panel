@@ -1,0 +1,40 @@
+.metricsContainer {
+  margin-bottom: 32px;
+}
+
+.metricsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1200px) {
+  .metricsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metricsRow {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

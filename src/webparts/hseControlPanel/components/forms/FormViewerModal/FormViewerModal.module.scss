@@ -1,0 +1,27 @@
+.formViewerModal {
+  .modalContent {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 200px;
+  }
+
+  .formContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+
+  .commandBar {
+    border-bottom: 1px solid var(--colorNeutralStroke2);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+  }
+}

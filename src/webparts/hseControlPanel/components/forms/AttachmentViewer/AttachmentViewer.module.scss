@@ -1,0 +1,243 @@
+@import "~@fluentui/react/dist/sass/References.scss";
+
+.attachmentViewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: $ms-color-white;
+}
+
+.header {
+  padding: 20px;
+  border-bottom: 1px solid $ms-color-neutralLight;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: $ms-color-neutralPrimary;
+  margin: 0 0 10px 0;
+}
+
+.summary {
+  margin-bottom: 20px;
+}
+
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: $ms-color-neutralLighter;
+  border-radius: 4px;
+  border: 1px solid $ms-color-neutralQuaternaryAlt;
+}
+
+.cardIcon {
+  font-size: 16px;
+  margin-right: 8px;
+  color: $ms-color-themePrimary;
+}
+
+.cardValue {
+  font-size: 18px;
+  font-weight: 600;
+  color: $ms-color-neutralPrimary;
+  margin: 0;
+}
+
+.cardLabel {
+  font-size: 12px;
+  color: $ms-color-neutralSecondary;
+  margin: 2px 0 0 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid $ms-color-neutralLight;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.categorySection {
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.categoryTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: $ms-color-neutralPrimary;
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid $ms-color-themePrimary;
+}
+
+.attachmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachmentItem {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: $ms-color-neutralLighterAlt;
+  border: 1px solid $ms-color-neutralQuaternaryAlt;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: $ms-color-neutralLighter;
+    border-color: $ms-color-neutralTertiary;
+  }
+}
+
+.attachmentIcon,
+.fileIcon {
+  font-size: 20px;
+  color: $ms-color-themePrimary;
+  margin-right: 12px;
+  min-width: 20px;
+}
+
+.attachmentInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName,
+.fileNameCell {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ms-color-neutralPrimary;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: $ms-color-neutralSecondary;
+  margin: 0;
+}
+
+.uploadDate {
+  font-size: 12px;
+  color: $ms-color-neutralSecondary;
+  margin: 0;
+}
+
+.attachmentActions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.actionButton {
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+
+  .ms-Button-icon {
+    font-size: 14px;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: $ms-color-neutralSecondary;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  color: $ms-color-neutralTertiary;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: $ms-color-neutralSecondary;
+  margin: 0;
+}
+
+// Additional classes for file containers and lists
+.filesContainer {
+  margin-top: 20px;
+  border: 1px solid $ms-color-neutralQuaternaryAlt;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.filesList {
+  .ms-DetailsList {
+    .ms-DetailsHeader {
+      background-color: $ms-color-neutralLighterAlt;
+    }
+
+    .ms-DetailsRow {
+      &:hover {
+        background-color: $ms-color-neutralLighter;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .summaryCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .attachmentItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .attachmentActions {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .summaryCards {
+    grid-template-columns: 1fr;
+  }
+
+  .header,
+  .toolbar,
+  .content {
+    padding: 15px;
+  }
+}

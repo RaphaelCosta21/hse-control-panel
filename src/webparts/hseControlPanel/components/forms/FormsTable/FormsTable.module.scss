@@ -1,0 +1,219 @@
+.formsTable {
+  width: 100%;
+  background: var(--colorNeutralBackground1);
+  border-radius: 8px;
+  border: 1px solid var(--colorNeutralStroke2);
+  overflow: hidden;
+
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    color: var(--colorNeutralForeground2);
+    font-size: 14px;
+  }
+
+  .detailsList {
+    :global(.ms-DetailsHeader) {
+      background-color: var(--colorNeutralBackground2);
+      border-bottom: 1px solid var(--colorNeutralStroke2);
+
+      .ms-DetailsHeader-cell {
+        font-weight: 600;
+        color: var(--colorNeutralForeground1);
+        font-size: 13px;
+
+        &:hover {
+          background-color: var(--colorNeutralBackground2Hover);
+        }
+      }
+    }
+
+    :global(.ms-DetailsRow) {
+      border-bottom: 1px solid var(--colorNeutralStroke2);
+
+      &:hover {
+        background-color: var(--colorNeutralBackground1Hover);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .ms-DetailsRow-cell {
+        padding: 12px 8px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  .companyCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .companyName {
+      font-weight: 600;
+      color: var(--colorNeutralForeground1);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .companyCNPJ {
+      font-size: 11px;
+      color: var(--colorNeutralForeground3);
+      font-family: "Consolas", "Monaco", monospace;
+    }
+  }
+
+  .dateCell {
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 12px;
+    color: var(--colorNeutralForeground2);
+  }
+
+  .progressCell {
+    display: flex;
+    align-items: center;
+
+    .progressBar {
+      width: 100%;
+      max-width: 120px;
+
+      :global(.ms-ProgressIndicator-progressTrack) {
+        height: 6px;
+        border-radius: 3px;
+        background-color: var(--colorNeutralBackground3);
+      }
+
+      :global(.ms-ProgressIndicator-progressBar) {
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--colorPaletteGreenBackground3),
+          var(--colorPaletteGreenForeground1)
+        );
+      }
+
+      :global(.ms-ProgressIndicator-itemDescription) {
+        font-size: 11px;
+        color: var(--colorNeutralForeground2);
+        margin-top: 2px;
+        text-align: center;
+      }
+    }
+  }
+
+  .actionsCell {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    .actionButton {
+      min-width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 1px solid var(--colorNeutralStroke2);
+      border-radius: 4px;
+      background: var(--colorNeutralBackground1);
+      color: var(--colorNeutralForeground2);
+
+      &:hover {
+        background: var(--colorNeutralBackground1Hover);
+        border-color: var(--colorNeutralStroke1Hover);
+        color: var(--colorNeutralForeground1);
+      }
+
+      &:active {
+        background: var(--colorNeutralBackground1Pressed);
+      }
+
+      .ms-Icon {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .attachmentCell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .attachmentButton {
+      min-width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+
+      &:hover {
+        background: var(--colorNeutralBackground1Hover);
+      }
+
+      .ms-Icon {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+
+    .emptyIcon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .emptyText {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--colorNeutralForeground2);
+      margin-bottom: 8px;
+    }
+
+    .emptySubtext {
+      font-size: 14px;
+      color: var(--colorNeutralForeground3);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .formsTable {
+    .companyCell {
+      .companyName {
+        font-size: 12px;
+      }
+
+      .companyCNPJ {
+        font-size: 10px;
+      }
+    }
+
+    .actionsCell {
+      flex-direction: column;
+      gap: 2px;
+
+      .actionButton {
+        min-width: 28px;
+        height: 28px;
+
+        .ms-Icon {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

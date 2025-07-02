@@ -1,0 +1,45 @@
+.searchBoxContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .searchBox {
+    width: 100%;
+    max-width: 400px;
+
+    :global(.ms-SearchBox-field) {
+      border-radius: 4px;
+      border: 1px solid var(--colorNeutralStroke1);
+      font-size: 14px;
+      padding: 8px 12px;
+
+      &:focus {
+        border-color: var(--colorBrandBackground);
+        box-shadow: 0 0 0 1px var(--colorBrandBackground);
+      }
+    }
+
+    :global(.ms-SearchBox-icon) {
+      color: var(--colorNeutralForeground3);
+      font-size: 16px;
+    }
+
+    :global(.ms-SearchBox-clearButton) {
+      color: var(--colorNeutralForeground3);
+
+      &:hover {
+        color: var(--colorNeutralForeground1);
+        background-color: var(--colorNeutralBackground1Hover);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .searchBoxContainer {
+    .searchBox {
+      max-width: 100%;
+    }
+  }
+}

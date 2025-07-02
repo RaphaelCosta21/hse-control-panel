@@ -1,0 +1,86 @@
+.dadosGeraisViewer {
+  padding: 16px;
+
+  .mainSection {
+    display: flex;
+    gap: 32px;
+  }
+
+  .leftColumn {
+    flex: 2;
+    min-width: 0;
+  }
+
+  .rightColumn {
+    flex: 1;
+    min-width: 300px;
+    background: var(--neutralLighterAlt);
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  .field {
+    margin-bottom: 8px;
+  }
+
+  .halfField {
+    flex: 1;
+    margin-bottom: 8px;
+  }
+
+  .quarterField {
+    flex: 0 0 80px;
+    margin-bottom: 8px;
+  }
+
+  .responsibleInfo {
+    background: var(--white);
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--neutralLight);
+    margin-bottom: 20px;
+
+    .persona {
+      margin-bottom: 12px;
+    }
+
+    .contactInfo {
+      padding-left: 8px;
+    }
+  }
+
+  .evaluationInfo {
+    background: var(--white);
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--neutralLight);
+
+    .infoRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+
+      .label {
+        font-weight: 600;
+        color: var(--neutralSecondary);
+      }
+
+      .statusText {
+        color: var(--themePrimary);
+        font-weight: 600;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mainSection {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .rightColumn {
+      min-width: auto;
+    }
+  }
+}

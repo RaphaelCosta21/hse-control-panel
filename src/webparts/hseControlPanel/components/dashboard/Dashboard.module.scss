@@ -1,0 +1,112 @@
+.dashboard {
+  padding: 24px;
+  background: #f8f9fa;
+  min-height: 100vh;
+
+  .dashboardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #323130;
+    }
+
+    .refreshButton {
+      background: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: #106ebe;
+      }
+    }
+  }
+
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #8a8886;
+    font-size: 1rem;
+  }
+
+  .dashboardGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+
+    .chartSection {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #edebe9;
+    }
+
+    .sidebarSection {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .activitySection {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #edebe9;
+      flex: 1;
+    }
+
+    .quickActionsSection {
+      background: white;
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #edebe9;
+      min-height: 300px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 16px;
+
+    .dashboardHeader {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .refreshButton {
+        align-self: flex-end;
+      }
+    }
+
+    .dashboardGrid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr 1fr;
+
+    .quickActionsSection {
+      grid-column: 1 / -1;
+    }
+  }
+}

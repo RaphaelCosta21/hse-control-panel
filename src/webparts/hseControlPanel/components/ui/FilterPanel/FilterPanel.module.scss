@@ -1,0 +1,65 @@
+@import "~@fluentui/react/dist/sass/References.scss";
+
+.filterPanel {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #edebe9;
+  overflow: hidden;
+}
+
+.filterHeader {
+  background: #f8f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #edebe9;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #323130;
+  }
+}
+
+.filterContent {
+  padding: 1.5rem;
+}
+
+.filterGroup {
+  margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filterActions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #edebe9;
+  background: #faf9f8;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .filterPanel {
+    margin: 0 -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .filterContent {
+    padding: 1rem;
+  }
+
+  .filterActions {
+    flex-direction: column;
+    gap: 0.75rem;
+
+    button {
+      width: 100%;
+    }
+  }
+}

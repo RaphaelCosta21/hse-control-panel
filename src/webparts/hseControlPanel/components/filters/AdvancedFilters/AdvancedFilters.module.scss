@@ -1,0 +1,21 @@
+.advancedFiltersPanel {
+  :global(.ms-Panel-content) {
+    padding: 24px;
+  }
+}
+
+.filterSection {
+  background-color: var(--neutral-background-1);
+  border: 1px solid var(--neutral-stroke-accessible-rest);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.activeFiltersInfo {
+  background-color: var(--palette-theme-lighter);
+  border: 1px solid var(--palette-theme-primary);
+  border-radius: 4px;
+  padding: 12px;
+  text-align: center;
+}

@@ -1,0 +1,33 @@
+.sectionTitle {
+  margin-bottom: 16px;
+
+  .titleRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+
+    .icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+  }
+
+  .mainTitle {
+    font-weight: 600;
+    color: var(--neutralPrimary);
+    border-bottom: 2px solid var(--themePrimary);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-weight: 600;
+    color: var(--neutralSecondary);
+    margin-bottom: 8px;
+  }
+
+  .description {
+    color: var(--neutralSecondary);
+    line-height: 1.4;
+  }
+}

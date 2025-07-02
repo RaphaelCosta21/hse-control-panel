@@ -1,0 +1,122 @@
+.settingsPage {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--ms-color-white);
+  min-height: 100vh;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ms-color-neutralLight);
+}
+
+.headerIcon {
+  font-size: 24px;
+  color: var(--ms-color-themePrimary);
+}
+
+.headerDescription {
+  margin-top: 8px;
+  color: var(--ms-color-neutralSecondary);
+}
+
+.content {
+  margin-bottom: 32px;
+}
+
+.settingsForm {
+  max-width: 800px;
+}
+
+.configGroup {
+  margin-bottom: 32px;
+}
+
+.groupIcon {
+  font-size: 18px;
+  color: var(--ms-color-themePrimary);
+}
+
+.groupTitle {
+  font-weight: 600;
+  color: var(--ms-color-neutralPrimary);
+}
+
+.configFields {
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.configField {
+  padding: 16px;
+  background-color: var(--ms-color-neutralLighter);
+  border-radius: 4px;
+  border-left: 4px solid var(--ms-color-themePrimary);
+}
+
+.fieldDescription {
+  margin-top: 4px;
+  color: var(--ms-color-neutralSecondary);
+  font-style: italic;
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--ms-color-white);
+  padding: 16px 0;
+  border-top: 1px solid var(--ms-color-neutralLight);
+  margin-top: 24px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .settingsPage {
+    padding: 16px;
+  }
+
+  .settingsForm {
+    max-width: 100%;
+  }
+
+  .configField {
+    padding: 12px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .configGroup {
+    margin-bottom: 24px;
+  }
+}
+
+/* Tema escuro */
+@media (prefers-color-scheme: dark) {
+  .settingsPage {
+    background-color: var(--ms-color-neutralDark);
+    color: var(--ms-color-white);
+  }
+
+  .configField {
+    background-color: var(--ms-color-neutralQuaternaryAlt);
+  }
+
+  .footer {
+    background-color: var(--ms-color-neutralDark);
+  }
+}

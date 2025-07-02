@@ -1,0 +1,18 @@
+.exportOptions {
+  background-color: var(--neutral-background-1);
+  border: 1px solid var(--neutral-stroke-accessible-rest);
+  border-radius: 6px;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.exportButton {
+  min-width: 120px;
+}
+
+.exportInfo {
+  background-color: var(--neutral-background-2);
+  padding: 12px;
+  border-radius: 4px;
+  border-left: 4px solid var(--palette-theme-primary);
+}

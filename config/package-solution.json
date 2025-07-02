@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "hse-control-panel-client-side-solution",
+    "id": "a9e6671e-767c-48ca-b87d-fdfdec7ce349",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "hse-control-panel description"
+      },
+      "longDescription": {
+        "default": "hse-control-panel description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "hse-control-panel Feature",
+        "description": "The feature that activates elements of the hse-control-panel solution.",
+        "id": "89e8dba6-caff-43b4-b833-5be0864a1e3f",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/hse-control-panel.sppkg"
+  }
+}

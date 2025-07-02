@@ -1,0 +1,77 @@
+.formsList {
+  width: 100%;
+  padding: 20px;
+  background: var(--colorNeutralBackground1);
+
+  .header {
+    margin-bottom: 20px;
+
+    .title {
+      font-weight: 600;
+      color: var(--colorNeutralForeground1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .commandBar {
+      :global(.ms-CommandBar) {
+        background: transparent;
+        border: none;
+      }
+    }
+  }
+
+  .filtersSection {
+    margin-bottom: 20px;
+
+    .searchContainer {
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .filtersContainer {
+      flex: 2;
+      min-width: 0;
+    }
+  }
+
+  .tableSection {
+    margin-bottom: 20px;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    border-top: 1px solid var(--colorNeutralStroke2);
+    background: var(--colorNeutralBackground2);
+    border-radius: 0 0 8px 8px;
+
+    .footerText {
+      color: var(--colorNeutralForeground2);
+      font-size: 13px;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .formsList {
+    padding: 16px;
+
+    .header {
+      .title {
+        font-size: 18px;
+      }
+    }
+
+    .filtersSection {
+      .searchContainer,
+      .filtersContainer {
+        max-width: 100%;
+        flex: none;
+      }
+    }
+  }
+}
