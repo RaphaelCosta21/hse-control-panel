@@ -2,98 +2,134 @@
 
 .quickActions {
   background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #edebe9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.08);
+  border: 1px solid #e8eaed;
+  height: fit-content;
 }
 
 .header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f8f9fa;
 
   h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #323130;
+    color: #2e4857;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
   }
 }
 
 .actionsGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .actionItem {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  text-align: center;
 }
 
 .actionButton {
   width: 100%;
-  height: 44px;
-  border-radius: 6px;
+  height: 50px;
+  border-radius: 8px;
   font-weight: 500;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
-  border: 1px solid #d1d1d1;
+  border: 1px solid #e8eaed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
   }
 
   &:active {
     transform: translateY(0);
   }
 
-  // Primary button specific styles
+  // Primary button - Oceaneering colors
   &.ms-Button--primary {
-    background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+    background: linear-gradient(135deg, #2e4857 0%, #1b2e3c 100%);
     border: none;
+    color: white;
 
     &:hover {
-      background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
+      background: linear-gradient(135deg, #1b2e3c 0%, #0f1a22 100%);
     }
   }
 
-  // Default button specific styles
+  // Default button
   &.ms-Button--default {
     background: white;
+    color: #2e4857;
 
     &:hover {
-      background: #f3f2f1;
-      border-color: #0078d4;
+      background: #f8f9fa;
+      border-color: #f5b800;
+      color: #2e4857;
+    }
+  }
+
+  // Orange accent buttons
+  &.accent {
+    background: linear-gradient(135deg, #f5b800 0%, #e85a00 100%);
+    border: none;
+    color: white;
+
+    &:hover {
+      background: linear-gradient(135deg, #e85a00 0%, #d54f00 100%);
+    }
+  }
+
+  // Green buttons
+  &.success {
+    background: linear-gradient(135deg, #4a9b7e 0%, #3a8b6e 100%);
+    border: none;
+    color: white;
+
+    &:hover {
+      background: linear-gradient(135deg, #3a8b6e 0%, #2a7b5e 100%);
     }
   }
 }
 
 .actionDescription {
-  font-size: 0.85rem;
-  color: #605e5c;
+  font-size: 0.75rem;
+  color: #6c757d;
   text-align: center;
-  margin-top: 0.25rem;
+  margin-top: 6px;
+  line-height: 1.2;
 }
 
 @media (max-width: 768px) {
   .quickActions {
-    padding: 1rem;
+    padding: 16px;
   }
 
   .actionsGrid {
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .actionButton {
-    height: 40px;
-    font-size: 0.9rem;
+    height: 44px;
+    font-size: 0.8rem;
   }
 
   .actionDescription {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 }

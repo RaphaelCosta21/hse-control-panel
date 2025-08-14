@@ -40,7 +40,7 @@ const MetricCard: React.FC<IMetricCardProps> = ({
 
   return (
     <div
-      className={`${styles.metricCard} ${className}`}
+      className={`${styles.metricCard} ${getColorClass(color)} ${className}`}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}

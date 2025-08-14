@@ -1,6 +1,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Icon } from "@fluentui/react";
 import { IActivityItem } from "../../types/IControlPanelData";
 import styles from "./ActivityFeed.module.scss";
 
@@ -41,7 +42,10 @@ const ActivityFeed: React.FC<IActivityFeedProps> = ({ activities }) => {
 
   return (
     <div className={styles.activityFeed}>
-      <h3>Atividade Recente</h3>
+      <h3>
+        <Icon iconName="History" />
+        Atividade Recente
+      </h3>
 
       {activities.length === 0 ? (
         <div className={styles.emptyState}>

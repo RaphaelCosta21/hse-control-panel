@@ -41,11 +41,54 @@
 
 .configGroup {
   margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid var(--neutral-lighter);
+  border-radius: 8px;
+  background-color: var(--neutral-lighter-alt);
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .groupIcon {
   font-size: 18px;
   color: var(--ms-color-themePrimary);
+}
+
+// Estilos para o componente de membros
+.settingsContainer {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.statsCard {
+  padding: 16px 20px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
+  border-radius: 12px;
+  color: white;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:first-child {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #1976d2 100%);
+  }
+
+  &:last-child {
+    background: linear-gradient(
+      135deg,
+      var(--secondary-color) 0%,
+      #7b1fa2 100%
+    );
+  }
 }
 
 .groupTitle {

@@ -2,56 +2,110 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e1e5e9;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.08);
+  border: 1px solid #e8eaed;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   h3 {
-    margin: 0 0 20px 0;
-    font-size: 1.125rem;
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #323130;
+    color: #2e4857;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .chartContainer {
-    margin-bottom: 20px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    margin-bottom: 16px;
   }
 
   .tooltip {
     background: white;
-    border: 1px solid #e1e5e9;
-    border-radius: 4px;
-    padding: 8px 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8eaed;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
     font-size: 0.875rem;
 
     p {
       margin: 0;
-      color: #323130;
+      color: #003366;
+      font-weight: 500;
     }
   }
 
   .chartStats {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
     padding-top: 16px;
-    border-top: 1px solid #f3f2f1;
+    border-top: 1px solid #f0f2f5;
 
     .statItem {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #e8f4fd;
+        transform: translateY(-1px);
+      }
 
       .statLabel {
         font-size: 0.75rem;
-        color: #8a8886;
+        color: #6c757d;
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .statValue {
-        font-size: 1.125rem;
-        color: #323130;
-        font-weight: 600;
+        font-size: 1.25rem;
+        color: #2e4857;
+        font-weight: 700;
+      }
+
+      &.total .statValue {
+        color: #2e4857;
+      }
+
+      &.avg .statValue {
+        color: #f5b800;
+      }
+    }
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: center;
+
+    .legendItem {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #6c757d;
+
+      .legendColor {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
       }
     }
   }
@@ -59,14 +113,21 @@
 
 @media (max-width: 768px) {
   .statusChart {
+    padding: 16px;
+
+    .chartContainer {
+      min-height: 200px;
+    }
+
     .chartStats {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: 12px;
 
       .statItem {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        text-align: left;
       }
     }
   }
