@@ -19,7 +19,7 @@ export interface ITeamMember {
   id: number;
   name: string;
   email: string;
-  team: "HSE" | "Compras";
+  team: "HSE" | "Compras" | "Outros";
   role: string;
   isActive: boolean;
   photoUrl?: string;
@@ -28,6 +28,7 @@ export interface ITeamMember {
 export interface IMembersData {
   hseMembers: ITeamMember[];
   comprasMembers: ITeamMember[];
+  outrosMembers: ITeamMember[];
 }
 
 export interface ISharePointUser {

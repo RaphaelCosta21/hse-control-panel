@@ -4,9 +4,6 @@ import {
   Text,
   PrimaryButton,
   DefaultButton,
-  DetailsList,
-  IColumn,
-  SelectionMode,
   CommandBar,
   ICommandBarItemProps,
   Dialog,
@@ -22,18 +19,15 @@ import {
   Persona,
   PersonaSize,
   PersonaPresence,
-  SearchBox,
-  List,
-  FocusZone,
-  FocusZoneDirection,
 } from "@fluentui/react";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
+import { PeoplePicker } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { LivePersona } from "@pnp/spfx-controls-react/lib/LivePersona";
 import styles from "../SettingsPage.module.scss";
 import { MembersService } from "../../../services/MembersService";
 import {
   ITeamMember,
   IMembersData,
-  ISharePointUser,
 } from "../../../types/IMember";
 
 export interface IMembersManagementProps {
@@ -51,13 +45,6 @@ interface IMembersManagementState {
   message: string;
   messageType: MessageBarType;
   saving: boolean;
-
-  // Estados para busca de pessoas
-  userSearchText: string;
-  searchResults: ISharePointUser[];
-  selectedUser: ISharePointUser | undefined;
-  showUserPicker: boolean;
-  searchingUsers: boolean;
 }
 
 export class MembersManagement extends React.Component<
@@ -72,7 +59,7 @@ export class MembersManagement extends React.Component<
     this.membersService = new MembersService(props.context);
 
     this.state = {
-      membersData: { hseMembers: [], comprasMembers: [] },
+      membersData: { hseMembers: [], comprasMembers: [], outrosMembers: [] },
       loading: true,
       showAddDialog: false,
       showEditDialog: false,
@@ -81,18 +68,11 @@ export class MembersManagement extends React.Component<
       message: "",
       messageType: MessageBarType.info,
       saving: false,
-
-      // Estados para busca de pessoas
-      userSearchText: "",
-      searchResults: [],
-      selectedUser: undefined,
-      showUserPicker: false,
-      searchingUsers: false,
     };
   }
 
   public componentDidMount(): void {
-    this.loadMembers();
+    this.loadMembers().catch(console.error);
   }
 
   private async loadMembers(): Promise<void> {
@@ -101,102 +81,13 @@ export class MembersManagement extends React.Component<
       const membersData = await this.membersService.getTeamMembers();
       this.setState({ membersData, loading: false });
     } catch (error) {
+      console.error("Erro ao carregar membros:", error);
       this.setState({
         loading: false,
         message: "Erro ao carregar membros da equipe",
         messageType: MessageBarType.error,
       });
     }
-  }
-
-  private getColumns(): IColumn[] {
-    return [
-      {
-        key: "photo",
-        name: "",
-        fieldName: "photo",
-        minWidth: 60,
-        maxWidth: 60,
-        onRender: (item: ITeamMember) => (
-          <Persona
-            imageUrl={item.photoUrl}
-            text={item.name}
-            size={PersonaSize.size32}
-            presence={
-              item.isActive ? PersonaPresence.online : PersonaPresence.offline
-            }
-          />
-        ),
-      },
-      {
-        key: "name",
-        name: "Nome",
-        fieldName: "name",
-        minWidth: 150,
-        maxWidth: 200,
-        isResizable: true,
-      },
-      {
-        key: "email",
-        name: "Email",
-        fieldName: "email",
-        minWidth: 200,
-        maxWidth: 250,
-        isResizable: true,
-      },
-      {
-        key: "role",
-        name: "Cargo",
-        fieldName: "role",
-        minWidth: 120,
-        maxWidth: 150,
-        isResizable: true,
-      },
-      {
-        key: "team",
-        name: "Equipe",
-        fieldName: "team",
-        minWidth: 80,
-        maxWidth: 100,
-        onRender: (item: ITeamMember) => (
-          <Text
-            styles={{
-              root: {
-                padding: "4px 8px",
-                borderRadius: "12px",
-                backgroundColor: item.team === "HSE" ? "#e1f5fe" : "#f3e5f5",
-                color: item.team === "HSE" ? "#01579b" : "#4a148c",
-                fontSize: "12px",
-                fontWeight: "500",
-              },
-            }}
-          >
-            {item.team}
-          </Text>
-        ),
-      },
-      {
-        key: "status",
-        name: "Status",
-        fieldName: "isActive",
-        minWidth: 80,
-        maxWidth: 100,
-        onRender: (item: ITeamMember) => (
-          <Text
-            styles={{
-              root: {
-                color: item.isActive
-                  ? "var(--success-color)"
-                  : "var(--warning-color)",
-                fontWeight: "500",
-              },
-            }}
-          >
-            {item.isActive ? "Ativo" : "Inativo"}
-          </Text>
-        ),
-      },
-    ];
   }
 
   private getCommandBarItems(): ICommandBarItemProps[] {
@@ -219,51 +110,90 @@ export class MembersManagement extends React.Component<
   private teamOptions: IDropdownOption[] = [
     { key: "HSE", text: "HSE" },
     { key: "Compras", text: "Compras" },
+    { key: "Outros", text: "Outros" },
   ];
 
-  private async handleSearchUsers(searchText: string): Promise<void> {
-    if (!searchText || searchText.length < 2) {
-      this.setState({ searchResults: [], showUserPicker: false });
-      return;
-    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private onPeoplePickerChange = async (items: any[]): Promise<void> => {
+    if (items && items.length > 0) {
+      const selectedPerson = items[0];
+      console.log("Selected person data:", selectedPerson);
+      
+      // Primeiro, define valores básicos
+      const basicInfo = {
+        name: selectedPerson.text || selectedPerson.displayName || "",
+        email: selectedPerson.secondaryText || selectedPerson.email || selectedPerson.loginName || "",
+        role: selectedPerson.tertiaryText || selectedPerson.jobTitle || selectedPerson.optionalText || "",
+      };
 
-    this.setState({ searchingUsers: true, userSearchText: searchText });
-
-    try {
-      const users = await this.membersService.searchUsers(searchText);
+      // Tenta buscar informações mais detalhadas via Microsoft Graph API
+      if (selectedPerson.id || selectedPerson.loginName || basicInfo.email) {
+        try {
+          const graphClient = await this.props.context.msGraphClientFactory.getClient('3');
+          let userQuery = "";
+          
+          // Prioriza ID, depois loginName, depois email
+          if (selectedPerson.id) {
+            userQuery = selectedPerson.id;
+          } else if (selectedPerson.loginName) {
+            userQuery = selectedPerson.loginName;
+          } else {
+            userQuery = basicInfo.email;
+          }
+          
+          const user = await graphClient.api(`/users/${userQuery}`).get();
+          console.log("User data from Graph API:", user);
+          
+          // Atualiza com informações mais completas do Graph API
+          if (user.displayName) basicInfo.name = user.displayName;
+          if (user.mail || user.userPrincipalName) basicInfo.email = user.mail || user.userPrincipalName;
+          if (user.jobTitle) basicInfo.role = user.jobTitle;
+          
+        } catch (error) {
+          console.warn("Erro ao buscar dados via Graph API:", error);
+          // Se falhar com ID/loginName, tenta buscar pelo email
+          if (basicInfo.email && basicInfo.email !== (selectedPerson.id || selectedPerson.loginName)) {
+            try {
+              const graphClient = await this.props.context.msGraphClientFactory.getClient('3');
+              const users = await graphClient.api(`/users?$filter=mail eq '${basicInfo.email}' or userPrincipalName eq '${basicInfo.email}'`).get();
+              
+              if (users.value && users.value.length > 0) {
+                const user = users.value[0];
+                console.log("User data from Graph API (by email):", user);
+                
+                if (user.displayName) basicInfo.name = user.displayName;
+                if (user.jobTitle) basicInfo.role = user.jobTitle;
+              }
+            } catch (emailError) {
+              console.warn("Erro ao buscar dados via Graph API por email:", emailError);
+            }
+          }
+        }
+      }
+      
       this.setState({
-        searchResults: users,
-        showUserPicker: users.length > 0,
-        searchingUsers: false,
+        newMember: {
+          ...this.state.newMember,
+          ...basicInfo,
+          role: basicInfo.role || "Cargo não informado",
+        },
       });
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
+    } else {
       this.setState({
-        searchingUsers: false,
-        searchResults: [],
-        showUserPicker: false,
+        newMember: {
+          ...this.state.newMember,
+          name: "",
+          email: "",
+          role: "",
+        },
       });
     }
-  }
-
-  private handleSelectUser(user: ISharePointUser): void {
-    this.setState({
-      selectedUser: user,
-      userSearchText: user.displayName,
-      showUserPicker: false,
-      newMember: {
-        ...this.state.newMember,
-        name: user.displayName,
-        email: user.email,
-        role: user.jobTitle || "",
-      },
-    });
-  }
+  };
 
   private async handleAddMember(): Promise<void> {
     const { newMember } = this.state;
 
-    if (!newMember.name || !newMember.email || !newMember.role) {
+    if (!newMember.name || !newMember.email) {
       this.setState({
         message: "Por favor, preencha todos os campos obrigatórios",
         messageType: MessageBarType.error,
@@ -290,6 +220,7 @@ export class MembersManagement extends React.Component<
         throw new Error("Falha ao adicionar membro");
       }
     } catch (error) {
+      console.error("Erro ao adicionar membro:", error);
       this.setState({
         message: "Erro ao adicionar membro",
         messageType: MessageBarType.error,
@@ -324,6 +255,7 @@ export class MembersManagement extends React.Component<
         throw new Error("Falha ao atualizar membro");
       }
     } catch (error) {
+      console.error("Erro ao atualizar membro:", error);
       this.setState({
         message: "Erro ao atualizar membro",
         messageType: MessageBarType.error,
@@ -351,6 +283,7 @@ export class MembersManagement extends React.Component<
         throw new Error("Falha ao remover membro");
       }
     } catch (error) {
+      console.error("Erro ao remover membro:", error);
       this.setState({
         message: "Erro ao remover membro",
         messageType: MessageBarType.error,
@@ -369,17 +302,7 @@ export class MembersManagement extends React.Component<
       message,
       messageType,
       saving,
-      userSearchText,
-      searchResults,
-      selectedUser,
-      showUserPicker,
-      searchingUsers,
     } = this.state;
-
-    const allMembers = [
-      ...membersData.hseMembers,
-      ...membersData.comprasMembers,
-    ];
 
     if (loading) {
       return (
@@ -434,65 +357,447 @@ export class MembersManagement extends React.Component<
 
           {/* Statistics */}
           <Stack horizontal tokens={{ childrenGap: 20 }}>
-            <div className={styles.statsCard}>
+            <div
+              style={{
+                padding: "20px",
+                borderRadius: "12px",
+                backgroundColor: "white",
+                border: "2px solid #e3f2fd",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                minWidth: "160px",
+                textAlign: "center",
+              }}
+            >
+              <Text
+                variant="large"
+                styles={{
+                  root: { 
+                    fontWeight: "700", 
+                    color: "#1976d2",
+                    marginBottom: "8px",
+                    display: "block"
+                  },
+                }}
+              >
+                {membersData.hseMembers.length}
+              </Text>
               <Text
                 variant="medium"
                 styles={{
-                  root: { fontWeight: "600", color: "var(--primary-color)" },
+                  root: { 
+                    fontWeight: "600", 
+                    color: "#1976d2",
+                    marginBottom: "4px",
+                    display: "block"
+                  },
                 }}
               >
                 Equipe HSE
               </Text>
-              <Text variant="xLarge" styles={{ root: { fontWeight: "700" } }}>
-                {membersData.hseMembers.length}
-              </Text>
-              <Text variant="small">
+              <Text 
+                variant="small" 
+                styles={{ 
+                  root: { 
+                    color: "#666",
+                    fontWeight: "500"
+                  } 
+                }}
+              >
                 {membersData.hseMembers.filter((m) => m.isActive).length} ativos
               </Text>
             </div>
 
-            <div className={styles.statsCard}>
+            <div
+              style={{
+                padding: "20px",
+                borderRadius: "12px",
+                backgroundColor: "white",
+                border: "2px solid #f3e5f5",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                minWidth: "160px",
+                textAlign: "center",
+              }}
+            >
+              <Text
+                variant="large"
+                styles={{
+                  root: { 
+                    fontWeight: "700", 
+                    color: "#7b1fa2",
+                    marginBottom: "8px",
+                    display: "block"
+                  },
+                }}
+              >
+                {membersData.comprasMembers.length}
+              </Text>
               <Text
                 variant="medium"
                 styles={{
-                  root: { fontWeight: "600", color: "var(--secondary-color)" },
+                  root: { 
+                    fontWeight: "600", 
+                    color: "#7b1fa2",
+                    marginBottom: "4px",
+                    display: "block"
+                  },
                 }}
               >
                 Equipe Compras
               </Text>
-              <Text variant="xLarge" styles={{ root: { fontWeight: "700" } }}>
-                {membersData.comprasMembers.length}
+              <Text 
+                variant="small" 
+                styles={{ 
+                  root: { 
+                    color: "#666",
+                    fontWeight: "500"
+                  } 
+                }}
+              >
+                {membersData.comprasMembers.filter((m) => m.isActive).length} ativos
               </Text>
-              <Text variant="small">
-                {membersData.comprasMembers.filter((m) => m.isActive).length}{" "}
-                ativos
+            </div>
+
+            <div
+              style={{
+                padding: "20px",
+                borderRadius: "12px",
+                backgroundColor: "white",
+                border: "2px solid #ede7f6",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                minWidth: "160px",
+                textAlign: "center",
+              }}
+            >
+              <Text
+                variant="large"
+                styles={{
+                  root: { 
+                    fontWeight: "700", 
+                    color: "#6a1b9a",
+                    marginBottom: "8px",
+                    display: "block"
+                  },
+                }}
+              >
+                {membersData.outrosMembers.length}
+              </Text>
+              <Text
+                variant="medium"
+                styles={{
+                  root: { 
+                    fontWeight: "600", 
+                    color: "#6a1b9a",
+                    marginBottom: "4px",
+                    display: "block"
+                  },
+                }}
+              >
+                Outros
+              </Text>
+              <Text 
+                variant="small" 
+                styles={{ 
+                  root: { 
+                    color: "#666",
+                    fontWeight: "500"
+                  } 
+                }}
+              >
+                {membersData.outrosMembers.filter((m) => m.isActive).length} ativos
               </Text>
             </div>
           </Stack>
 
-          {/* Members List */}
-          <DetailsList
-            items={allMembers}
-            columns={this.getColumns()}
-            selectionMode={SelectionMode.single}
-            onItemInvoked={(item) =>
-              this.setState({ selectedMember: item, showEditDialog: true })
-            }
-            onRenderRow={(props) => {
-              if (props) {
-                return (
-                  <div
-                    {...props}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      this.handleRemoveMember(props.item);
-                    }}
-                  />
-                );
-              }
-              return null;
-            }}
-          />
+          {/* Members by Team */}
+          <Stack tokens={{ childrenGap: 30 }}>
+            {/* HSE Team */}
+            {membersData.hseMembers.length > 0 && (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="large" styles={{ root: { fontWeight: "600", color: "var(--primary-color)" } }}>
+                  🛡️ Equipe HSE ({membersData.hseMembers.length})
+                </Text>
+                <Stack horizontal wrap tokens={{ childrenGap: 15 }}>
+                  {membersData.hseMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      onClick={() => this.setState({ selectedMember: member, showEditDialog: true })}
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #e1f5fe",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "white",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        minWidth: "280px",
+                        maxWidth: "420px",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+                        e.currentTarget.style.transform = "translateY(0px)";
+                      }}
+                    >
+                      <Stack tokens={{ childrenGap: 8 }}>
+                        <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }}>
+                          <Persona
+                            imageUrl={member.photoUrl}
+                            text={member.name}
+                            size={PersonaSize.size40}
+                            presence={member.isActive ? PersonaPresence.online : PersonaPresence.offline}
+                          />
+                          <Stack>
+                            <Text variant="medium" styles={{ root: { fontWeight: "600" } }}>
+                              {member.name}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#666" } }}>
+                              {member.email}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#1976d2", fontWeight: "600", marginTop: "2px" } }}>
+                              {member.role || "Cargo não informado"}
+                            </Text>
+                          </Stack>
+                        </Stack>
+                        <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                padding: "4px 8px",
+                                borderRadius: "12px",
+                                backgroundColor: "#e1f5fe",
+                                color: "#01579b",
+                                fontSize: "11px",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            HSE
+                          </Text>
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                color: member.isActive ? "#4caf50" : "#ff9800",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            {member.isActive ? "Ativo" : "Inativo"}
+                          </Text>
+                        </Stack>
+                      </Stack>
+                    </div>
+                  ))}
+                </Stack>
+              </Stack>
+            )}
+
+            {/* Compras Team */}
+            {membersData.comprasMembers.length > 0 && (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="large" styles={{ root: { fontWeight: "600", color: "var(--secondary-color)" } }}>
+                  🛒 Equipe Compras ({membersData.comprasMembers.length})
+                </Text>
+                <Stack horizontal wrap tokens={{ childrenGap: 15 }}>
+                  {membersData.comprasMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      onClick={() => this.setState({ selectedMember: member, showEditDialog: true })}
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #f3e5f5",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "white",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        minWidth: "280px",
+                        maxWidth: "420px",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+                        e.currentTarget.style.transform = "translateY(0px)";
+                      }}
+                    >
+                      <Stack tokens={{ childrenGap: 8 }}>
+                        <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }}>
+                          <Persona
+                            imageUrl={member.photoUrl}
+                            text={member.name}
+                            size={PersonaSize.size40}
+                            presence={member.isActive ? PersonaPresence.online : PersonaPresence.offline}
+                          />
+                          <Stack>
+                            <Text variant="medium" styles={{ root: { fontWeight: "600" } }}>
+                              {member.name}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#666" } }}>
+                              {member.email}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#7b1fa2", fontWeight: "600", marginTop: "2px" } }}>
+                              {member.role || "Cargo não informado"}
+                            </Text>
+                          </Stack>
+                        </Stack>
+                        <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                padding: "4px 8px",
+                                borderRadius: "12px",
+                                backgroundColor: "#f3e5f5",
+                                color: "#4a148c",
+                                fontSize: "11px",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            Compras
+                          </Text>
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                color: member.isActive ? "#4caf50" : "#ff9800",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            {member.isActive ? "Ativo" : "Inativo"}
+                          </Text>
+                        </Stack>
+                      </Stack>
+                    </div>
+                  ))}
+                </Stack>
+              </Stack>
+            )}
+
+            {/* Outros Team */}
+            {membersData.outrosMembers.length > 0 && (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="large" styles={{ root: { fontWeight: "600", color: "#6B46C1" } }}>
+                  👥 Outros ({membersData.outrosMembers.length})
+                </Text>
+                <Stack horizontal wrap tokens={{ childrenGap: 15 }}>
+                  {membersData.outrosMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      onClick={() => this.setState({ selectedMember: member, showEditDialog: true })}
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #ede9fe",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "white",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        minWidth: "280px",
+                        maxWidth: "420px",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+                        e.currentTarget.style.transform = "translateY(0px)";
+                      }}
+                    >
+                      <Stack tokens={{ childrenGap: 8 }}>
+                        <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }}>
+                          <Persona
+                            imageUrl={member.photoUrl}
+                            text={member.name}
+                            size={PersonaSize.size40}
+                            presence={member.isActive ? PersonaPresence.online : PersonaPresence.offline}
+                          />
+                          <Stack>
+                            <Text variant="medium" styles={{ root: { fontWeight: "600" } }}>
+                              {member.name}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#666" } }}>
+                              {member.email}
+                            </Text>
+                            <Text variant="small" styles={{ root: { color: "#6a1b9a", fontWeight: "600", marginTop: "2px" } }}>
+                              {member.role || "Cargo não informado"}
+                            </Text>
+                          </Stack>
+                        </Stack>
+                        <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                padding: "4px 8px",
+                                borderRadius: "12px",
+                                backgroundColor: "#ede9fe",
+                                color: "#6B46C1",
+                                fontSize: "11px",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            Outros
+                          </Text>
+                          <Text
+                            variant="small"
+                            styles={{
+                              root: {
+                                color: member.isActive ? "#4caf50" : "#ff9800",
+                                fontWeight: "500",
+                              },
+                            }}
+                          >
+                            {member.isActive ? "Ativo" : "Inativo"}
+                          </Text>
+                        </Stack>
+                      </Stack>
+                    </div>
+                  ))}
+                </Stack>
+              </Stack>
+            )}
+
+            {/* Empty State */}
+            {membersData.hseMembers.length === 0 && 
+             membersData.comprasMembers.length === 0 && 
+             membersData.outrosMembers.length === 0 && (
+              <Stack
+                horizontalAlign="center"
+                verticalAlign="center"
+                tokens={{ childrenGap: 16 }}
+                styles={{
+                  root: {
+                    padding: "40px",
+                    textAlign: "center",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "8px",
+                    border: "1px dashed #dee2e6",
+                  },
+                }}
+              >
+                <Text variant="xLarge" styles={{ root: { color: "#6c757d" } }}>
+                  👥
+                </Text>
+                <Text variant="large" styles={{ root: { fontWeight: "600", color: "#495057" } }}>
+                  Nenhum membro cadastrado
+                </Text>
+                <Text variant="medium" styles={{ root: { color: "#6c757d" } }}>
+                  Clique em &quot;Adicionar Membro&quot; para começar a gerenciar as equipes
+                </Text>
+              </Stack>
+            )}
+          </Stack>
 
           {/* Add Member Dialog */}
           <Dialog
@@ -506,7 +811,7 @@ export class MembersManagement extends React.Component<
             minWidth={500}
           >
             <Stack tokens={{ childrenGap: 15 }}>
-              {/* Seletor de Pessoas */}
+              {/* PeoplePicker */}
               <Stack>
                 <Text
                   variant="medium"
@@ -514,163 +819,76 @@ export class MembersManagement extends React.Component<
                 >
                   👤 Selecionar Pessoa *
                 </Text>
-                <SearchBox
-                  placeholder="Digite o nome da pessoa para buscar..."
-                  value={userSearchText}
-                  onChange={(_, value) => {
-                    this.setState({ userSearchText: value || "" });
-                    if (value && value.length >= 2) {
-                      this.handleSearchUsers(value).catch(console.error);
-                    } else {
-                      this.setState({
-                        showUserPicker: false,
-                        searchResults: [],
-                      });
-                    }
+                <PeoplePicker
+                  context={{
+                    absoluteUrl: this.props.context.pageContext.web.absoluteUrl,
+                    msGraphClientFactory: this.props.context.msGraphClientFactory,
+                    spHttpClient: this.props.context.spHttpClient
                   }}
-                  onSearch={(value) =>
-                    this.handleSearchUsers(value).catch(console.error)
-                  }
+                  titleText=""
+                  personSelectionLimit={1}
+                  groupName={""}
+                  showtooltip={true}
+                  required={true}
+                  disabled={false}
+                  onChange={this.onPeoplePickerChange}
+                  showHiddenInUI={false}
+                  principalTypes={[1, 2]}
+                  resolveDelay={1000}
+                  placeholder="Digite o nome da pessoa para buscar..."
+                  ensureUser={true}
+                  suggestionsLimit={10}
                 />
-
-                {/* Lista de resultados da busca */}
-                {showUserPicker && searchResults.length > 0 && (
-                  <Stack
-                    styles={{
-                      root: {
-                        border: "1px solid var(--neutral-lighter)",
-                        borderRadius: "4px",
-                        maxHeight: "200px",
-                        overflowY: "auto",
-                        backgroundColor: "white",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      },
+                
+                {/* Prévia das informações capturadas */}
+                {newMember.name && (
+                  <Stack 
+                    styles={{ 
+                      root: { 
+                        marginTop: "12px",
+                        padding: "16px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
+                        border: "1px solid #e9ecef"
+                      }
                     }}
+                    tokens={{ childrenGap: 12 }}
                   >
-                    {searchResults.map((user, index) => (
-                      <Stack
-                        key={index}
-                        horizontal
-                        verticalAlign="center"
-                        tokens={{ childrenGap: 12 }}
-                        styles={{
-                          root: {
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                            ":hover": {
-                              backgroundColor: "var(--neutral-lighter-alt)",
-                            },
-                          },
-                        }}
-                        onClick={() => this.handleSelectUser(user)}
-                      >
-                        <Persona
-                          text={user.displayName}
-                          secondaryText={user.email}
-                          tertiaryText={user.jobTitle}
-                          size={PersonaSize.size32}
-                          imageUrl={user.photoUrl}
+                    <Text variant="small" styles={{ root: { fontWeight: "600", color: "#495057" } }}>
+                      📋 Informações detectadas:
+                    </Text>
+                    
+                    {/* LivePersona para mostrar informações completas - oculto mas funcional */}
+                    {newMember.email && (
+                      <div style={{ display: 'none' }}>
+                        <LivePersona
+                          upn={newMember.email}
+                          template={"<div>{{displayName}} - {{jobTitle}}</div>"}
+                          serviceScope={this.props.context.serviceScope}
                         />
-                      </Stack>
-                    ))}
-                  </Stack>
-                )}
-
-                {searchingUsers && (
-                  <Stack
-                    horizontal
-                    verticalAlign="center"
-                    tokens={{ childrenGap: 8 }}
-                  >
-                    <Spinner size={0} />
-                    <Text variant="small">Buscando pessoas...</Text>
+                      </div>
+                    )}
+                    
+                    <Stack tokens={{ childrenGap: 8 }}>
+                      <Text variant="small">
+                        <span style={{ fontWeight: "500" }}>👤 Nome:</span> {newMember.name}
+                      </Text>
+                      <Text variant="small">
+                        <span style={{ fontWeight: "500" }}>📧 Email:</span> {newMember.email}
+                      </Text>
+                      <Text variant="small">
+                        <span style={{ fontWeight: "500" }}>💼 Cargo:</span> {" "}
+                        <span style={{ 
+                          color: newMember.role === "Cargo não informado" ? "#dc3545" : "#28a745",
+                          fontWeight: "600"
+                        }}>
+                          {newMember.role}
+                        </span>
+                      </Text>
+                    </Stack>
                   </Stack>
                 )}
               </Stack>
-
-              {/* Campos preenchidos automaticamente */}
-              {selectedUser && (
-                <Stack tokens={{ childrenGap: 10 }}>
-                  <MessageBar messageBarType={MessageBarType.success}>
-                    ✅ Pessoa selecionada:{" "}
-                    <strong>{selectedUser.displayName}</strong>
-                  </MessageBar>
-
-                  <TextField
-                    label="Nome (preenchido automaticamente)"
-                    value={newMember.name || ""}
-                    disabled
-                  />
-
-                  <TextField
-                    label="Email (preenchido automaticamente)"
-                    value={newMember.email || ""}
-                    disabled
-                  />
-
-                  <TextField
-                    label="Cargo *"
-                    value={newMember.role || ""}
-                    onChange={(_, value) =>
-                      this.setState({
-                        newMember: { ...newMember, role: value },
-                      })
-                    }
-                    placeholder="Cargo pode ser editado se necessário"
-                    required
-                  />
-                </Stack>
-              )}
-
-              {/* Campos manuais como fallback */}
-              {!selectedUser && (
-                <Stack tokens={{ childrenGap: 10 }}>
-                  <Text
-                    variant="small"
-                    styles={{
-                      root: {
-                        color: "var(--neutral-secondary)",
-                        fontStyle: "italic",
-                      },
-                    }}
-                  >
-                    💡 Ou preencha manualmente caso não encontre a pessoa:
-                  </Text>
-
-                  <TextField
-                    label="Nome *"
-                    value={newMember.name || ""}
-                    onChange={(_, value) =>
-                      this.setState({
-                        newMember: { ...newMember, name: value },
-                      })
-                    }
-                    required
-                  />
-
-                  <TextField
-                    label="Email *"
-                    value={newMember.email || ""}
-                    onChange={(_, value) =>
-                      this.setState({
-                        newMember: { ...newMember, email: value },
-                      })
-                    }
-                    required
-                  />
-
-                  <TextField
-                    label="Cargo *"
-                    value={newMember.role || ""}
-                    onChange={(_, value) =>
-                      this.setState({
-                        newMember: { ...newMember, role: value },
-                      })
-                    }
-                    required
-                  />
-                </Stack>
-              )}
 
               <Dropdown
                 label="Equipe *"
@@ -680,21 +898,11 @@ export class MembersManagement extends React.Component<
                   this.setState({
                     newMember: {
                       ...newMember,
-                      team: option?.key as "HSE" | "Compras",
+                      team: option?.key as "HSE" | "Compras" | "Outros",
                     },
                   })
                 }
                 required
-              />
-
-              <Toggle
-                label="Membro ativo"
-                checked={newMember.isActive}
-                onChange={(_, checked) =>
-                  this.setState({
-                    newMember: { ...newMember, isActive: checked },
-                  })
-                }
               />
             </Stack>
 
@@ -728,36 +936,30 @@ export class MembersManagement extends React.Component<
             {selectedMember && (
               <Stack tokens={{ childrenGap: 15 }}>
                 <TextField
-                  label="Nome *"
+                  label="Nome"
                   value={selectedMember.name}
-                  onChange={(_, value) =>
-                    this.setState({
-                      selectedMember: { ...selectedMember, name: value || "" },
-                    })
-                  }
-                  required
+                  disabled
+                  styles={{
+                    root: { opacity: 0.7 }
+                  }}
                 />
 
                 <TextField
-                  label="Email *"
+                  label="Email"
                   value={selectedMember.email}
-                  onChange={(_, value) =>
-                    this.setState({
-                      selectedMember: { ...selectedMember, email: value || "" },
-                    })
-                  }
-                  required
+                  disabled
+                  styles={{
+                    root: { opacity: 0.7 }
+                  }}
                 />
 
                 <TextField
-                  label="Cargo *"
+                  label="Cargo"
                   value={selectedMember.role}
-                  onChange={(_, value) =>
-                    this.setState({
-                      selectedMember: { ...selectedMember, role: value || "" },
-                    })
-                  }
-                  required
+                  disabled
+                  styles={{
+                    root: { opacity: 0.7 }
+                  }}
                 />
 
                 <Dropdown
@@ -768,7 +970,7 @@ export class MembersManagement extends React.Component<
                     this.setState({
                       selectedMember: {
                         ...selectedMember,
-                        team: option?.key as "HSE" | "Compras",
+                        team: option?.key as "HSE" | "Compras" | "Outros",
                       },
                     })
                   }
@@ -791,9 +993,9 @@ export class MembersManagement extends React.Component<
                 <Stack horizontal horizontalAlign="space-between">
                   <DefaultButton
                     text="🗑️ Remover Membro"
-                    onClick={() => {
+                    onClick={async () => {
                       this.setState({ showEditDialog: false });
-                      this.handleRemoveMember(selectedMember);
+                      await this.handleRemoveMember(selectedMember);
                     }}
                     styles={{
                       root: { color: "var(--error-color)" },

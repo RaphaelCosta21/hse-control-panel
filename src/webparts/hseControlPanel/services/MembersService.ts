@@ -56,12 +56,14 @@ export class MembersService {
       return {
         hseMembers: members.filter((m) => m.team === "HSE"),
         comprasMembers: members.filter((m) => m.team === "Compras"),
+        outrosMembers: members.filter((m) => m.team === "Outros"),
       };
     } catch (error) {
       console.error("Erro ao buscar membros:", error);
       return {
         hseMembers: [],
         comprasMembers: [],
+        outrosMembers: [],
       };
     }
   }
@@ -226,7 +228,7 @@ export class MembersService {
       console.error("Erro ao buscar usuários:", error);
 
       // Fallback: retornar usuários mockados se a busca falhar
-      if (searchText.toLowerCase().includes("raphael")) {
+      if (searchText.toLowerCase().indexOf("raphael") !== -1) {
         return [
           {
             id: "raphael.costa@oceaneering.com",
