@@ -4,10 +4,10 @@ import {
   IColumn,
   DetailsListLayoutMode,
   SelectionMode,
-  IconButton,
   ProgressIndicator,
+  DefaultButton,
 } from "@fluentui/react";
-import { StatusBadge, RiskBadge } from "../../ui";
+import { StatusBadge, UserCard } from "../../ui";
 import { IFormListItem } from "../../../types/IControlPanelData";
 import styles from "./FormsTable.module.scss";
 
@@ -15,6 +15,9 @@ export interface IFormsTableProps {
   forms: IFormListItem[];
   onView?: (form: IFormListItem) => void;
   onExport?: (form: IFormListItem) => void;
+  onStartReview?: (form: IFormListItem) => void;
+  onDownloadPDF?: (form: IFormListItem) => void;
+  onDownloadAttachments?: (form: IFormListItem) => void;
   loading?: boolean;
   className?: string;
 }
@@ -23,6 +26,9 @@ const FormsTable: React.FC<IFormsTableProps> = ({
   forms,
   onView,
   onExport,
+  onStartReview,
+  onDownloadPDF,
+  onDownloadAttachments,
   loading = false,
   className = "",
 }) => {
@@ -49,6 +55,209 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       );
     }
     return cnpj;
+  };
+
+  // Função para extrair data de criação do JSON DadosFormulario
+  const getCreationDate = (item: IFormListItem): string => {
+    try {
+      // O JSON está na propriedade DadosFormulario
+      let dadosFormulario = null;
+
+      if (item.metadata) {
+        dadosFormulario =
+          typeof item.metadata === "string"
+            ? JSON.parse(item.metadata)
+            : item.metadata;
+      } else if (item.DadosFormulario) {
+        dadosFormulario =
+          typeof item.DadosFormulario === "string"
+            ? JSON.parse(item.DadosFormulario)
+            : item.DadosFormulario;
+      }
+
+      if (
+        dadosFormulario &&
+        dadosFormulario.metadata &&
+        dadosFormulario.metadata.historicoStatusChange
+      ) {
+        const statusChange = dadosFormulario.metadata.historicoStatusChange;
+
+        // Procura por "Em Andamento" no histórico de status
+        if (
+          statusChange["Em Andamento"] &&
+          statusChange["Em Andamento"].dataAlteracao
+        ) {
+          return formatDate(statusChange["Em Andamento"].dataAlteracao);
+        }
+      }
+
+      // Fallback para dataSubmissao se não encontrar no metadata
+      if (item.dataSubmissao) {
+        return formatDate(item.dataSubmissao.toString());
+      }
+
+      return "N/A";
+    } catch (error) {
+      console.error("Erro ao extrair data de criação:", error);
+      return "N/A";
+    }
+  };
+
+  // Função para extrair data do último status do JSON DadosFormulario
+  const getLastStatusDate = (item: IFormListItem): string => {
+    try {
+      // O JSON está na propriedade DadosFormulario
+      let dadosFormulario = null;
+
+      if (item.metadata) {
+        dadosFormulario =
+          typeof item.metadata === "string"
+            ? JSON.parse(item.metadata)
+            : item.metadata;
+      } else if (item.DadosFormulario) {
+        dadosFormulario =
+          typeof item.DadosFormulario === "string"
+            ? JSON.parse(item.DadosFormulario)
+            : item.DadosFormulario;
+      }
+
+      if (
+        dadosFormulario &&
+        dadosFormulario.metadata &&
+        dadosFormulario.metadata.historicoStatusChange
+      ) {
+        const statusChange = dadosFormulario.metadata.historicoStatusChange;
+
+        // Pega todas as chaves de status e encontra a mais recente
+        const statusKeys = Object.keys(statusChange);
+        let ultimaData = null;
+
+        for (const status of statusKeys) {
+          const statusData = statusChange[status];
+          if (statusData && statusData.dataAlteracao) {
+            if (
+              !ultimaData ||
+              new Date(statusData.dataAlteracao) > new Date(ultimaData)
+            ) {
+              ultimaData = statusData.dataAlteracao;
+            }
+          }
+        }
+
+        if (ultimaData) {
+          return formatDate(ultimaData);
+        }
+      }
+
+      // Fallback para dataAvaliacao ou dataSubmissao
+      if (item.dataAvaliacao) {
+        return formatDate(item.dataAvaliacao.toString());
+      } else if (item.dataSubmissao) {
+        return formatDate(item.dataSubmissao.toString());
+      }
+
+      return "N/A";
+    } catch (error) {
+      console.error("Erro ao extrair data do último status:", error);
+      return "N/A";
+    }
+  };
+
+  // Função para extrair número da revisão do JSON DadosFormulario
+  const getRevisionNumber = (item: IFormListItem): string => {
+    try {
+      console.log("=== DEBUG REVISÃO ===");
+      console.log("Item completo:", item);
+
+      // O JSON está na propriedade DadosFormulario ou similar
+      let dadosFormulario = null;
+
+      // Tenta diferentes propriedades onde pode estar o JSON
+      if (item.metadata) {
+        dadosFormulario =
+          typeof item.metadata === "string"
+            ? JSON.parse(item.metadata)
+            : item.metadata;
+      } else if (item.DadosFormulario) {
+        dadosFormulario =
+          typeof item.DadosFormulario === "string"
+            ? JSON.parse(item.DadosFormulario)
+            : item.DadosFormulario;
+      }
+
+      console.log("Dados do formulário:", dadosFormulario);
+
+      if (
+        dadosFormulario &&
+        dadosFormulario.metadata &&
+        dadosFormulario.metadata.historicoRevisoes
+      ) {
+        const historicoRevisoes = dadosFormulario.metadata.historicoRevisoes;
+        console.log("Histórico de revisões:", historicoRevisoes);
+
+        if (Array.isArray(historicoRevisoes) && historicoRevisoes.length > 0) {
+          // Pega o último item do array de revisões
+          const ultimaRevisao = historicoRevisoes[historicoRevisoes.length - 1];
+          console.log("Última revisão:", ultimaRevisao);
+
+          if (ultimaRevisao && ultimaRevisao.numeroRevisao !== undefined) {
+            console.log(
+              "Número da revisão encontrado:",
+              ultimaRevisao.numeroRevisao
+            );
+            return `Rev. ${ultimaRevisao.numeroRevisao}`;
+          }
+        }
+      }
+
+      console.log("Retornando Rev. 1 (fallback)");
+      return "Rev. 1";
+    } catch (error) {
+      console.error("Erro ao extrair número da revisão:", error);
+      return "Rev. 1";
+    }
+  };
+
+  // Função para extrair criado por do JSON DadosFormulario
+  const getCreatedBy = (item: IFormListItem): string => {
+    try {
+      // O JSON está na propriedade DadosFormulario
+      let dadosFormulario = null;
+
+      if (item.metadata) {
+        dadosFormulario =
+          typeof item.metadata === "string"
+            ? JSON.parse(item.metadata)
+            : item.metadata;
+      } else if ((item as any).DadosFormulario) {
+        dadosFormulario =
+          typeof (item as any).DadosFormulario === "string"
+            ? JSON.parse((item as any).DadosFormulario)
+            : (item as any).DadosFormulario;
+      }
+
+      if (
+        dadosFormulario &&
+        dadosFormulario.metadata &&
+        dadosFormulario.metadata.historicoStatusChange
+      ) {
+        const statusChange = dadosFormulario.metadata.historicoStatusChange;
+
+        // Procura por "Em Andamento" no histórico de status para pegar quem criou
+        if (
+          statusChange["Em Andamento"] &&
+          statusChange["Em Andamento"].usuario
+        ) {
+          return statusChange["Em Andamento"].usuario;
+        }
+      }
+
+      // Fallback para propriedades diretas do item
+      return item.criadoPor || item.nomePreenchimento || "Sistema";
+    } catch (error) {
+      console.error("Erro ao extrair criado por:", error);
+      return "Sistema";
+    }
   };
 
   const columns: IColumn[] = [
@@ -80,49 +289,50 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       onRender: (item: IFormListItem) => <StatusBadge status={item.status} />,
     },
     {
-      key: "submissionDate",
-      name: "Data Sub.",
-      fieldName: "submissionDate",
-      minWidth: 80,
-      maxWidth: 100,
+      key: "creationDate",
+      name: "Data de Criação",
+      fieldName: "creationDate",
+      minWidth: 100,
+      maxWidth: 120,
       isResizable: true,
       onRender: (item: IFormListItem) => (
-        <span className={styles.dateCell}>
-          {formatDate(
-            item.submissionDate || item.dataSubmissao?.toString() || ""
-          )}
-        </span>
+        <span className={styles.dateCell}>{getCreationDate(item)}</span>
       ),
     },
     {
-      key: "riskLevel",
-      name: "Risco",
-      fieldName: "riskLevel",
-      minWidth: 80,
-      maxWidth: 100,
+      key: "lastStatusDate",
+      name: "Data do Status Atual",
+      fieldName: "lastStatusDate",
+      minWidth: 100,
+      maxWidth: 120,
       isResizable: true,
       onRender: (item: IFormListItem) => (
-        <RiskBadge
-          level={
-            String(item.riskLevel || parseInt(item.grauRisco)) as
-              | "1"
-              | "2"
-              | "3"
-              | "4"
-          }
-        />
+        <span className={styles.dateCell}>{getLastStatusDate(item)}</span>
+      ),
+    },
+    {
+      key: "createdBy",
+      name: "Criado Por",
+      fieldName: "criadoPor",
+      minWidth: 120,
+      maxWidth: 150,
+      isResizable: true,
+      onRender: (item: IFormListItem) => (
+        <div className={styles.companyCell}>
+          <span className={styles.companyName}>👤 {getCreatedBy(item)}</span>
+        </div>
       ),
     },
     {
       key: "completionPercentage",
       name: "% Concl.",
       fieldName: "completionPercentage",
-      minWidth: 120,
-      maxWidth: 150,
+      minWidth: 100,
+      maxWidth: 120,
       isResizable: true,
       onRender: (item: IFormListItem) => {
         const percentage =
-          item.completionPercentage || item.percentualConclusao;
+          item.completionPercentage || item.percentualConclusao || 0;
         return (
           <div className={styles.progressCell}>
             <ProgressIndicator
@@ -135,68 +345,54 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       },
     },
     {
-      key: "createdBy",
-      name: "Criado Por",
-      fieldName: "criadoPor",
-      minWidth: 120,
-      maxWidth: 180,
+      key: "revisionNumber",
+      name: "Revisão Atual",
+      fieldName: "revisionNumber",
+      minWidth: 100,
+      maxWidth: 120,
       isResizable: true,
       onRender: (item: IFormListItem) => (
         <div className={styles.companyCell}>
           <span className={styles.companyName}>
-            👤 {item.criadoPor || "Sistema"}
+            📝 {getRevisionNumber(item)}
           </span>
         </div>
       ),
     },
     {
-      key: "attachments",
-      name: "Anexos",
-      fieldName: "attachments",
-      minWidth: 60,
-      maxWidth: 80,
-      isResizable: false,
-      onRender: (item: IFormListItem) => {
-        const hasAttachments = item.anexosCount && item.anexosCount > 0;
-        return (
-          <div className={styles.attachmentCell}>
-            {hasAttachments ? (
-              <IconButton
-                iconProps={{ iconName: "Attach", style: { color: "#0078d4" } }}
-                title={`${item.anexosCount} anexo(s)`}
-                onClick={() => onView && onView(item)}
-                className={styles.attachmentButton}
-              />
-            ) : (
-              <span style={{ color: "#a19f9d" }}>—</span>
-            )}
-          </div>
-        );
-      },
+      key: "assignedReviewer",
+      name: "Análise por",
+      fieldName: "assignedReviewer",
+      minWidth: 150,
+      maxWidth: 200,
+      isResizable: true,
+      onRender: (item: IFormListItem) => (
+        <UserCard
+          user={item.avaliadorAtribuido}
+          showNotSelected={true}
+          className={styles.userCell}
+        />
+      ),
     },
     {
       key: "actions",
       name: "Ações",
       fieldName: "actions",
-      minWidth: 80,
-      maxWidth: 100,
+      minWidth: 100,
+      maxWidth: 120,
       isResizable: false,
-      onRender: (item: IFormListItem) => (
-        <div className={styles.actionsCell}>
-          <IconButton
-            iconProps={{ iconName: "View" }}
-            title="Visualizar"
-            onClick={() => onView && onView(item)}
-            className={styles.actionButton}
-          />
-          <IconButton
-            iconProps={{ iconName: "PDF" }}
-            title="Exportar PDF"
-            onClick={() => onExport && onExport(item)}
-            className={styles.actionButton}
-          />
-        </div>
-      ),
+      onRender: (item: IFormListItem) => {
+        return (
+          <div className={styles.actionsCell}>
+            <DefaultButton
+              text="Visualizar"
+              iconProps={{ iconName: "View" }}
+              onClick={() => onView && onView(item)}
+              className={styles.actionButton}
+            />
+          </div>
+        );
+      },
     },
   ];
 

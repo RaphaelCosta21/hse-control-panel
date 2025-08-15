@@ -1,0 +1,257 @@
+/* Dados Gerais Section Styles */
+@import "~@fluentui/react/dist/sass/References";
+
+.container {
+  padding: 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.reviewAlert {
+  margin-bottom: 24px;
+  border-radius: 8px;
+
+  :global(.ms-MessageBar-text) {
+    font-weight: 500;
+  }
+}
+
+.infoCard {
+  background: white;
+  border: 1px solid #edebe9;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &.highlight {
+    border-color: #0066a3;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px 16px 24px;
+  border-bottom: 1px solid #f3f2f1;
+
+  .cardIcon {
+    font-size: 20px;
+    color: #0066a3;
+    margin-right: 12px;
+  }
+
+  .cardTitle {
+    font-weight: 600;
+    color: #323130;
+  }
+}
+
+.cardContent {
+  padding: 20px 24px 24px 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .fieldLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: #605e5c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+
+  .fieldValue {
+    font-size: 14px;
+    font-weight: 500;
+    color: #323130;
+
+    span {
+      color: inherit;
+    }
+  }
+}
+
+.booleanValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.positive {
+    background: rgba(16, 124, 16, 0.1);
+    color: #107c10;
+
+    i {
+      color: #107c10;
+    }
+  }
+
+  &.negative {
+    background: rgba(209, 52, 56, 0.1);
+    color: #d13438;
+
+    i {
+      color: #d13438;
+    }
+  }
+}
+
+.grauRisco {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 120px;
+}
+
+.anexosCard {
+  background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+  border: 2px dashed #d2d0ce;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0066a3;
+    background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+  }
+}
+
+.documentCard {
+  max-width: 200px;
+  transition: all 0.2s ease;
+  background: white;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  padding: 12px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.documentHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .documentIcon {
+    color: #0066a3;
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .documentTitle {
+    font-weight: 600;
+    color: #323130;
+  }
+}
+
+.documentName {
+  color: #605e5c;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.documentActions {
+  display: flex;
+  gap: 8px;
+
+  .documentButton {
+    flex: 1;
+    font-size: 12px;
+
+    :global(.ms-Button-label) {
+      font-size: 12px;
+    }
+  }
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .cardHeader {
+    padding: 16px 20px 12px 20px;
+
+    .cardIcon {
+      font-size: 18px;
+    }
+
+    .cardTitle {
+      font-size: 16px;
+    }
+  }
+
+  .cardContent {
+    padding: 16px 20px 20px 20px;
+  }
+
+  .field {
+    .fieldLabel {
+      font-size: 11px;
+    }
+
+    .fieldValue {
+      font-size: 13px;
+    }
+  }
+
+  .documentCard {
+    max-width: 150px;
+  }
+}
+
+/* Utility classes */
+.textCenter {
+  text-align: center;
+}
+
+.textBold {
+  font-weight: 600;
+}
+
+.marginBottom {
+  margin-bottom: 16px;
+}
+
+.colorPrimary {
+  color: #0066a3;
+}
+
+.colorSuccess {
+  color: #107c10;
+}
+
+.colorWarning {
+  color: #ff8c00;
+}
+
+.colorError {
+  color: #d13438;
+}

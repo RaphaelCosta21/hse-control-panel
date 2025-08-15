@@ -1,0 +1,85 @@
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 150px;
+
+  .persona {
+    flex-shrink: 0;
+  }
+
+  .userInfo {
+    flex: 1;
+    min-width: 0; // Permite que o texto seja truncado
+
+    .userName {
+      color: var(--colorNeutralForeground1);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &.notSelected {
+    .emptyPersona {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--colorNeutralBackground3);
+      border: 1px dashed var(--colorNeutralStroke2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      .emptyIcon {
+        font-size: 14px;
+        color: var(--colorNeutralForeground3);
+        opacity: 0.7;
+      }
+    }
+
+    .notSelectedText {
+      color: var(--colorNeutralForeground3);
+      font-style: italic;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Variações de tamanho
+.userCard[data-size="size24"] {
+  .emptyPersona {
+    width: 24px;
+    height: 24px;
+
+    .emptyIcon {
+      font-size: 10px;
+    }
+  }
+}
+
+.userCard[data-size="size40"] {
+  .emptyPersona {
+    width: 40px;
+    height: 40px;
+
+    .emptyIcon {
+      font-size: 16px;
+    }
+  }
+}
+
+.userCard[data-size="size48"] {
+  .emptyPersona {
+    width: 48px;
+    height: 48px;
+
+    .emptyIcon {
+      font-size: 18px;
+    }
+  }
+}

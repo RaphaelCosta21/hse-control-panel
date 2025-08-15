@@ -46,14 +46,55 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
         dadosGerais: {
           empresa: "Petrobras",
           cnpj: "33.000.167/0001-01",
+          numeroContrato: "CTR-2024-001",
+          dataInicioContrato: new Date("2024-01-01"),
+          dataTerminoContrato: new Date("2024-12-31"),
+          responsavelTecnico: "João Silva",
+          atividadePrincipalCNAE: "0600-1/01",
+          grauRisco: "2",
+          gerenteContratoMarine: "Carlos Santos",
+          escopoServico: "Serviços de manutenção offshore",
+          totalEmpregados: 150,
+          empregadosParaServico: 45,
+          possuiSESMT: true,
+          numeroComponentesSESMT: 3,
+          // Campos adicionais do mock anterior
           endereco: "Rio de Janeiro, RJ",
           telefone: "(21) 1234-5678",
           email: "contato@petrobras.com.br",
-          responsavelTecnico: "João Silva",
           responsavelTecnicoEmail: "joao.silva@petrobras.com.br",
           responsavelTecnicoTelefone: "(21) 9876-5432",
         },
         conformidadeLegal: {
+          nr01: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr04: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr05: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr06: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr07: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr09: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr10: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr11: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr12: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr13: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr15: { aplicavel: true, questoes: {}, comentarios: "" },
+          nr23: { aplicavel: true, questoes: {}, comentarios: "" },
+          licencasAmbientais: {
+            aplicavel: true,
+            questoes: {},
+            comentarios: "",
+          },
+          legislacaoMaritima: {
+            aplicavel: true,
+            questoes: {},
+            comentarios: "",
+          },
+          treinamentosObrigatorios: {
+            aplicavel: true,
+            questoes: {},
+            comentarios: "",
+          },
+          gestaoSMS: { aplicavel: true, questoes: {}, comentarios: "" },
+          // Campos adicionais do mock anterior
           possuiLicencaAmbiental: true,
           numeroLicencaAmbiental: "LA123456",
           validadeLicencaAmbiental: new Date("2025-12-31"),
@@ -65,6 +106,13 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
           validadeAtaCIPA: new Date("2025-12-31"),
         },
         servicosEspeciais: {
+          fornecedorEmbarcacoes: true,
+          fornecedorIcamentoCarga: false,
+          certificadosMaritimos: {
+            iopp: "cert-iopp-001.pdf",
+            registroArmador: "reg-armador-001.pdf",
+          },
+          // Campos adicionais do mock anterior
           realizaServicosAltura: true,
           realizaServicosEspacosConfinados: false,
           realizaServicosEletricos: true,
@@ -76,6 +124,11 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
         percentualConclusao: 95,
         status: "Em Análise",
         dataSubmissao: new Date("2024-06-10"),
+        anexos: {
+          resumoEstatisticoMensal: "rem-2024.pdf",
+          contratoSocial: "contrato-social.pdf",
+          cartaoCNPJ: "cartao-cnpj.pdf",
+        },
       };
 
       setFormData(mockFormData);
@@ -165,7 +218,7 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
   // Load initial form if provided
   React.useEffect(() => {
     if (initialFormId) {
-      loadForm(initialFormId);
+      loadForm(initialFormId).catch(console.error);
     }
   }, [initialFormId, loadForm]);
 

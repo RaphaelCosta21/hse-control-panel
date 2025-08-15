@@ -46,6 +46,41 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
     [context, serviceConfig]
   );
 
+  // Função auxiliar para extrair dados do avaliador
+  const extractAssignedReviewer = React.useCallback(
+    (item: Record<string, any>) => {
+      try {
+        // Verifica se tem avaliador atribuído na coluna AvaliadorResponsavel
+        if (item.AvaliadorResponsavel) {
+          return {
+            name: item.AvaliadorResponsavel.Title || item.AvaliadorResponsavel,
+            email: item.AvaliadorResponsavel.EMail || "",
+            photoUrl: undefined, // Será carregado posteriormente se necessário
+            isActive: true,
+          };
+        }
+
+        // Fallback: verifica se tem dados no JSON DadosFormulario
+        if (item.DadosFormulario) {
+          const dadosFormulario =
+            typeof item.DadosFormulario === "string"
+              ? JSON.parse(item.DadosFormulario)
+              : item.DadosFormulario;
+
+          if (dadosFormulario?.metadata?.avaliadorAtribuido) {
+            return dadosFormulario.metadata.avaliadorAtribuido;
+          }
+        }
+
+        return undefined;
+      } catch (error) {
+        console.error("Erro ao extrair dados do avaliador:", error);
+        return undefined;
+      }
+    },
+    []
+  );
+
   // Load real data from SharePoint
   const loadForms = React.useCallback(async () => {
     try {
@@ -74,6 +109,8 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         submissionDate: item.Created,
         riskLevel: parseInt(item.GrauRisco || "1", 10) as 1 | 2 | 3 | 4,
         completionPercentage: item.PercentualConclusao || 0,
+        // Novo campo: dados do avaliador atribuído
+        avaliadorAtribuido: extractAssignedReviewer(item),
       }));
 
       setForms(convertedForms);

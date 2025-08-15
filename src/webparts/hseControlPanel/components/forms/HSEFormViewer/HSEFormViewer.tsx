@@ -118,7 +118,7 @@ const HSEFormViewer: React.FC<IHSEFormViewerProps> = ({
                 }}
               >
                 <AttachmentViewer
-                  attachments={formData.anexos || {}}
+                  attachments={{}}
                   formId={formData.id || 0}
                   companyName={
                     typeof formData.dadosGerais?.empresa === "string"

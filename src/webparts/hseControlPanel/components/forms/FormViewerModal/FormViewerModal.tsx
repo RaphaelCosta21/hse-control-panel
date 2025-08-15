@@ -16,6 +16,7 @@ import { FormEvaluation } from "../FormEvaluation/FormEvaluation";
 import { IFormListItem } from "../../../types/IControlPanelData";
 import {
   IHSEFormData,
+  IDadosGerais,
   IConformidadeLegal,
   IServicosEspeciais,
 } from "../../../types/IHSEFormData";
@@ -118,7 +119,7 @@ const FormViewerModal: React.FC<IFormViewerModalProps> = ({
 
       const convertedData: IHSEFormData = {
         id: formDetails.Id,
-        dadosGerais,
+        dadosGerais: dadosGerais as IDadosGerais,
         conformidadeLegal: conformidadeLegal as IConformidadeLegal,
         servicosEspeciais: servicosEspeciais as IServicosEspeciais,
         grauRisco: (getSafeValue("dadosGerais.grauRisco") ||

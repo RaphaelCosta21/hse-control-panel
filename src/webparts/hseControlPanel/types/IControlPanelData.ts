@@ -38,11 +38,20 @@ export interface IFormListItem {
   emailPreenchimento?: string;
   nomePreenchimento?: string;
   anexosCount?: number;
+  metadata?: any; // JSON metadata from SharePoint list
+  DadosFormulario?: any; // JSON data from SharePoint column DadosFormulario
   // Additional properties for table display
   companyName?: string;
   submissionDate?: string;
   riskLevel?: 1 | 2 | 3 | 4;
   completionPercentage?: number;
+  // Dados do avaliador atribuído
+  avaliadorAtribuido?: {
+    name: string;
+    email: string;
+    photoUrl?: string;
+    isActive?: boolean;
+  };
 }
 
 export interface IFormsFilters {

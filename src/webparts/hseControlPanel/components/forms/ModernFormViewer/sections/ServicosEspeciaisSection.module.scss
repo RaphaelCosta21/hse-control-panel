@@ -1,0 +1,371 @@
+/* Serviços Especializados Section Styles */
+@import "~@fluentui/react/dist/sass/References";
+
+.container {
+  padding: 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.reviewAlert {
+  margin-bottom: 24px;
+  border-radius: 8px;
+
+  :global(.ms-MessageBar-text) {
+    font-weight: 500;
+  }
+}
+
+.resumoSection {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+
+  .resumoCard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    flex: 1;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .resumoIconAtivo {
+      font-size: 24px;
+      color: #107c10;
+    }
+
+    .resumoIconVencendo {
+      font-size: 24px;
+      color: #ff8c00;
+    }
+
+    .resumoIconVencido {
+      font-size: 24px;
+      color: #d13438;
+    }
+
+    .resumoIconAusente {
+      font-size: 24px;
+      color: #605e5c;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+
+      span:first-child {
+        font-weight: 600;
+        font-size: 24px;
+      }
+
+      span:last-child {
+        color: #605e5c;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+.categoriaSection {
+  margin-bottom: 40px;
+}
+
+.categoriaHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #0066a3 0%, #003d5c 100%);
+  color: white;
+  border-radius: 12px;
+
+  .categoriaIcon {
+    font-size: 32px;
+    opacity: 0.9;
+  }
+
+  .categoriaTitulo {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .categoriaDescricao {
+    opacity: 0.9;
+  }
+}
+
+.servicosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.servicoCard {
+  background: white;
+  border: 1px solid #edebe9;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.obrigatorio {
+    border-left: 4px solid #d13438;
+  }
+
+  &.opcional {
+    border-left: 4px solid #ff8c00;
+  }
+}
+
+.servicoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+  border-bottom: 1px solid #f3f2f1;
+}
+
+.servicoInfo {
+  flex: 1;
+
+  .servicoNome {
+    font-weight: 600;
+    color: #323130;
+    margin-bottom: 4px;
+  }
+
+  .servicoDescricao {
+    color: #605e5c;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .servicoTipo {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.servicoStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.statusAtivo {
+    background: rgba(16, 124, 16, 0.1);
+    color: #107c10;
+
+    i {
+      color: #107c10;
+    }
+  }
+
+  &.statusVencendo {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+
+    i {
+      color: #ff8c00;
+    }
+  }
+
+  &.statusVencido {
+    background: rgba(209, 52, 56, 0.1);
+    color: #d13438;
+
+    i {
+      color: #d13438;
+    }
+  }
+
+  &.statusAusente {
+    background: rgba(96, 94, 92, 0.1);
+    color: #605e5c;
+
+    i {
+      color: #605e5c;
+    }
+  }
+}
+
+.servicoDetalhes {
+  padding: 20px;
+}
+
+.detalheItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #605e5c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.dataVencimento {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .alertaVencimento {
+    color: #ff8c00;
+    font-weight: 600;
+  }
+
+  .alertaVencido {
+    color: #d13438;
+    font-weight: 600;
+  }
+}
+
+.certificacoesList,
+.metodosList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.certificacaoTag,
+.metodoTag {
+  background: #0066a3;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.metodoTag {
+  background: #107c10;
+}
+
+.anexoItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fc;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .anexoIcon {
+    color: #0066a3;
+    font-size: 16px;
+  }
+
+  .anexoActions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+
+    button {
+      font-size: 12px;
+      padding: 4px 12px;
+      height: auto;
+    }
+  }
+}
+
+.anexosList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.servicoAusente {
+  padding: 20px;
+  background: #fff8f0;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .resumoSection {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .servicosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .categoriaHeader {
+    padding: 16px;
+
+    .categoriaIcon {
+      font-size: 24px;
+    }
+  }
+
+  .servicoHeader {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .servicoDetalhes,
+  .servicoAusente {
+    padding: 16px;
+  }
+
+  .anexoItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .anexoActions {
+      margin-left: 0;
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
