@@ -10,7 +10,7 @@ import {
 } from "@fluentui/react";
 import { SearchBox, FormFilters } from "../filters";
 import FormsTable from "./FormsTable/FormsTable";
-import FormViewerModal from "./FormViewerModal";
+import ModernFormViewer from "./ModernFormViewer/ModernFormViewer";
 import { IFormListItem } from "../../types/IControlPanelData";
 import { ISharePointConfig } from "../../types/ISharePointConfig";
 import { SharePointService } from "../../services/SharePointService";
@@ -311,13 +311,18 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         </Text>
       </div>
 
-      {/* Form Viewer Modal */}
-      <FormViewerModal
+      {/* Modern Form Viewer */}
+      <ModernFormViewer
         isOpen={isViewerOpen}
         onDismiss={handleCloseViewer}
         form={selectedForm}
         sharePointService={sharePointService}
         onFormUpdate={handleFormUpdate}
+        currentUser={{
+          name: context.pageContext.user.displayName || context.pageContext.user.loginName,
+          email: context.pageContext.user.email,
+          photoUrl: undefined,
+        }}
       />
     </div>
   );

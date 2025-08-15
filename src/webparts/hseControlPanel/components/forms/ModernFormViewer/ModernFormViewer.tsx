@@ -77,6 +77,67 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
   const [isReviewing, setIsReviewing] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState("dadosGerais");
 
+  // Função para criar dados básicos do formulário
+  const createBasicFormData = (formDetails: {
+    Id: number;
+    Title: string;
+    CNPJ: string;
+    StatusAvaliacao: string;
+    GrauRisco: string;
+    PercentualConclusao: number;
+    EmailPreenchimento: string;
+    NomePreenchimento: string;
+  }): IHSEFormData => {
+    return {
+      id: formDetails.Id,
+      grauRisco: (formDetails.GrauRisco || "2") as "1" | "2" | "3" | "4",
+      percentualConclusao: formDetails.PercentualConclusao || 0,
+      status: (formDetails.StatusAvaliacao || "Em Andamento") as "Em Andamento" | "Enviado" | "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações",
+      dadosGerais: {
+        empresa: formDetails.Title || "",
+        cnpj: formDetails.CNPJ || "",
+        numeroContrato: "",
+        dataInicioContrato: new Date(),
+        dataTerminoContrato: new Date(),
+        responsavelTecnico: formDetails.NomePreenchimento || "",
+        email: formDetails.EmailPreenchimento || "",
+        atividadePrincipalCNAE: "",
+        grauRisco: (formDetails.GrauRisco || "2") as "1" | "2" | "3" | "4",
+        gerenteContratoMarine: "",
+        escopoServico: "",
+        totalEmpregados: 0,
+        empregadosParaServico: 0,
+        possuiSESMT: false,
+        numeroComponentesSESMT: 0,
+      },
+      conformidadeLegal: {
+        nr01: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr04: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr05: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr06: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr07: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr09: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr10: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr11: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr12: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr13: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr15: { aplicavel: false, questoes: {}, comentarios: "" },
+        nr23: { aplicavel: false, questoes: {}, comentarios: "" },
+        licencasAmbientais: { aplicavel: false, questoes: {}, comentarios: "" },
+        legislacaoMaritima: { aplicavel: false, questoes: {}, comentarios: "" },
+        treinamentosObrigatorios: { aplicavel: false, questoes: {}, comentarios: "" },
+        gestaoSMS: { aplicavel: false, questoes: {}, comentarios: "" },
+      },
+      servicosEspeciais: {
+        fornecedorEmbarcacoes: false,
+        fornecedorIcamentoCarga: false,
+      },
+      anexos: {
+        resumoEstatisticoMensal: "", // Campo obrigatório, mas vazio se não há dados
+      },
+    };
+  };
+
   const loadFormData = React.useCallback(async () => {
     if (!form) return;
 
@@ -84,81 +145,44 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
       setLoading(true);
       setError(undefined);
 
-      // Simular carregamento de dados (implementar com SharePoint)
-      const mockFormData: IHSEFormData = {
-        id: form.id,
-        grauRisco: (form.grauRisco || "2") as "1" | "2" | "3" | "4",
-        percentualConclusao: 85,
-        status: form.status,
-        dadosGerais: {
-          empresa: form.empresa,
-          cnpj: form.cnpj,
-          numeroContrato: "CTR-2024-001",
-          dataInicioContrato: new Date("2024-01-15"),
-          dataTerminoContrato: new Date("2024-12-31"),
-          responsavelTecnico: "João Silva Santos",
-          atividadePrincipalCNAE: "4950-7/00",
-          grauRisco: (form.grauRisco || "2") as "1" | "2" | "3" | "4",
-          gerenteContratoMarine: "Carlos Eduardo Oliveira",
-          escopoServico:
-            "Serviços de manutenção preventiva e corretiva em equipamentos marítimos",
-          totalEmpregados: 45,
-          empregadosParaServico: 12,
-          possuiSESMT: true,
-          numeroComponentesSESMT: 3,
-        },
-        conformidadeLegal: {
-          nr01: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr04: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr05: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr06: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr07: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr09: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr10: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr11: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr12: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr13: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr15: { aplicavel: true, questoes: {}, comentarios: "" },
-          nr23: { aplicavel: true, questoes: {}, comentarios: "" },
-          licencasAmbientais: {
-            aplicavel: true,
-            questoes: {},
-            comentarios: "",
-          },
-          legislacaoMaritima: {
-            aplicavel: true,
-            questoes: {},
-            comentarios: "",
-          },
-          treinamentosObrigatorios: {
-            aplicavel: true,
-            questoes: {},
-            comentarios: "",
-          },
-          gestaoSMS: { aplicavel: true, questoes: {}, comentarios: "" },
-        },
-        servicosEspeciais: {
-          fornecedorEmbarcacoes: false,
-          fornecedorIcamentoCarga: true,
-        },
-        anexos: {
-          resumoEstatisticoMensal: "rem_2024.pdf",
-        },
-      };
+      // Carregar dados reais do SharePoint
+      const formDetails = await sharePointService.getFormDetails(form.id);
+      
+      let realFormData: IHSEFormData;
+      
+      if (formDetails.DadosFormulario) {
+        // Se temos dados salvos no campo DadosFormulario, usar eles
+        try {
+          const parsedData = JSON.parse(formDetails.DadosFormulario);
+          realFormData = {
+            ...parsedData,
+            id: formDetails.Id,
+            grauRisco: formDetails.GrauRisco as "1" | "2" | "3" | "4",
+            percentualConclusao: formDetails.PercentualConclusao,
+            status: formDetails.StatusAvaliacao as "Em Andamento" | "Enviado" | "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações",
+          };
+        } catch (parseError) {
+          console.warn("Erro ao analisar dados do formulário, usando dados básicos:", parseError);
+          realFormData = createBasicFormData(formDetails);
+        }
+      } else {
+        // Criar estrutura básica com dados disponíveis
+        realFormData = createBasicFormData(formDetails);
+      }
 
-      setFormData(mockFormData);
+      setFormData(realFormData);
     } catch (err) {
       console.error("Erro ao carregar dados do formulário:", err);
       setError("Erro ao carregar os dados do formulário. Tente novamente.");
     } finally {
       setLoading(false);
     }
-  }, [form]);
+  }, [form, sharePointService]);
 
   // Load form data when form changes
   React.useEffect(() => {
     if (form && isOpen) {
-      void loadFormData();
+      loadFormData().catch(console.error);
     }
   }, [form, isOpen, loadFormData]);
 
