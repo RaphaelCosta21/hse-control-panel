@@ -125,9 +125,20 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
         status: "Em Análise",
         dataSubmissao: new Date("2024-06-10"),
         anexos: {
-          resumoEstatisticoMensal: "rem-2024.pdf",
-          contratoSocial: "contrato-social.pdf",
-          cartaoCNPJ: "cartao-cnpj.pdf",
+          rem: [
+            {
+              id: "mock_rem_1",
+              fileName: "rem-2024.pdf",
+              fileSize: 1024000,
+              uploadDate: "2024-06-10T10:00:00.000Z",
+              sharePointPath: "",
+              category: "rem",
+              subcategory: "geral",
+              originalName: "rem-2024.pdf",
+              fileType: "application/pdf",
+              url: ""
+            }
+          ],
         },
       };
 

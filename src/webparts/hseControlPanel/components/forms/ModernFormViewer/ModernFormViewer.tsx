@@ -63,6 +63,14 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
   onFormUpdate,
   currentUser,
 }) => {
+  console.log("🎭 [ModernFormViewer] Componente renderizado");
+  console.log("🎭 [ModernFormViewer] Props:", {
+    isOpen,
+    form,
+    sharePointService,
+    currentUser,
+  });
+
   const [formData, setFormData] = React.useState<IHSEFormData | undefined>(
     undefined
   );
@@ -92,7 +100,13 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
       id: formDetails.Id,
       grauRisco: (formDetails.GrauRisco || "2") as "1" | "2" | "3" | "4",
       percentualConclusao: formDetails.PercentualConclusao || 0,
-      status: (formDetails.StatusAvaliacao || "Em Andamento") as "Em Andamento" | "Enviado" | "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações",
+      status: (formDetails.StatusAvaliacao || "Em Andamento") as
+        | "Em Andamento"
+        | "Enviado"
+        | "Em Análise"
+        | "Aprovado"
+        | "Rejeitado"
+        | "Pendente Informações",
       dadosGerais: {
         empresa: formDetails.Title || "",
         cnpj: formDetails.CNPJ || "",
@@ -125,7 +139,11 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
         nr23: { aplicavel: false, questoes: {}, comentarios: "" },
         licencasAmbientais: { aplicavel: false, questoes: {}, comentarios: "" },
         legislacaoMaritima: { aplicavel: false, questoes: {}, comentarios: "" },
-        treinamentosObrigatorios: { aplicavel: false, questoes: {}, comentarios: "" },
+        treinamentosObrigatorios: {
+          aplicavel: false,
+          questoes: {},
+          comentarios: "",
+        },
         gestaoSMS: { aplicavel: false, questoes: {}, comentarios: "" },
       },
       servicosEspeciais: {
@@ -133,56 +151,114 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
         fornecedorIcamentoCarga: false,
       },
       anexos: {
-        resumoEstatisticoMensal: "", // Campo obrigatório, mas vazio se não há dados
+        rem: [], // Array vazio por padrão
       },
     };
   };
 
   const loadFormData = React.useCallback(async () => {
-    if (!form) return;
+    console.log("📊 [ModernFormViewer] loadFormData iniciado");
+    console.log("📊 [ModernFormViewer] Form:", form);
+
+    if (!form) {
+      console.log("❌ [ModernFormViewer] Form é null/undefined, saindo");
+      return;
+    }
 
     try {
+      console.log("⏳ [ModernFormViewer] Iniciando carregamento de dados");
       setLoading(true);
       setError(undefined);
 
+      console.log(
+        "🔗 [ModernFormViewer] Chamando sharePointService.getFormDetails com ID:",
+        form.id
+      );
       // Carregar dados reais do SharePoint
       const formDetails = await sharePointService.getFormDetails(form.id);
-      
+
+      console.log(
+        "📋 [ModernFormViewer] Dados retornados do SharePoint:",
+        formDetails
+      );
+
       let realFormData: IHSEFormData;
-      
+
       if (formDetails.DadosFormulario) {
+        console.log(
+          "💾 [ModernFormViewer] Usando dados salvos do campo DadosFormulario"
+        );
         // Se temos dados salvos no campo DadosFormulario, usar eles
         try {
           const parsedData = JSON.parse(formDetails.DadosFormulario);
+          console.log(
+            "📄 [ModernFormViewer] Dados parseados com sucesso:",
+            parsedData
+          );
           realFormData = {
             ...parsedData,
             id: formDetails.Id,
             grauRisco: formDetails.GrauRisco as "1" | "2" | "3" | "4",
             percentualConclusao: formDetails.PercentualConclusao,
-            status: formDetails.StatusAvaliacao as "Em Andamento" | "Enviado" | "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações",
+            status: formDetails.StatusAvaliacao as
+              | "Em Andamento"
+              | "Enviado"
+              | "Em Análise"
+              | "Aprovado"
+              | "Rejeitado"
+              | "Pendente Informações",
           };
         } catch (parseError) {
-          console.warn("Erro ao analisar dados do formulário, usando dados básicos:", parseError);
+          console.warn(
+            "⚠️ [ModernFormViewer] Erro ao analisar dados do formulário, usando dados básicos:",
+            parseError
+          );
           realFormData = createBasicFormData(formDetails);
         }
       } else {
+        console.log(
+          "🔧 [ModernFormViewer] Campo DadosFormulario vazio, criando estrutura básica"
+        );
         // Criar estrutura básica com dados disponíveis
         realFormData = createBasicFormData(formDetails);
       }
 
+      console.log(
+        "✅ [ModernFormViewer] Form data final processado:",
+        realFormData
+      );
       setFormData(realFormData);
     } catch (err) {
-      console.error("Erro ao carregar dados do formulário:", err);
+      console.error(
+        "❌ [ModernFormViewer] Erro ao carregar dados do formulário:",
+        err
+      );
       setError("Erro ao carregar os dados do formulário. Tente novamente.");
     } finally {
+      console.log(
+        "🏁 [ModernFormViewer] loadFormData finalizado, setLoading(false)"
+      );
       setLoading(false);
     }
   }, [form, sharePointService]);
 
   // Load form data when form changes
   React.useEffect(() => {
+    console.log(
+      "🔄 [ModernFormViewer] useEffect triggered - form:",
+      form,
+      "isOpen:",
+      isOpen
+    );
     if (form && isOpen) {
+      console.log(
+        "🚀 [ModernFormViewer] Condições atendidas, chamando loadFormData"
+      );
       loadFormData().catch(console.error);
+    } else {
+      console.log(
+        "⏸️ [ModernFormViewer] Condições não atendidas para carregar dados"
+      );
     }
   }, [form, isOpen, loadFormData]);
 
@@ -436,6 +512,15 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
       </Pivot>
     );
   };
+
+  console.log(
+    "🎨 [ModernFormViewer] Renderizando componente - isOpen:",
+    isOpen,
+    "formData:",
+    formData,
+    "loading:",
+    loading
+  );
 
   return (
     <>

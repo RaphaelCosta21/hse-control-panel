@@ -188,11 +188,21 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
     []
   );
 
-  const handleView = React.useCallback((form: IFormListItem) => {
-    console.log("Visualizar formulário:", form);
-    setSelectedForm(form);
-    setIsViewerOpen(true);
-  }, []);
+  const handleView = React.useCallback(
+    (form: IFormListItem) => {
+      console.log("🔍 [FormsList] Clicou em Visualizar - Form ID:", form.id);
+      console.log("🔍 [FormsList] Dados do formulário:", form);
+      console.log("🔍 [FormsList] SharePointService:", sharePointService);
+
+      setSelectedForm(form);
+      setIsViewerOpen(true);
+
+      console.log(
+        "🔍 [FormsList] Estado após setters - selectedForm definido e isViewerOpen=true"
+      );
+    },
+    [sharePointService]
+  );
 
   const handleExport = React.useCallback(async (form: IFormListItem) => {
     console.log("Exportar formulário:", form);
@@ -233,8 +243,12 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
   );
 
   const handleCloseViewer = React.useCallback(() => {
+    console.log("❌ [FormsList] Fechando ModernFormViewer");
     setIsViewerOpen(false);
     setSelectedForm(undefined);
+    console.log(
+      "❌ [FormsList] Estado após fechar - isViewerOpen=false, selectedForm=undefined"
+    );
   }, []);
 
   const commandBarItems: ICommandBarItemProps[] = [
@@ -319,7 +333,9 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         sharePointService={sharePointService}
         onFormUpdate={handleFormUpdate}
         currentUser={{
-          name: context.pageContext.user.displayName || context.pageContext.user.loginName,
+          name:
+            context.pageContext.user.displayName ||
+            context.pageContext.user.loginName,
           email: context.pageContext.user.email,
           photoUrl: undefined,
         }}

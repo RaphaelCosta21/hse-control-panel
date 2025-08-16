@@ -97,24 +97,84 @@ export interface IServicosEspeciais {
   [key: string]: unknown;
 }
 
+// Interface para metadados de arquivo individual
+export interface IFileMetadata {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  uploadDate: string;
+  sharePointPath: string;
+  category: string;
+  subcategory: string;
+  originalName: string;
+  fileType: string;
+  url: string;
+}
+
 export interface IAnexos {
-  // Dados Gerais - Anexo Obrigatório
-  resumoEstatisticoMensal: string; // REM - obrigatório
+  // 🏢 DADOS GERAIS - REM (Resumo Estatístico Mensal de Acidentes)
+  rem?: IFileMetadata[];
 
-  // Anexos Condicionais (baseados em respostas "SIM")
-  documentosSESMT?: string;
-  documentosCIPA?: string;
-  caEPIs?: string;
-  pcmso?: string;
-  aso?: string;
-  ppra?: string;
+  // 👥 CONFORMIDADE LEGAL - SESMT e Recursos Humanos
+  sesmt?: IFileMetadata[];
+  cipa?: IFileMetadata[];
 
-  // Anexos adicionais de dados gerais
-  contratoSocial?: string;
-  cartaoCNPJ?: string;
+  // 🛡️ CONFORMIDADE LEGAL - EPIs e Saúde Ocupacional
+  caEPI?: IFileMetadata[];
+  pcmso?: IFileMetadata[];
+  aso?: IFileMetadata[];
 
-  // Index signature para anexos dinâmicos
-  [categoria: string]: string | undefined;
+  // 📋 CONFORMIDADE LEGAL - Sistema de Gestão SMS
+  smsProcedimentoAcidentes?: IFileMetadata[];
+  smsCalendarioInspecoes?: IFileMetadata[];
+  smsProcedimentoResiduos?: IFileMetadata[];
+  smsMetasObjetivos?: IFileMetadata[];
+  smsProgramaAnual?: IFileMetadata[];
+
+  // 🎓 CONFORMIDADE LEGAL - Treinamentos
+  certificadoProgramaTreinamento?: IFileMetadata[];
+  evidenciaTreinamento?: IFileMetadata[];
+
+  // ⚖️ CONFORMIDADE LEGAL - Licenças
+  licencaOperacao?: IFileMetadata[];
+
+  // 🔧 CONFORMIDADE LEGAL - Normas Regulamentadoras
+  nr23LaudoManutencao?: IFileMetadata[];
+  nr16LaudoPericulosidade?: IFileMetadata[];
+  nr15LaudoInsalubridade?: IFileMetadata[];
+  nr13EvidenciaSistematica?: IFileMetadata[];
+  nr12EvidenciaDispositivo?: IFileMetadata[];
+  nr12PlanoInspecao?: IFileMetadata[];
+  nr11CertificadoTreinamento?: IFileMetadata[];
+  nr10ProjetoInstalacoes?: IFileMetadata[];
+  nr10CertificacaoProfissionais?: IFileMetadata[];
+
+  // 🚢 SERVIÇOS ESPECIAIS - Documentação Marítima
+  iopp?: IFileMetadata[];
+  registroArmador?: IFileMetadata[];
+  propriedadeMaritima?: IFileMetadata[];
+  arqueacao?: IFileMetadata[];
+  segurancaNavegacao?: IFileMetadata[];
+  classificacaoCasco?: IFileMetadata[];
+  classificacaoMaquinas?: IFileMetadata[];
+  bordaLivre?: IFileMetadata[];
+  seguroDepem?: IFileMetadata[];
+  autorizacaoAntaq?: IFileMetadata[];
+  tripulacaoSeguranca?: IFileMetadata[];
+  agulhaMagnetica?: IFileMetadata[];
+  balsaInflavel?: IFileMetadata[];
+  licencaRadio?: IFileMetadata[];
+
+  // 🏗️ SERVIÇOS ESPECIAIS - Equipamentos e Certificações
+  testeCarga?: IFileMetadata[];
+  registroCREA?: IFileMetadata[];
+  art?: IFileMetadata[];
+  planoManutencao?: IFileMetadata[];
+  monitoramentoFumaca?: IFileMetadata[];
+  certificacaoEquipamentos?: IFileMetadata[];
+
+  // Index signature para outras categorias dinâmicas
+  [categoria: string]: IFileMetadata[] | undefined;
 }
 
 export interface IHSEFormData {

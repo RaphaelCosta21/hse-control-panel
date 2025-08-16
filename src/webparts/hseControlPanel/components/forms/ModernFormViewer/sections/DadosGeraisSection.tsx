@@ -1,4 +1,4 @@
-import * as React from "react";
+﻿import * as React from "react";
 import {
   Stack,
   Text,
@@ -9,7 +9,11 @@ import {
   MessageBarType,
   DefaultButton,
 } from "@fluentui/react";
-import { IDadosGerais, IAnexos } from "../../../../types/IHSEFormData";
+import {
+  IDadosGerais,
+  IAnexos,
+  IFileMetadata,
+} from "../../../../types/IHSEFormData";
 import styles from "./DadosGeraisSection.module.scss";
 
 export interface IDadosGeraisSectionProps {
@@ -23,30 +27,51 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
   anexos,
   isReviewing,
 }) => {
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString("pt-BR");
+  const formatCurrency = (value: number | undefined | null): string => {
+    if (value === undefined || value === null || isNaN(value))
+      return "Não informado";
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
   };
 
-  const formatCurrency = (value: number): string => {
-    return value.toLocaleString("pt-BR");
+  const formatFileSize = (bytes: number): string => {
+    if (!bytes) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const getGrauRiscoColor = (grau: string): string => {
-    switch (grau) {
-      case "1":
-        return "#107c10"; // Verde
-      case "2":
-        return "#ff8c00"; // Laranja
-      case "3":
-        return "#d13438"; // Vermelho
-      case "4":
-        return "#8b0000"; // Vermelho escuro
-      default:
-        return "#605e5c"; // Cinza
+  const formatUploadDate = (dateString: string): string => {
+    if (!dateString) return "Data não informada";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("pt-BR");
+    } catch {
+      return "Data inválida";
     }
   };
 
-  const getGrauRiscoText = (grau: string): string => {
+  const getGrauRiscoColor = (grau: string | undefined | null): string => {
+    if (!grau) return "#605e5c";
+    switch (grau) {
+      case "1":
+        return "#107c10";
+      case "2":
+        return "#ff8c00";
+      case "3":
+        return "#d13438";
+      case "4":
+        return "#8b0000";
+      default:
+        return "#605e5c";
+    }
+  };
+
+  const getGrauRiscoText = (grau: string | undefined | null): string => {
+    if (!grau) return "Não informado";
     switch (grau) {
       case "1":
         return "Grau 1 - Baixo";
@@ -80,7 +105,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
 
   const renderField = (
     label: string,
-    value: string | number | boolean,
+    value: string | number | boolean | undefined | null,
     type: "text" | "number" | "boolean" = "text"
   ): React.ReactElement => (
     <div className={styles.field}>
@@ -96,7 +121,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
             {value ? "Sim" : "Não"}
           </span>
         ) : (
-          <Text variant="medium">{value.toString()}</Text>
+          <Text variant="medium">{value?.toString() || "Não informado"}</Text>
         )}
       </div>
     </div>
@@ -104,37 +129,72 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
 
   const renderAnexo = (
     titulo: string,
-    nomeArquivo: string | undefined
+    anexoData: string | IFileMetadata[] | undefined
   ): React.ReactElement | null => {
-    if (!nomeArquivo) return null;
+    // Se anexoData é undefined ou vazio, retorna null
+    if (!anexoData) return null;
 
-    return (
-      <div className={styles.documentCard}>
-        <div className={styles.documentHeader}>
-          <Icon iconName="Attach" className={styles.documentIcon} />
-          <Text variant="medium" className={styles.documentTitle}>
-            {titulo}
+    // Se anexoData é um array (formato JSON dos anexos)
+    if (Array.isArray(anexoData) && anexoData.length > 0) {
+      return (
+        <div className={styles.documentCard}>
+          <div className={styles.documentHeader}>
+            <Icon iconName="Attach" className={styles.documentIcon} />
+            <Text variant="medium" className={styles.documentTitle}>
+              {titulo}
+            </Text>
+          </div>
+          {anexoData.map((anexo, index) => (
+            <div key={anexo.id || index} className={styles.documentItem}>
+              <Text variant="small" className={styles.documentName}>
+                📄 {anexo.originalName || anexo.fileName || "Arquivo"}
+              </Text>
+              <Text variant="xSmall" className={styles.documentInfo}>
+                Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
+                {formatUploadDate(anexo.uploadDate || "")}
+              </Text>
+              <div className={styles.documentActions}>
+                {anexo.url && (
+                  <DefaultButton
+                    iconProps={{ iconName: "Download" }}
+                    text="Baixar"
+                    onClick={() => window.open(anexo.url, "_blank")}
+                    className={styles.documentButton}
+                  />
+                )}
+                <DefaultButton
+                  iconProps={{ iconName: "View" }}
+                  text="Visualizar"
+                  onClick={() =>
+                    console.log(`Visualizar ${anexo.originalName}`)
+                  }
+                  className={styles.documentButton}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Se anexoData é uma string (formato antigo)
+    if (typeof anexoData === "string") {
+      return (
+        <div className={styles.documentCard}>
+          <div className={styles.documentHeader}>
+            <Icon iconName="Attach" className={styles.documentIcon} />
+            <Text variant="medium" className={styles.documentTitle}>
+              {titulo}
+            </Text>
+          </div>
+          <Text variant="small" className={styles.documentName}>
+            {anexoData}
           </Text>
         </div>
-        <Text variant="small" className={styles.documentName}>
-          {nomeArquivo}
-        </Text>
-        <div className={styles.documentActions}>
-          <DefaultButton
-            iconProps={{ iconName: "Download" }}
-            text="Baixar"
-            onClick={() => console.log(`Download ${nomeArquivo}`)}
-            className={styles.documentButton}
-          />
-          <DefaultButton
-            iconProps={{ iconName: "View" }}
-            text="Visualizar"
-            onClick={() => console.log(`Visualizar ${nomeArquivo}`)}
-            className={styles.documentButton}
-          />
-        </div>
-      </div>
-    );
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -150,7 +210,6 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
       )}
 
       <Stack tokens={{ childrenGap: 24 }}>
-        {/* Informações da Empresa */}
         {renderInfoCard(
           "🏢 Informações da Empresa",
           "Building",
@@ -189,52 +248,14 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 </div>
               </Stack.Item>
             </Stack>
-          </Stack>,
-          true
-        )}
-
-        {/* Informações Contratuais */}
-        {renderInfoCard(
-          "📋 Informações Contratuais",
-          "ContactCard",
-          <Stack tokens={{ childrenGap: 16 }}>
-            <Stack horizontal tokens={{ childrenGap: 32 }}>
-              <Stack.Item grow>
-                {renderField(
-                  "Número do Contrato",
-                  data.numeroContrato as string
-                )}
-              </Stack.Item>
-              <Stack.Item>
-                {renderField(
-                  "Gerente do Contrato (Marine)",
-                  data.gerenteContratoMarine as string
-                )}
-              </Stack.Item>
-            </Stack>
-
-            <Stack horizontal tokens={{ childrenGap: 32 }}>
-              <Stack.Item>
-                {renderField(
-                  "Data de Início",
-                  formatDate(data.dataInicioContrato as Date)
-                )}
-              </Stack.Item>
-              <Stack.Item>
-                {renderField(
-                  "Data de Término",
-                  formatDate(data.dataTerminoContrato as Date)
-                )}
-              </Stack.Item>
-            </Stack>
 
             <Separator />
 
             {renderField("Escopo do Serviço", data.escopoServico as string)}
-          </Stack>
+          </Stack>,
+          true
         )}
 
-        {/* Recursos Humanos */}
         {renderInfoCard(
           "👥 Recursos Humanos",
           "People",
@@ -264,7 +285,6 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
           </Stack>
         )}
 
-        {/* SESMT */}
         {renderInfoCard(
           "🛡️ SESMT - Serviços Especializados",
           "Shield",
@@ -294,22 +314,24 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
           </Stack>
         )}
 
-        {/* Anexos */}
         <div className={styles.anexosCard}>
           <div className={styles.cardHeader}>
-            <Icon iconName="Attach" className={styles.cardIcon} />
+            <Icon iconName="FileTemplate" className={styles.cardIcon} />
             <Text variant="large" className={styles.cardTitle}>
-              📎 Documentos Anexos
+              📊 Resumo Estatístico Mensal de Acidentes
             </Text>
           </div>
           <div className={styles.cardContent}>
-            <Stack horizontal wrap tokens={{ childrenGap: 16 }}>
-              {renderAnexo("Contrato Social", anexos.contratoSocial)}
-              {renderAnexo("Cartão CNPJ", anexos.cartaoCNPJ)}
-
-              {!anexos.contratoSocial && !anexos.cartaoCNPJ && (
-                <MessageBar messageBarType={MessageBarType.warning}>
-                  ⚠️ Nenhum documento foi anexado para esta seção.
+            <Stack tokens={{ childrenGap: 16 }}>
+              {anexos.rem &&
+                anexos.rem.length > 0 &&
+                renderAnexo("REM - Resumo Estatístico Mensal", anexos.rem)}
+              {(!anexos.rem || anexos.rem.length === 0) && (
+                <MessageBar
+                  messageBarType={MessageBarType.warning}
+                  className={styles.warningMessage}
+                >
+                  ⚠️ REM (Resumo Estatístico Mensal) não foi anexado.
                 </MessageBar>
               )}
             </Stack>
