@@ -136,8 +136,8 @@ export const useHSEForm = (initialFormId?: number): IHSEFormHookData => {
               subcategory: "geral",
               originalName: "rem-2024.pdf",
               fileType: "application/pdf",
-              url: ""
-            }
+              url: "",
+            },
           ],
         },
       };
