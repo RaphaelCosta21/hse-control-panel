@@ -14,18 +14,27 @@ import {
   IAnexos,
   IFileMetadata,
 } from "../../../../types/IHSEFormData";
+import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./DadosGeraisSection.module.scss";
 
 export interface IDadosGeraisSectionProps {
   data: IDadosGerais;
   anexos: IAnexos;
   isReviewing: boolean;
+  sharePointService?: SharePointService;
+  formId?: number;
+  cnpj?: string;
+  empresa?: string;
 }
 
 const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
   data,
   anexos,
   isReviewing,
+  sharePointService,
+  formId,
+  cnpj,
+  empresa,
 }) => {
   const formatCurrency = (value: number | undefined | null): string => {
     if (value === undefined || value === null || isNaN(value))
@@ -83,6 +92,60 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
         return "Grau 4 - Muito Alto";
       default:
         return `Grau ${grau}`;
+    }
+  };
+
+  const handleAnexoAction = async (
+    anexo: IFileMetadata,
+    action: "view" | "download"
+  ): Promise<void> => {
+    try {
+      let attachmentData = anexo;
+
+      // Se não tem URL definida e temos o SharePointService, tentar obter a URL
+      if (
+        (!anexo.url || anexo.url.trim() === "") &&
+        sharePointService &&
+        anexo.id &&
+        formId &&
+        cnpj &&
+        empresa
+      ) {
+        console.log(`Buscando URL para anexo ID: ${anexo.id}`);
+
+        const formData = {
+          id: formId,
+          cnpj: cnpj,
+          empresa: empresa,
+          categoria: anexo.category,
+          fileName: anexo.fileName || anexo.originalName,
+        };
+
+        const attachmentInfo = await sharePointService.getAttachmentById(
+          anexo.id,
+          formData
+        );
+        if (attachmentInfo) {
+          attachmentData = attachmentInfo;
+        }
+      }
+
+      if (attachmentData.url && attachmentData.url.trim() !== "") {
+        window.open(attachmentData.url, "_blank");
+      } else {
+        // Mostrar informações do anexo para debug
+        const actionText = action === "view" ? "visualizar" : "baixar";
+        alert(
+          `Não foi possível ${actionText} o arquivo.\n\nArquivo: ${
+            anexo.originalName || anexo.fileName
+          }\nID: ${anexo.id}\nTamanho: ${formatFileSize(
+            anexo.fileSize || 0
+          )}\n\nVerifique se o arquivo existe no SharePoint.`
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao processar ação do anexo:", error);
+      alert("Erro ao processar o arquivo. Tente novamente.");
     }
   };
 
@@ -154,20 +217,10 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 {formatUploadDate(anexo.uploadDate || "")}
               </Text>
               <div className={styles.documentActions}>
-                {anexo.url && (
-                  <DefaultButton
-                    iconProps={{ iconName: "Download" }}
-                    text="Baixar"
-                    onClick={() => window.open(anexo.url, "_blank")}
-                    className={styles.documentButton}
-                  />
-                )}
                 <DefaultButton
                   iconProps={{ iconName: "View" }}
                   text="Visualizar"
-                  onClick={() =>
-                    console.log(`Visualizar ${anexo.originalName}`)
-                  }
+                  onClick={() => handleAnexoAction(anexo, "view")}
                   className={styles.documentButton}
                 />
               </div>
