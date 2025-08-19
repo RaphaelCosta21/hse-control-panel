@@ -501,6 +501,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
               cnpj={formData.dadosGerais.cnpj || ""}
               empresa={String(formData.dadosGerais.nomeEmpresa || "")}
               id={formData.id?.toString() || ""}
+              sharePointService={sharePointService}
             />
           </div>
         </PivotItem>

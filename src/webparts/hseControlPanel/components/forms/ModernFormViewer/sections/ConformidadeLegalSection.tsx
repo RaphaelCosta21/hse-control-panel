@@ -13,6 +13,7 @@ import {
   IAnexos,
   IFileMetadata,
 } from "../../../../types/IHSEFormData";
+import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./ConformidadeLegalSection.module.scss";
 
 export interface IConformidadeLegalSectionProps {
@@ -22,6 +23,7 @@ export interface IConformidadeLegalSectionProps {
   cnpj: string;
   empresa: string;
   id: string;
+  sharePointService?: SharePointService;
 }
 
 interface IQuestao {
@@ -36,6 +38,29 @@ interface ISectionData {
   categoria: "obrigatorias" | "opcionais" | "outros";
   questoes: IQuestao[];
   anexos: string[];
+}
+
+interface ISectionFormData {
+  aplicavel: boolean;
+  questao1?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  questao2?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  questao3?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  questao4?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  questao5?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  questao6?: {
+    resposta: "SIM" | "NAO" | "NA";
+  };
+  comentarios?: string;
 }
 
 const conformidadeSections: ISectionData[] = [
@@ -407,7 +432,63 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
   cnpj,
   empresa,
   id,
+  sharePointService,
 }) => {
+  console.log("🎯 [ConformidadeLegal] Dados recebidos:", {
+    data,
+    anexos,
+    cnpj,
+    empresa,
+    id,
+  });
+
+  // Função auxiliar para formatar tamanho do arquivo
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  // Função auxiliar para formatar data de upload
+  const formatUploadDate = (dateString: string): string => {
+    if (!dateString) return "Data não disponível";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    } catch {
+      return "Data inválida";
+    }
+  };
+
+  // Debug específico para NR01
+  console.log(
+    "🔬 [ConformidadeLegal] Estrutura completa de conformidadeLegal:",
+    data
+  );
+  console.log(
+    "🔬 [ConformidadeLegal] Chaves disponíveis:",
+    Object.keys(data || {})
+  );
+  console.log("🔬 [ConformidadeLegal] NR01 específica:", data?.nr01);
+
+  // Testando acesso direto
+  if (data?.nr01) {
+    console.log("✅ [ConformidadeLegal] NR01 encontrada!");
+    console.log("   - Aplicável:", data.nr01.aplicavel);
+    console.log("   - Questões:", data.nr01.questoes);
+    console.log("   - Questão1:", data.nr01.questoes?.questao1);
+    console.log("   - Questão2:", data.nr01.questoes?.questao2);
+    console.log("   - Comentários:", data.nr01.comentarios);
+  } else {
+    console.log("❌ [ConformidadeLegal] NR01 NÃO encontrada!");
+  }
+
   const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
 
   const toggleSection = (sectionId: string): void => {
@@ -419,72 +500,384 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
   };
 
   const getSectionData = (sectionId: string): unknown => {
-    return data[sectionId as keyof IConformidadeLegal];
+    const result = data[sectionId as keyof IConformidadeLegal];
+    console.log(`🗂️ [ConformidadeLegal] getSectionData(${sectionId}):`, result);
+    return result;
   };
 
   const getQuestaoResposta = (
     sectionId: string,
     questaoId: string
-  ): "SIM" | "NAO" | undefined => {
-    const sectionData = getSectionData(sectionId) as any;
-    return sectionData?.questoes?.[questaoId]?.resposta;
+  ): "SIM" | "NAO" | "NA" | undefined => {
+    const sectionData = getSectionData(sectionId) as ISectionFormData;
+    console.log(
+      `🔍 [ConformidadeLegal] Buscando resposta para ${sectionId}.${questaoId}:`
+    );
+    console.log(`   - Dados da seção:`, sectionData);
+
+    // Acessar diretamente a questão (questao1, questao2, etc.)
+    const questaoData = sectionData?.[questaoId as keyof ISectionFormData];
+    console.log(`   - Dados da questão (${questaoId}):`, questaoData);
+
+    // Verifica se questaoData é um objeto com propriedade resposta
+    const resposta =
+      questaoData &&
+      typeof questaoData === "object" &&
+      "resposta" in questaoData
+        ? (questaoData as { resposta?: "SIM" | "NAO" | "NA" }).resposta
+        : undefined;
+
+    console.log(
+      `📝 [ConformidadeLegal] Resposta encontrada para ${sectionId}.${questaoId}:`,
+      resposta
+    );
+    return resposta;
+  };
+
+  const getSectionComentarios = (sectionId: string): string | undefined => {
+    const sectionData = getSectionData(sectionId) as ISectionFormData;
+    const comentarios = sectionData?.comentarios;
+    console.log(
+      `💬 [ConformidadeLegal] Comentários para ${sectionId}:`,
+      comentarios
+    );
+    return comentarios;
   };
 
   const getSectionStatus = (
     sectionId: string
   ): "completo" | "incompleto" | "nao_aplicavel" => {
-    const sectionData = getSectionData(sectionId) as any;
+    const sectionData = getSectionData(sectionId) as ISectionFormData;
+
+    // Se a seção não é aplicável, retorna N/A
     if (!sectionData || !sectionData.aplicavel) return "nao_aplicavel";
 
     const section = conformidadeSections.find((s) => s.id === sectionId);
     if (!section) return "nao_aplicavel";
 
-    const todasRespondidas = section.questoes.every(
-      (questao) => getQuestaoResposta(sectionId, questao.id) !== undefined
-    );
+    // Verifica se todas as questões foram respondidas
+    const todasRespondidas = section.questoes.every((questao) => {
+      const resposta = getQuestaoResposta(sectionId, questao.id);
+      return resposta === "SIM" || resposta === "NAO" || resposta === "NA";
+    });
 
     return todasRespondidas ? "completo" : "incompleto";
   };
 
-  const handleAnexoAction = async (anexoNome: string): Promise<void> => {
+  // Mapeamento das chaves do JSON para os nomes reais das pastas SharePoint
+  const getSharePointFolderName = (anexoKey: string): string => {
+    const mapeamentoPastas: Record<string, string> = {
+      // NR04 - SESMT
+      "sesmt": "SESMT",
+
+      // NR05 - CIPA  
+      "cipa": "CIPA",
+
+      // NR06 - EPI
+      "caEPI": "EPI",
+
+      // NR07 - PCMSO + ASO
+      "pcmso": "PCMSO",
+      "aso": "ASO",
+
+      // NR10 - CERTIFICADO_PROFISSIONAIS + PROJETO_INSTALACOES
+      "NR10_CERTIFICADO_PROFISSIONAIS": "NR10_CERTIFICADO_PROFISSIONAIS",
+      "NR10_PROJETO_INSTALACOES": "NR10_PROJETO_INSTALACOES",
+
+      // NR11 - CERTIFICADO_TREINAMENTO
+      "NR11_CERTIFICADO_TREINAMENTO": "NR11_CERTIFICADO_TREINAMENTO",
+
+      // NR12 - EVIDENCIA_DISPOSITIVO + PLANO_INSPECAO
+      "NR12_EVIDENCIA_DISPOSITIVO": "NR12_EVIDENCIA_DISPOSITIVO",
+      "NR12_PLANO_INSPECAO": "NR12_PLANO_INSPECAO",
+
+      // NR13 - EVIDENCIA_SISTEMATICA
+      "NR13_EVIDENCIA_SISTEMATICA": "NR13_EVIDENCIA_SISTEMATICA",
+
+      // NR15 - LAUDO_INSALUBRIDADE
+      "NR15_LAUDO_INSALUBRIDADE": "NR15_LAUDO_INSALUBRIDADE",
+
+      // NR16 - LAUDO_PERICULOSIDADE
+      "NR16_LAUDO_PERICULOSIDADE": "NR16_LAUDO_PERICULOSIDADE",
+
+      // NR23 - LAUDO_MANUTENCAO
+      "NR23_LAUDO_MANUTENCAO": "NR23_LAUDO_MANUTENCAO",
+
+      // TREINAMENTOS OBRIGATÓRIOS
+      "EVIDENCIA_TREINAMENTO": "EVIDENCIA_TREINAMENTO",
+      "CERTIFICADO_PROGRAMA_TREINAMENTO": "CERTIFICADO_PROGRAMA_TREINAMENTO",
+
+      // GESTÃO DE SMS
+      "SMS_CALENDARIO_INSPECOES": "SMS_CALENDARIO_INSPECOES",
+      "SMS_METAS_OBJETIVOS": "SMS_METAS_OBJETIVOS",
+      "SMS_PROCEDIMENTO_ACIDENTES": "SMS_PROCEDIMENTO_ACIDENTES",
+      "SMS_PROGRAMA_ANUAL": "SMS_PROGRAMA_ANUAL",
+      "SMS_PROCEDIMENTO_RESIDUOS": "SMS_PROCEDIMENTO_RESIDUOS",
+
+      // LICENÇAS AMBIENTAIS
+      "LICENCA_OPERACAO": "LICENCA_OPERACAO",
+    };
+
+    return mapeamentoPastas[anexoKey] || anexoKey;
+  };
+
+  // Função para processar ações nos anexos (visualizar/download) - NOVA VERSÃO
+  const handleAnexoAction = async (
+    anexo: IFileMetadata,
+    action: "view" | "download",
+    anexoKey: string
+  ): Promise<void> => {
     try {
-      // TODO: Implementar visualização do anexo
-      console.log("Visualizar anexo:", anexoNome);
+      let attachmentData = anexo;
+
+      // Se não tem URL definida e temos o SharePointService, tentar obter a URL
+      if (
+        (!anexo.url || anexo.url.trim() === "") &&
+        sharePointService &&
+        anexo.id &&
+        id &&
+        cnpj &&
+        empresa
+      ) {
+        console.log(
+          `🔗 [ConformidadeLegal] Buscando URL para anexo ID: ${anexo.id}`
+        );
+
+        const sharePointFolderName = getSharePointFolderName(anexoKey);
+        console.log(
+          `📁 [ConformidadeLegal] Mapeamento de pasta:`,
+          {
+            anexoKey,
+            sharePointFolderName,
+            anexoFileName: anexo.fileName || anexo.originalName
+          }
+        );
+
+        const formData = {
+          id: parseInt(id), // Converter string para number
+          cnpj: cnpj,
+          empresa: empresa,
+          categoria: sharePointFolderName, // Usar o nome correto da pasta SharePoint
+          fileName: anexo.fileName || anexo.originalName,
+        };
+
+        const attachmentInfo = await sharePointService.getAttachmentById(
+          anexo.id,
+          formData
+        );
+        if (attachmentInfo) {
+          attachmentData = attachmentInfo;
+        }
+      }
+
+      if (attachmentData.url && attachmentData.url.trim() !== "") {
+        window.open(attachmentData.url, "_blank");
+      } else {
+        // Mostrar informações do anexo para debug
+        const actionText = action === "view" ? "visualizar" : "baixar";
+        alert(
+          `Não foi possível ${actionText} o arquivo.\n\nArquivo: ${
+            anexo.originalName || anexo.fileName
+          }\nID: ${anexo.id}\nTamanho: ${formatFileSize(
+            anexo.fileSize || 0
+          )}\n\nVerifique se o arquivo existe no SharePoint.`
+        );
+      }
     } catch (error) {
-      console.error("Erro ao abrir anexo:", error);
+      console.error(
+        "❌ [ConformidadeLegal] Erro ao processar ação do anexo:",
+        error
+      );
+      alert("Erro ao processar o arquivo. Tente novamente.");
     }
   };
 
-  const renderAnexo = (anexoNome: string): React.ReactElement => {
-    // Buscar o anexo correspondente nos dados
-    const anexoKey = anexoNome
-      .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/[^a-z0-9]/g, "");
+  // Função antiga para compatibilidade - renderizar anexo por nome
+  const handleAnexoActionAntigo = async (anexoNome: string): Promise<void> => {
+    try {
+      console.log(
+        "🔗 [ConformidadeLegal] Tentando visualizar anexo:",
+        anexoNome
+      );
 
+      // Buscar o anexo correspondente nos dados
+      const anexoKey = anexoNome
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9]/g, "");
+
+      console.log("🔗 [ConformidadeLegal] Chave do anexo:", anexoKey);
+      console.log("🔗 [ConformidadeLegal] Anexos disponíveis:", anexos);
+
+      const anexoData = anexos[anexoKey as keyof IAnexos] as IFileMetadata[];
+      const arquivo = anexoData?.[0];
+
+      if (arquivo && arquivo.url) {
+        console.log("🔗 [ConformidadeLegal] Abrindo arquivo:", arquivo.url);
+        window.open(arquivo.url, "_blank");
+      } else {
+        console.warn(
+          "🔗 [ConformidadeLegal] Arquivo não encontrado ou sem URL:",
+          arquivo
+        );
+        alert("Arquivo não encontrado ou indisponível para visualização.");
+      }
+    } catch (error) {
+      console.error("Erro ao abrir anexo:", error);
+      alert("Erro ao tentar visualizar o anexo.");
+    }
+  };
+
+  // Mapeamento de nomes de anexos para chaves do objeto anexos (nomes das pastas SharePoint)
+  const getAnexoKey = (anexoNome: string): string => {
+    const mapeamento: Record<string, string> = {
+      // NR01 - SEM ANEXO
+
+      // NR04 - SESMT
+      "SESMT - Dimensionamento": "sesmt",
+      "SESMT - Atas de Reunião": "sesmt",
+      "SESMT - Serviços Especializados em Engenharia de Segurança e Medicina do Trabalho": "sesmt",
+
+      // NR05 - CIPA
+      "CIPA - Comissão Interna de Prevenção de Acidentes": "cipa",
+
+      // NR06 - EPI
+      "CA EPI - Certificado de Aprovação de Equipamentos de Proteção Individual":
+        "caEPI",
+      "EPI - Certificado de Aprovação": "caEPI",
+
+      // NR07 - PCMSO + ASO
+      "PCMSO - Programa de Controle Médico de Saúde Ocupacional": "pcmso",
+      "ASO - Atestado de Saúde Ocupacional": "aso",
+
+      // NR10 - CERTIFICADO_PROFISSIONAIS + PROJETO_INSTALACOES
+      "NR 10 - Certificado de Profissionais": "NR10_CERTIFICADO_PROFISSIONAIS",
+      "NR 10 - Projeto de Instalações": "NR10_PROJETO_INSTALACOES",
+
+      // NR11 - CERTIFICADO_TREINAMENTO
+      "NR 11 - Certificado de Treinamento": "NR11_CERTIFICADO_TREINAMENTO",
+
+      // NR12 - EVIDENCIA_DISPOSITIVO + PLANO_INSPECAO
+      "NR 12 - Certificado de Máquinas": "NR12_EVIDENCIA_DISPOSITIVO",
+      "NR 12 - Evidência de Dispositivo": "NR12_EVIDENCIA_DISPOSITIVO",
+      "NR 12 - Plano de Inspeção": "NR12_PLANO_INSPECAO",
+
+      // NR13 - EVIDENCIA_SISTEMATICA
+      "NR 13 - Certificado de Caldeiras": "NR13_EVIDENCIA_SISTEMATICA",
+      "NR 13 - Evidência Sistemática": "NR13_EVIDENCIA_SISTEMATICA",
+
+      // NR15 - LAUDO_INSALUBRIDADE
+      "NR 15 - Laudo de Insalubridade": "NR15_LAUDO_INSALUBRIDADE",
+
+      // NR16 - LAUDO_PERICULOSIDADE
+      "NR 16 - Laudo de Periculosidade": "NR16_LAUDO_PERICULOSIDADE",
+
+      // NR23 - LAUDO_MANUTENCAO
+      "NR 23 - Laudo de Manutenção de Proteção Contra Incêndios":
+        "NR23_LAUDO_MANUTENCAO",
+
+      // TREINAMENTOS OBRIGATÓRIOS - EVIDENCIA_TREINAMENTO + CERTIFICADO_PROGRAMA_TREINAMENTO
+      "Evidência de Treinamento": "EVIDENCIA_TREINAMENTO",
+      "Certificado de Programa de Treinamento":
+        "CERTIFICADO_PROGRAMA_TREINAMENTO",
+
+      // GESTÃO DE SMS - 5 pastas
+      "SMS - Calendário de Inspeções": "SMS_CALENDARIO_INSPECOES",
+      "SMS - Metas e Objetivos": "SMS_METAS_OBJETIVOS",
+      "SMS - Procedimento de Acidentes": "SMS_PROCEDIMENTO_ACIDENTES",
+      "SMS - Programa Anual": "SMS_PROGRAMA_ANUAL",
+      "SMS - Procedimento de Resíduos": "SMS_PROCEDIMENTO_RESIDUOS",
+
+      // LICENÇAS AMBIENTAIS - LICENCA_OPERACAO
+      "Licenças Ambientais - Licença de Operação": "LICENCA_OPERACAO",
+      "Licenças Ambientais - Licença de Instalação": "LICENCA_OPERACAO",
+
+      // LEGISLAÇÃO MARÍTIMA - SEM ANEXO (não possui anexos)
+    };
+
+    return (
+      mapeamento[anexoNome] ||
+      anexoNome
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9]/g, "")
+    );
+  };
+
+  const renderAnexo = (anexoNome: string): React.ReactElement => {
+    // Buscar o anexo correspondente nos dados usando o mapeamento
+    const anexoKey = getAnexoKey(anexoNome);
     const anexoData = anexos[anexoKey as keyof IAnexos] as IFileMetadata[];
     const arquivo = anexoData?.[0]; // Pegar o primeiro arquivo se existir
 
+    console.log("📎 [ConformidadeLegal] Renderizando anexo:", {
+      anexoNome,
+      anexoKey,
+      anexoData,
+      arquivo,
+      todasChavesAnexos: Object.keys(anexos || {}),
+    });
+
+    // Se existem arquivos anexados, renderizar com dados reais
+    if (anexoData && anexoData.length > 0) {
+      return (
+        <div key={anexoNome} className={styles.anexoItem}>
+          <div className={styles.anexoDetails}>
+            <Icon iconName="Attach" className={styles.anexoIcon} />
+            <div>
+              <Text
+                variant="small"
+                style={{ fontWeight: 600, color: "#0078d4" }}
+              >
+                {anexoNome}
+              </Text>
+              {anexoData.map((anexo, index) => (
+                <div key={anexo.id || index} style={{ marginTop: "4px" }}>
+                  <Text variant="xSmall" style={{ color: "#107c10" }}>
+                    📄 {anexo.originalName || anexo.fileName || "Arquivo"}
+                  </Text>
+                  <Text
+                    variant="xSmall"
+                    style={{ color: "#666", display: "block" }}
+                  >
+                    Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
+                    {formatUploadDate(anexo.uploadDate || "")}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.anexoActions}>
+            <DefaultButton
+              iconProps={{ iconName: "View" }}
+              text="Visualizar"
+              onClick={() => handleAnexoAction(anexoData[0], "view", anexoKey)}
+              title="Clique para visualizar o arquivo"
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Caso contrário, renderizar anexo sem arquivo anexado
     return (
       <div key={anexoNome} className={styles.anexoItem}>
         <div className={styles.anexoDetails}>
           <Icon iconName="Attach" className={styles.anexoIcon} />
           <div>
             <Text variant="small">{anexoNome}</Text>
-            {arquivo && (
-              <Text variant="xSmall">
-                {arquivo.fileName} • {(arquivo.fileSize / 1024).toFixed(1)} KB •{" "}
-                {arquivo.uploadDate}
-              </Text>
-            )}
+            <Text variant="xSmall" style={{ color: "#d13438" }}>
+              Arquivo não anexado (chave: {anexoKey})
+            </Text>
           </div>
         </div>
         <div className={styles.anexoActions}>
           <DefaultButton
             iconProps={{ iconName: "View" }}
             text="Visualizar"
-            onClick={() => handleAnexoAction(anexoNome)}
-            disabled={!arquivo}
+            onClick={() => handleAnexoActionAntigo(anexoNome)}
+            disabled={true}
+            title="Arquivo não disponível"
           />
         </div>
       </div>
@@ -507,16 +900,33 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
         <Text variant="small" style={{ marginBottom: "8px" }}>
           {questao.texto}
         </Text>
-        {resposta && (
-          <div
-            className={`${styles.toggleValue} ${
-              resposta === "SIM" ? styles.positive : styles.negative
-            }`}
-          >
-            <Icon iconName={resposta === "SIM" ? "CheckMark" : "Cancel"} />
-            <Text variant="small">Resposta: {resposta}</Text>
-          </div>
-        )}
+
+        {/* Sempre mostrar a resposta ou indicar que não foi respondida */}
+        <div
+          className={`${styles.toggleValue} ${
+            resposta === "SIM"
+              ? styles.positive
+              : resposta === "NAO"
+              ? styles.negative
+              : resposta === "NA"
+              ? styles.statusNotApplicable
+              : styles.statusIncomplete // Para quando não há resposta
+          }`}
+          style={{ marginTop: "8px" }}
+        >
+          <Icon
+            iconName={
+              resposta === "SIM"
+                ? "CheckMark"
+                : resposta === "NAO"
+                ? "Cancel"
+                : resposta === "NA"
+                ? "Remove"
+                : "Warning" // Para quando não há resposta
+            }
+          />
+          <Text variant="small">Resposta: {resposta || "Não respondida"}</Text>
+        </div>
       </div>
     );
   };
@@ -539,7 +949,6 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
   const renderSection = (section: ISectionData): React.ReactElement => {
     const isExpanded = expandedSections.includes(section.id);
     const status = getSectionStatus(section.id);
-    const sectionData = getSectionData(section.id);
 
     return (
       <div
@@ -602,11 +1011,11 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
             </Stack>
 
             {/* Comentários */}
-            {(sectionData as any)?.comentarios && (
+            {getSectionComentarios(section.id) && (
               <div className={styles.field} style={{ marginTop: "16px" }}>
                 <Label>Comentários:</Label>
                 <Text variant="small" className={styles.observacoes}>
-                  {(sectionData as any).comentarios}
+                  {getSectionComentarios(section.id)}
                 </Text>
               </div>
             )}
