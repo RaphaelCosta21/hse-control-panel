@@ -378,8 +378,8 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       key: "actions",
       name: "Ações",
       fieldName: "actions",
-      minWidth: 100,
-      maxWidth: 120,
+      minWidth: 180,
+      maxWidth: 200,
       isResizable: false,
       onRender: (item: IFormListItem) => {
         return (
@@ -388,6 +388,13 @@ const FormsTable: React.FC<IFormsTableProps> = ({
               text="Visualizar"
               iconProps={{ iconName: "View" }}
               onClick={() => onView && onView(item)}
+              className={styles.actionButton}
+              style={{ marginRight: "8px" }}
+            />
+            <DefaultButton
+              text="Download PDF"
+              iconProps={{ iconName: "PDF" }}
+              onClick={() => onDownloadPDF && onDownloadPDF(item)}
               className={styles.actionButton}
             />
           </div>

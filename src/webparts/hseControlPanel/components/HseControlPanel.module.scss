@@ -1,4 +1,100 @@
 @import "~@fluentui/react/dist/sass/References.scss";
+@import "../styles/sharepoint-overrides.scss";
+
+// Sobrescrever limitações de largura do SharePoint
+:global(.CanvasZoneSectionContainer) {
+  max-width: none !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+:global(.CanvasZone) {
+  max-width: none !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+:global(.ControlZone) {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:global(.CanvasSection) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+:global(.CommentsWrapper) {
+  display: none !important;
+}
+
+// Ocultar todos os elementos relacionados a comentários do SharePoint
+:global([data-sp-feature-tag="Comments"]) {
+  display: none !important;
+}
+
+:global([data-sp-feature-instance-id*="Comments"]) {
+  display: none !important;
+}
+
+:global([id*="CommentsWrapper"]) {
+  display: none !important;
+}
+
+:global(.Page-commentsWrapper) {
+  display: none !important;
+}
+
+:global([data-viewport-id*="Comments"]) {
+  display: none !important;
+}
+
+// Seletores específicos para comentários (mais seguros)
+:global([class*="CommentsWrapper"]) {
+  display: none !important;
+}
+
+:global([id*="comment" i][class*="wrapper" i]) {
+  display: none !important;
+}
+
+:global([data-sp-webpart*="comment" i]) {
+  display: none !important;
+}
+// Ocultar barra de comandos do SharePoint
+:global(.spCommandBarWrapper) {
+  display: none !important;
+}
+
+// Ocultar cabeçalho do site do SharePoint
+:global(#spSiteHeader) {
+  display: none !important;
+}
+// Ocultar elementos do cabeçalho do SharePoint
+:global(#SuiteNavWrapper) {
+  display: none !important;
+}
+
+:global(.sp-appBar) {
+  display: none !important;
+}
+
+:global([data-sp-feature-tag="Site header"]) {
+  display: none !important;
+}
+
+:global(.spPageChromeAppHeaderWrapper) {
+  display: none !important;
+}
+
+:global([data-sp-webpart]) {
+  max-width: none !important;
+  width: 100% !important;
+}
 
 .hseControlPanel {
   overflow: hidden;
@@ -30,7 +126,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, #f5b800 0%, #e85a00 100%);
+    background: linear-gradient(90deg, #00385c 0%, #00263e 100%);
   }
 }
 
@@ -38,12 +134,12 @@
   .logoContainer {
     width: 64px;
     height: 64px;
-    background: linear-gradient(135deg, #f5b800 0%, #e85a00 100%);
+    background: linear-gradient(135deg, #00385c 0%, #00263e 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(245, 184, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 56, 92, 0.3);
 
     .logoIcon {
       font-size: 28px;
@@ -212,16 +308,17 @@
   }
 }
 
-.footer {
-  padding: 1rem 2rem;
-  text-align: center;
-  border-top: 1px solid var(--colorNeutralStroke2);
-  background: var(--colorNeutralBackground1);
+// Footer antigo removido - usando componente Footer personalizado
+// .footer {
+//   padding: 1rem 2rem;
+//   text-align: center;
+//   border-top: 1px solid var(--colorNeutralStroke2);
+//   background: var(--colorNeutralBackground1);
 
-  .footerText {
-    color: var(--colorNeutralForeground3);
-  }
-}
+//   .footerText {
+//     color: var(--colorNeutralForeground3);
+//   }
+// }
 
 .links {
   a {
@@ -257,7 +354,5 @@
     padding: 0;
   }
 
-  .footer {
-    padding: 1rem;
-  }
+  // Footer responsivo agora é gerenciado pelo componente Footer
 }

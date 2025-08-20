@@ -1,11 +1,14 @@
 import * as React from "react";
 import { Pivot, PivotItem, Stack, Icon, Text } from "@fluentui/react";
 import styles from "./HseControlPanel.module.scss";
+// Import SharePoint overrides para personalizar a interface
+import "../styles/sharepoint-overrides.scss";
 import type { IHseControlPanelProps } from "./IHseControlPanelProps";
 import { escape } from "@microsoft/sp-lodash-subset";
 import { Dashboard } from "./dashboard";
 import { FormsList } from "./forms";
 import { SettingsNavigation } from "./settings";
+import { Footer } from "./common/Footer";
 import { getDefaultSharePointConfig } from "../config/sharePointConfig";
 import { spfi, SPFx } from "@pnp/sp";
 import "@pnp/sp/profiles";
@@ -206,13 +209,8 @@ const HseControlPanel: React.FC<IHseControlPanelProps> = ({
         )}
       </div>
 
-      {description && (
-        <div className={styles.footer}>
-          <Text variant="small" className={styles.footerText}>
-            {environmentMessage} | Configuração: {escape(description)}
-          </Text>
-        </div>
-      )}
+      {/* Footer personalizado */}
+      <Footer />
     </section>
   );
 };

@@ -3,6 +3,7 @@
 
 export * from "./LoadingSpinner";
 export * from "./SectionTitle";
+export * from "./Footer";
 
 // TODO: Implement these components
 // export * from "./LoadingOverlay";

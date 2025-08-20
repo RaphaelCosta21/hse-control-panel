@@ -110,17 +110,19 @@
 
   .actionsCell {
     display: flex;
-    gap: 4px;
+    gap: 8px;
     align-items: center;
+    justify-content: flex-start;
 
     .actionButton {
       min-width: 32px;
       height: 32px;
-      padding: 0;
+      padding: 4px 8px;
       border: 1px solid var(--colorNeutralStroke2);
       border-radius: 4px;
       background: var(--colorNeutralBackground1);
       color: var(--colorNeutralForeground2);
+      font-size: 12px;
 
       &:hover {
         background: var(--colorNeutralBackground1Hover);

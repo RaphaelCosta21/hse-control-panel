@@ -14,6 +14,7 @@ import ModernFormViewer from "./ModernFormViewer/ModernFormViewer";
 import { IFormListItem } from "../../types/IControlPanelData";
 import { ISharePointConfig } from "../../types/ISharePointConfig";
 import { SharePointService } from "../../services/SharePointService";
+import { PDFGeneratorService } from "../../services/pdfGenerator";
 import { IFormsFilters } from "../../types/IControlPanelData";
 import styles from "./FormsList.module.scss";
 
@@ -208,25 +209,71 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
     console.log("Exportar formulário:", form);
 
     try {
-      // TODO: Implementar geração de PDF real
-      // const pdfBlob = await sharePointService.generateFormPDF(form.id);
-
+      // TODO: Implementar geração de Excel ou outro formato
       // Por enquanto, simular download
       const link = document.createElement("a");
       link.href = "#";
-      link.download = `HSE_Formulario_${form.empresa.replace(/\s+/g, "_")}_${
+      link.download = `HSE_Dados_${form.empresa.replace(/\s+/g, "_")}_${
         form.id
-      }.pdf`;
+      }.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      console.log("PDF 'baixado' com sucesso");
+      console.log("Dados exportados com sucesso");
     } catch (err) {
-      console.error("Erro ao gerar PDF:", err);
-      alert("Erro ao gerar PDF. Tente novamente.");
+      console.error("Erro ao exportar dados:", err);
+      alert("Erro ao exportar dados. Tente novamente.");
     }
   }, []);
+
+  const handleDownloadPDF = React.useCallback(
+    async (form: IFormListItem) => {
+      console.log("🔽 [FormsList] Gerando PDF para formulário:", form.id);
+
+      try {
+        // Buscar dados completos do formulário
+        const formDetails = await sharePointService.getFormDetails(form.id);
+
+        if (!formDetails || !formDetails.DadosFormulario) {
+          throw new Error("Dados do formulário não encontrados");
+        }
+
+        // Parse dos dados JSON
+        const formData = JSON.parse(formDetails.DadosFormulario);
+
+        // Gerar HTML do PDF com estilos otimizados para impressão
+        const htmlContent = PDFGeneratorService.generateFormHTML(
+          formData,
+          context.pageContext.user.displayName,
+          context.pageContext.user.email
+        );
+
+        // Criar nova aba com o HTML
+        const newWindow = window.open("", "_blank");
+
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+
+          // Definir título da aba
+          newWindow.document.title = `HSE Formulário - ${form.empresa}`;
+
+          console.log(
+            "✅ [FormsList] HTML aberto em nova aba para impressão/PDF"
+          );
+        } else {
+          throw new Error(
+            "Não foi possível abrir nova aba. Verifique se pop-ups estão bloqueados."
+          );
+        }
+      } catch (err) {
+        console.error("❌ [FormsList] Erro ao gerar PDF:", err);
+        alert(`Erro ao gerar PDF: ${err.message || err}`);
+      }
+    },
+    [sharePointService, context]
+  );
 
   const handleFormUpdate = React.useCallback(
     (updatedForm: IFormListItem) => {
@@ -316,6 +363,7 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
           loading={loading}
           onView={handleView}
           onExport={handleExport}
+          onDownloadPDF={handleDownloadPDF}
         />
       </div>
 

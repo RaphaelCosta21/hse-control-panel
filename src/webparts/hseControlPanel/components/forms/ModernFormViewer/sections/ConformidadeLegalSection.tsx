@@ -564,170 +564,22 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     return todasRespondidas ? "completo" : "incompleto";
   };
 
-  // Mapeamento das chaves do JSON para os nomes reais das pastas SharePoint
-  const getSharePointFolderName = (anexoKey: string): string => {
-    const mapeamentoPastas: Record<string, string> = {
-      // NR04 - SESMT
-      "sesmt": "SESMT",
-
-      // NR05 - CIPA  
-      "cipa": "CIPA",
-
-      // NR06 - EPI
-      "caEPI": "EPI",
-
-      // NR07 - PCMSO + ASO
-      "pcmso": "PCMSO",
-      "aso": "ASO",
-
-      // NR10 - CERTIFICADO_PROFISSIONAIS + PROJETO_INSTALACOES
-      "NR10_CERTIFICADO_PROFISSIONAIS": "NR10_CERTIFICADO_PROFISSIONAIS",
-      "NR10_PROJETO_INSTALACOES": "NR10_PROJETO_INSTALACOES",
-
-      // NR11 - CERTIFICADO_TREINAMENTO
-      "NR11_CERTIFICADO_TREINAMENTO": "NR11_CERTIFICADO_TREINAMENTO",
-
-      // NR12 - EVIDENCIA_DISPOSITIVO + PLANO_INSPECAO
-      "NR12_EVIDENCIA_DISPOSITIVO": "NR12_EVIDENCIA_DISPOSITIVO",
-      "NR12_PLANO_INSPECAO": "NR12_PLANO_INSPECAO",
-
-      // NR13 - EVIDENCIA_SISTEMATICA
-      "NR13_EVIDENCIA_SISTEMATICA": "NR13_EVIDENCIA_SISTEMATICA",
-
-      // NR15 - LAUDO_INSALUBRIDADE
-      "NR15_LAUDO_INSALUBRIDADE": "NR15_LAUDO_INSALUBRIDADE",
-
-      // NR16 - LAUDO_PERICULOSIDADE
-      "NR16_LAUDO_PERICULOSIDADE": "NR16_LAUDO_PERICULOSIDADE",
-
-      // NR23 - LAUDO_MANUTENCAO
-      "NR23_LAUDO_MANUTENCAO": "NR23_LAUDO_MANUTENCAO",
-
-      // TREINAMENTOS OBRIGATÓRIOS
-      "EVIDENCIA_TREINAMENTO": "EVIDENCIA_TREINAMENTO",
-      "CERTIFICADO_PROGRAMA_TREINAMENTO": "CERTIFICADO_PROGRAMA_TREINAMENTO",
-
-      // GESTÃO DE SMS
-      "SMS_CALENDARIO_INSPECOES": "SMS_CALENDARIO_INSPECOES",
-      "SMS_METAS_OBJETIVOS": "SMS_METAS_OBJETIVOS",
-      "SMS_PROCEDIMENTO_ACIDENTES": "SMS_PROCEDIMENTO_ACIDENTES",
-      "SMS_PROGRAMA_ANUAL": "SMS_PROGRAMA_ANUAL",
-      "SMS_PROCEDIMENTO_RESIDUOS": "SMS_PROCEDIMENTO_RESIDUOS",
-
-      // LICENÇAS AMBIENTAIS
-      "LICENCA_OPERACAO": "LICENCA_OPERACAO",
-    };
-
-    return mapeamentoPastas[anexoKey] || anexoKey;
-  };
-
-  // Função para processar ações nos anexos (visualizar/download) - NOVA VERSÃO
-  const handleAnexoAction = async (
-    anexo: IFileMetadata,
-    action: "view" | "download",
-    anexoKey: string
-  ): Promise<void> => {
-    try {
-      let attachmentData = anexo;
-
-      // Se não tem URL definida e temos o SharePointService, tentar obter a URL
-      if (
-        (!anexo.url || anexo.url.trim() === "") &&
-        sharePointService &&
-        anexo.id &&
-        id &&
-        cnpj &&
-        empresa
-      ) {
-        console.log(
-          `🔗 [ConformidadeLegal] Buscando URL para anexo ID: ${anexo.id}`
-        );
-
-        const sharePointFolderName = getSharePointFolderName(anexoKey);
-        console.log(
-          `📁 [ConformidadeLegal] Mapeamento de pasta:`,
-          {
-            anexoKey,
-            sharePointFolderName,
-            anexoFileName: anexo.fileName || anexo.originalName
-          }
-        );
-
-        const formData = {
-          id: parseInt(id), // Converter string para number
-          cnpj: cnpj,
-          empresa: empresa,
-          categoria: sharePointFolderName, // Usar o nome correto da pasta SharePoint
-          fileName: anexo.fileName || anexo.originalName,
-        };
-
-        const attachmentInfo = await sharePointService.getAttachmentById(
-          anexo.id,
-          formData
-        );
-        if (attachmentInfo) {
-          attachmentData = attachmentInfo;
-        }
-      }
-
-      if (attachmentData.url && attachmentData.url.trim() !== "") {
-        window.open(attachmentData.url, "_blank");
-      } else {
-        // Mostrar informações do anexo para debug
-        const actionText = action === "view" ? "visualizar" : "baixar";
-        alert(
-          `Não foi possível ${actionText} o arquivo.\n\nArquivo: ${
-            anexo.originalName || anexo.fileName
-          }\nID: ${anexo.id}\nTamanho: ${formatFileSize(
-            anexo.fileSize || 0
-          )}\n\nVerifique se o arquivo existe no SharePoint.`
-        );
-      }
-    } catch (error) {
-      console.error(
-        "❌ [ConformidadeLegal] Erro ao processar ação do anexo:",
-        error
+  // Função simplificada para anexos com URL completa no JSON
+  const handleAnexoActionSimplificado = (anexo: IFileMetadata): void => {
+    if (anexo.url && anexo.url.trim() !== "") {
+      console.log("🔗 [ConformidadeLegal] Abrindo anexo com URL:", anexo.url);
+      window.open(anexo.url, "_blank");
+    } else {
+      console.warn("⚠️ [ConformidadeLegal] Anexo sem URL:", anexo);
+      alert(
+        `Não foi possível visualizar o arquivo.\n\nArquivo: ${
+          anexo.originalName || anexo.fileName
+        }\nMotivo: URL não encontrada no JSON`
       );
-      alert("Erro ao processar o arquivo. Tente novamente.");
     }
   };
 
-  // Função antiga para compatibilidade - renderizar anexo por nome
-  const handleAnexoActionAntigo = async (anexoNome: string): Promise<void> => {
-    try {
-      console.log(
-        "🔗 [ConformidadeLegal] Tentando visualizar anexo:",
-        anexoNome
-      );
-
-      // Buscar o anexo correspondente nos dados
-      const anexoKey = anexoNome
-        .toLowerCase()
-        .replace(/\s+/g, "")
-        .replace(/[^a-z0-9]/g, "");
-
-      console.log("🔗 [ConformidadeLegal] Chave do anexo:", anexoKey);
-      console.log("🔗 [ConformidadeLegal] Anexos disponíveis:", anexos);
-
-      const anexoData = anexos[anexoKey as keyof IAnexos] as IFileMetadata[];
-      const arquivo = anexoData?.[0];
-
-      if (arquivo && arquivo.url) {
-        console.log("🔗 [ConformidadeLegal] Abrindo arquivo:", arquivo.url);
-        window.open(arquivo.url, "_blank");
-      } else {
-        console.warn(
-          "🔗 [ConformidadeLegal] Arquivo não encontrado ou sem URL:",
-          arquivo
-        );
-        alert("Arquivo não encontrado ou indisponível para visualização.");
-      }
-    } catch (error) {
-      console.error("Erro ao abrir anexo:", error);
-      alert("Erro ao tentar visualizar o anexo.");
-    }
-  };
-
+  // Função para processar ações nos anexos (visualizar/download) - VERSÃO COMPLEXA (DESCONTINUADA)
   // Mapeamento de nomes de anexos para chaves do objeto anexos (nomes das pastas SharePoint)
   const getAnexoKey = (anexoNome: string): string => {
     const mapeamento: Record<string, string> = {
@@ -736,7 +588,8 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
       // NR04 - SESMT
       "SESMT - Dimensionamento": "sesmt",
       "SESMT - Atas de Reunião": "sesmt",
-      "SESMT - Serviços Especializados em Engenharia de Segurança e Medicina do Trabalho": "sesmt",
+      "SESMT - Serviços Especializados em Engenharia de Segurança e Medicina do Trabalho":
+        "sesmt",
 
       // NR05 - CIPA
       "CIPA - Comissão Interna de Prevenção de Acidentes": "cipa",
@@ -851,7 +704,7 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
             <DefaultButton
               iconProps={{ iconName: "View" }}
               text="Visualizar"
-              onClick={() => handleAnexoAction(anexoData[0], "view", anexoKey)}
+              onClick={() => handleAnexoActionSimplificado(anexoData[0])}
               title="Clique para visualizar o arquivo"
             />
           </div>
@@ -875,7 +728,7 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
           <DefaultButton
             iconProps={{ iconName: "View" }}
             text="Visualizar"
-            onClick={() => handleAnexoActionAntigo(anexoNome)}
+            onClick={() => {}} // Função vazia para anexos não disponíveis
             disabled={true}
             title="Arquivo não disponível"
           />
