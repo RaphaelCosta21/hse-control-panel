@@ -36,13 +36,26 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
   cnpj,
   empresa,
 }) => {
-  const formatCurrency = (value: number | undefined | null): string => {
+  const formatNumber = (value: number | undefined | null): string => {
     if (value === undefined || value === null || isNaN(value))
       return "Não informado";
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
+    return value.toLocaleString("pt-BR");
+  };
+
+  const formatCNPJ = (cnpj: string | undefined | null): string => {
+    if (!cnpj) return "Não informado";
+
+    // Remove todos os caracteres não numéricos
+    const numericCNPJ = cnpj.replace(/\D/g, "");
+
+    // Verifica se tem 14 dígitos
+    if (numericCNPJ.length !== 14) return cnpj; // Retorna o valor original se não for válido
+
+    // Formata o CNPJ: XX.XXX.XXX/XXXX-XX
+    return numericCNPJ.replace(
+      /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+      "$1.$2.$3/$4-$5"
+    );
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -157,7 +170,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
   ): React.ReactElement => (
     <div className={`${styles.infoCard} ${highlight ? styles.highlight : ""}`}>
       <div className={styles.cardHeader}>
-        <Icon iconName={icon} className={styles.cardIcon} />
+        {/* <Icon iconName={icon} className={styles.cardIcon} /> */}
         <Text variant="large" className={styles.cardTitle}>
           {title}
         </Text>
@@ -272,7 +285,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 {renderField("Razão Social", data.empresa as string)}
               </Stack.Item>
               <Stack.Item>
-                {renderField("CNPJ", data.cnpj as string)}
+                {renderField("CNPJ", formatCNPJ(data.cnpj as string))}
               </Stack.Item>
             </Stack>
 
@@ -317,14 +330,14 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
               <Stack.Item>
                 {renderField(
                   "Total de Empregados",
-                  formatCurrency(data.totalEmpregados as number),
+                  formatNumber(data.totalEmpregados as number),
                   "number"
                 )}
               </Stack.Item>
               <Stack.Item>
                 {renderField(
                   "Empregados para o Serviço",
-                  formatCurrency(data.empregadosParaServico as number),
+                  formatNumber(data.empregadosParaServico as number),
                   "number"
                 )}
               </Stack.Item>
@@ -358,7 +371,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 <Stack.Item>
                   {renderField(
                     "Número de Componentes",
-                    formatCurrency(data.numeroComponentesSESMT as number),
+                    formatNumber(data.numeroComponentesSESMT as number),
                     "number"
                   )}
                 </Stack.Item>
@@ -369,7 +382,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
 
         <div className={styles.anexosCard}>
           <div className={styles.cardHeader}>
-            <Icon iconName="FileTemplate" className={styles.cardIcon} />
+            {/* <Icon iconName="FileTemplate" className={styles.cardIcon} /> */}
             <Text variant="large" className={styles.cardTitle}>
               📊 Resumo Estatístico Mensal de Acidentes
             </Text>

@@ -89,6 +89,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 16px;
+  align-items: start; /* Alinha os itens no topo para evitar expansão conjunta */
 }
 
 .nrCard {
@@ -97,6 +98,8 @@
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.2s ease;
+  height: min-content; /* Permite que cada card tenha altura independente */
+  align-self: start; /* Garante que o card não se estique verticalmente */
 
   &:hover {
     transform: translateY(-2px);
@@ -109,6 +112,14 @@
 
   &.optional {
     border-left: 4px solid #605e5c;
+  }
+
+  &.selected {
+    border-left: 4px solid #107c10;
+  }
+
+  &.notSelected {
+    border-left: 4px solid #d13438;
   }
 }
 

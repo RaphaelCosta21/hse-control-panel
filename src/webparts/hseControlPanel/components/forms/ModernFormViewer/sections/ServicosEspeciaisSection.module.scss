@@ -369,3 +369,109 @@
     }
   }
 }
+
+// Classes CSS necessárias para o novo design de cards
+.servicosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.servicoCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.selected {
+    border: 2px solid #107c10;
+  }
+
+  &.notSelected {
+    border: 2px solid #d13438;
+  }
+}
+
+.servicoHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f2f1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.servicoTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  margin-right: 16px;
+}
+
+.servicoNome {
+  font-weight: 600;
+  color: #323130;
+}
+
+.servicoStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusComplete {
+  color: #107c10;
+  font-size: 16px;
+}
+
+.statusNotSelected {
+  color: #d13438;
+  font-size: 16px;
+}
+
+.statusLabel {
+  color: #605e5c;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.servicoContent {
+  padding: 20px;
+}
+
+.anexoDetails {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.anexoIcon {
+  color: #0078d4;
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.anexoActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.field {
+  margin-bottom: 16px;
+}

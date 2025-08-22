@@ -191,8 +191,8 @@ const conformidadeSections: ISectionData[] = [
       },
     ],
     anexos: [
+      "NR 10 - Certificado de Profissionais",
       "NR 10 - Projeto de Instalações Elétricas",
-      "NR 10 - Certificação de Profissionais",
     ],
   },
   {
@@ -358,7 +358,7 @@ const conformidadeSections: ISectionData[] = [
     anexos: [],
   },
   {
-    id: "treinamentosObrigatorios",
+    id: "treinamentos",
     titulo: "Treinamentos Obrigatórios",
     obrigatoria: false,
     categoria: "outros",
@@ -493,7 +493,7 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
 
   const toggleSection = (sectionId: string): void => {
     setExpandedSections((prev) =>
-      prev.includes(sectionId)
+      prev.indexOf(sectionId) !== -1
         ? prev.filter((id) => id !== sectionId)
         : [...prev, sectionId]
     );
@@ -552,14 +552,25 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     // Se a seção não é aplicável, retorna N/A
     if (!sectionData || !sectionData.aplicavel) return "nao_aplicavel";
 
-    const section = conformidadeSections.find((s) => s.id === sectionId);
+    let section: ISectionData | undefined;
+    for (let i = 0; i < conformidadeSections.length; i++) {
+      if (conformidadeSections[i].id === sectionId) {
+        section = conformidadeSections[i];
+        break;
+      }
+    }
     if (!section) return "nao_aplicavel";
 
     // Verifica se todas as questões foram respondidas
-    const todasRespondidas = section.questoes.every((questao) => {
+    let todasRespondidas = true;
+    for (let i = 0; i < section.questoes.length; i++) {
+      const questao = section.questoes[i];
       const resposta = getQuestaoResposta(sectionId, questao.id);
-      return resposta === "SIM" || resposta === "NAO" || resposta === "NA";
-    });
+      if (resposta !== "SIM" && resposta !== "NAO" && resposta !== "NA") {
+        todasRespondidas = false;
+        break;
+      }
+    }
 
     return todasRespondidas ? "completo" : "incompleto";
   };
@@ -604,46 +615,51 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
       "ASO - Atestado de Saúde Ocupacional": "aso",
 
       // NR10 - CERTIFICADO_PROFISSIONAIS + PROJETO_INSTALACOES
-      "NR 10 - Certificado de Profissionais": "NR10_CERTIFICADO_PROFISSIONAIS",
-      "NR 10 - Projeto de Instalações": "NR10_PROJETO_INSTALACOES",
+      "NR 10 - Certificado de Profissionais": "nr10CertificacaoProfissionais",
+      "NR 10 - Projeto de Instalações Elétricas": "nr10ProjetoInstalacoes",
 
       // NR11 - CERTIFICADO_TREINAMENTO
-      "NR 11 - Certificado de Treinamento": "NR11_CERTIFICADO_TREINAMENTO",
+      "NR 11 - Certificado de Treinamento": "nr11CertificadoTreinamento",
 
       // NR12 - EVIDENCIA_DISPOSITIVO + PLANO_INSPECAO
-      "NR 12 - Certificado de Máquinas": "NR12_EVIDENCIA_DISPOSITIVO",
-      "NR 12 - Evidência de Dispositivo": "NR12_EVIDENCIA_DISPOSITIVO",
-      "NR 12 - Plano de Inspeção": "NR12_PLANO_INSPECAO",
+      "NR 12 - Certificado de Máquinas": "nr12EvidenciaDispositivo",
+      "NR 12 - Evidência de Dispositivo": "nr12EvidenciaDispositivo",
+      "NR 12 - Evidência de Dispositivos de Segurança":
+        "nr12EvidenciaDispositivo",
+      "NR 12 - Plano de Inspeção": "nr12PlanoInspecao",
+      "NR 12 - Plano de Inspeção de Máquinas": "nr12PlanoInspecao",
 
       // NR13 - EVIDENCIA_SISTEMATICA
-      "NR 13 - Certificado de Caldeiras": "NR13_EVIDENCIA_SISTEMATICA",
-      "NR 13 - Evidência Sistemática": "NR13_EVIDENCIA_SISTEMATICA",
+      "NR 13 - Certificado de Caldeiras": "nr13EvidenciaSistematica",
+      "NR 13 - Evidência Sistemática": "nr13EvidenciaSistematica",
+      "NR 13 - Evidência de Sistemática de Caldeiras e Vasos de Pressão":
+        "nr13EvidenciaSistematica",
 
       // NR15 - LAUDO_INSALUBRIDADE
-      "NR 15 - Laudo de Insalubridade": "NR15_LAUDO_INSALUBRIDADE",
+      "NR 15 - Laudo de Insalubridade": "nr15LaudoInsalubridade",
 
       // NR16 - LAUDO_PERICULOSIDADE
-      "NR 16 - Laudo de Periculosidade": "NR16_LAUDO_PERICULOSIDADE",
+      "NR 16 - Laudo de Periculosidade": "nr16LaudoPericulosidade",
 
       // NR23 - LAUDO_MANUTENCAO
       "NR 23 - Laudo de Manutenção de Proteção Contra Incêndios":
-        "NR23_LAUDO_MANUTENCAO",
+        "nr23LaudoManutencao",
 
       // TREINAMENTOS OBRIGATÓRIOS - EVIDENCIA_TREINAMENTO + CERTIFICADO_PROGRAMA_TREINAMENTO
-      "Evidência de Treinamento": "EVIDENCIA_TREINAMENTO",
-      "Certificado de Programa de Treinamento":
-        "CERTIFICADO_PROGRAMA_TREINAMENTO",
+      "Treinamentos - Evidência de Treinamento": "evidenciaTreinamento",
+      "Treinamentos - Certificado de Programa de Treinamento":
+        "certificadoProgramaTreinamento",
 
       // GESTÃO DE SMS - 5 pastas
-      "SMS - Calendário de Inspeções": "SMS_CALENDARIO_INSPECOES",
-      "SMS - Metas e Objetivos": "SMS_METAS_OBJETIVOS",
-      "SMS - Procedimento de Acidentes": "SMS_PROCEDIMENTO_ACIDENTES",
-      "SMS - Programa Anual": "SMS_PROGRAMA_ANUAL",
-      "SMS - Procedimento de Resíduos": "SMS_PROCEDIMENTO_RESIDUOS",
+      "SMS - Calendário de Inspeções": "smsCalendarioInspecoes",
+      "SMS - Metas e Objetivos": "smsMetasObjetivos",
+      "SMS - Procedimento de Acidentes": "smsProcedimentoAcidentes",
+      "SMS - Programa Anual": "smsProgramaAnual",
+      "SMS - Procedimento de Resíduos": "smsProcedimentoResiduos",
 
       // LICENÇAS AMBIENTAIS - LICENCA_OPERACAO
-      "Licenças Ambientais - Licença de Operação": "LICENCA_OPERACAO",
-      "Licenças Ambientais - Licença de Instalação": "LICENCA_OPERACAO",
+      "Licenças Ambientais - Licença de Operação": "licencaOperacao",
+      "Licenças Ambientais - Licença de Instalação": "licencaOperacao",
 
       // LEGISLAÇÃO MARÍTIMA - SEM ANEXO (não possui anexos)
     };
@@ -669,6 +685,8 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
       anexoData,
       arquivo,
       todasChavesAnexos: Object.keys(anexos || {}),
+      tipoAnexoData: typeof anexoData,
+      anexoDataLength: anexoData?.length,
     });
 
     // Se existem arquivos anexados, renderizar com dados reais
@@ -799,15 +817,22 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     }
   };
 
+  // Função para verificar se uma seção foi selecionada (aplicável)
+  const isSectionSelected = (sectionId: string): boolean => {
+    const sectionData = getSectionData(sectionId) as ISectionFormData;
+    return !!(sectionData && sectionData.aplicavel);
+  };
+
   const renderSection = (section: ISectionData): React.ReactElement => {
-    const isExpanded = expandedSections.includes(section.id);
+    const isExpanded = expandedSections.indexOf(section.id) !== -1;
     const status = getSectionStatus(section.id);
+    const isSelected = isSectionSelected(section.id);
 
     return (
       <div
         key={section.id}
         className={`${styles.nrCard} ${
-          section.obrigatoria ? styles.mandatory : styles.optional
+          isSelected ? styles.selected : styles.notSelected
         }`}
       >
         <div
@@ -892,9 +917,12 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     categoria: "obrigatorias" | "opcionais" | "outros",
     titulo: string
   ): React.ReactElement => {
-    const sectionsInCategory = conformidadeSections.filter(
-      (s) => s.categoria === categoria
-    );
+    const sectionsInCategory: ISectionData[] = [];
+    for (let i = 0; i < conformidadeSections.length; i++) {
+      if (conformidadeSections[i].categoria === categoria) {
+        sectionsInCategory.push(conformidadeSections[i]);
+      }
+    }
 
     return (
       <div style={{ marginBottom: "32px" }}>

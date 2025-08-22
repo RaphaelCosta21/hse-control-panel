@@ -8,90 +8,153 @@ import {
   MessageBarType,
   DefaultButton,
 } from "@fluentui/react";
-import { IServicosEspeciais, IAnexos } from "../../../../types/IHSEFormData";
+import {
+  IServicosEspeciais,
+  IAnexos,
+  IFileMetadata,
+} from "../../../../types/IHSEFormData";
+import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./ServicosEspeciaisSection.module.scss";
 
 export interface IServicosEspeciaisSectionProps {
   data: IServicosEspeciais;
   anexos: IAnexos;
   isReviewing: boolean;
+  cnpj: string;
+  empresa: string;
+  id: string;
+  sharePointService?: SharePointService;
 }
 
-interface IServicoCategoria {
-  titulo: string;
-  icon: string;
-  descricao: string;
-  servicos: IServicoItem[];
-}
-
-interface IServicoItem {
-  key: string;
+interface IAnexoInfo {
+  id: string;
   nome: string;
   descricao: string;
-  obrigatorio: boolean;
 }
 
-const servicosMaritimos: IServicoCategoria[] = [
+interface ISectionData {
+  id: string;
+  titulo: string;
+  aplicavel: boolean;
+  anexos: IAnexoInfo[];
+}
+
+// Dados das seções baseados nas imagens fornecidas
+const servicosEspeciaisSections: ISectionData[] = [
   {
-    titulo: "Certificados Marítimos",
-    icon: "Ferry",
-    descricao: "Documentação para operações aquaviárias",
-    servicos: [
+    id: "fornecedorEmbarcacoes",
+    titulo: "Fornecedor de Embarcações",
+    aplicavel: false, // Será definido dinamicamente
+    anexos: [
       {
-        key: "certificadoAquaviario",
-        nome: "Certificado Aquaviário",
-        descricao: "Certificado para navegação em águas interiores",
-        obrigatorio: true,
+        id: "iopp",
+        nome: "IOPP",
+        descricao: "Certificado Internacional de Prevenção à Poluição por Óleo",
       },
       {
-        key: "habilitacaoANTAQ",
-        nome: "Habilitação ANTAQ",
-        descricao: "Registro na Agência Nacional de Transportes Aquaviários",
-        obrigatorio: true,
+        id: "registroArmador",
+        nome: "Registro de Armador",
+        descricao: "Registro do armador da embarcação.",
+      },
+      {
+        id: "propriedadeMaritima",
+        nome: "Propriedade Marítima",
+        descricao: "Documento de propriedade da embarcação.",
+      },
+      {
+        id: "arqueacao",
+        nome: "Arqueação",
+        descricao: "Certificado de arqueação da embarcação.",
+      },
+      {
+        id: "segurancaNavegacao",
+        nome: "Segurança de Navegação",
+        descricao: "Certificado de segurança de navegação.",
+      },
+      {
+        id: "classificacaoCasco",
+        nome: "Classificação de Casco",
+        descricao: "Certificado de classificação do casco da embarcação.",
+      },
+      {
+        id: "classificacaoMaquinas",
+        nome: "Classificação de Máquinas",
+        descricao: "Certificado de classificação das máquinas da embarcação.",
+      },
+      {
+        id: "bordaLivre",
+        nome: "Borda Livre",
+        descricao: "Certificado de borda livre da embarcação.",
+      },
+      {
+        id: "seguroDepem",
+        nome: "Seguro DEPEM",
+        descricao:
+          "Seguro obrigatório de danos pessoais causados por embarcações.",
+      },
+      {
+        id: "autorizacaoAntaq",
+        nome: "Autorização ANTAQ",
+        descricao:
+          "Autorização da Agência Nacional de Transportes Aquaviários.",
+      },
+      {
+        id: "tripulacaoSeguranca",
+        nome: "Tripulação de Segurança",
+        descricao: "Documento de tripulação mínima de segurança.",
+      },
+      {
+        id: "agulhaMagnetica",
+        nome: "Agulha Magnética",
+        descricao: "Certificado de agulha magnética da embarcação.",
+      },
+      {
+        id: "balsaInflavel",
+        nome: "Balsa Inflável",
+        descricao: "Certificado de balsa inflável de salvatagem.",
+      },
+      {
+        id: "licencaRadio",
+        nome: "Licença de Rádio",
+        descricao: "Licença de estação de rádio da embarcação.",
       },
     ],
   },
   {
-    titulo: "Equipamentos de Elevação",
-    icon: "StreamingOn",
-    descricao: "Certificações para equipamentos de movimentação",
-    servicos: [
+    id: "fornecedorIcamento",
+    titulo: "Fornecedor de Içamento",
+    aplicavel: false, // Será definido dinamicamente
+    anexos: [
       {
-        key: "certificadoGuindaste",
-        nome: "Certificado de Guindaste",
-        descricao: "Inspeção e certificação de guindastes",
-        obrigatorio: false,
+        id: "testeCarga",
+        nome: "Teste de Carga",
+        descricao:
+          "Certificado de teste de carga para equipamentos de içamento.",
       },
       {
-        key: "certificadoGuincho",
-        nome: "Certificado de Guincho",
-        descricao: "Inspeção e certificação de guinchos",
-        obrigatorio: false,
+        id: "registroCREA",
+        nome: "Registro CREA (Engenheiro)",
+        descricao: "Registro de engenheiro responsável no CREA.",
       },
       {
-        key: "certificadoPonte",
-        nome: "Certificado de Ponte Rolante",
-        descricao: "Inspeção e certificação de pontes rolantes",
-        obrigatorio: false,
-      },
-    ],
-  },
-  {
-    titulo: "Serviços Especializados",
-    icon: "WorkforceManagement",
-    descricao: "Capacitações e certificações especiais",
-    servicos: [
-      {
-        key: "soldaSubaquatica",
-        nome: "Solda Subaquática",
-        descricao: "Certificação para soldagem subaquática",
-        obrigatorio: false,
+        id: "art",
+        nome: "ART (Anotação de Responsabilidade Técnica)",
+        descricao: "Anotação de Responsabilidade Técnica",
       },
       {
-        key: "inspecaoNDT",
-        nome: "Inspeção NDT",
-        descricao: "Ensaios não destrutivos",
-        obrigatorio: false,
+        id: "planoManutencao",
+        nome: "Plano de Manutenção",
+        descricao: "Plano de manutenção dos equipamentos de içamento.",
+      },
+      {
+        id: "monitoramentoFumaca",
+        nome: "Monitoramento de Fumaça",
+        descricao: "Evidência de monitoramento de emissão de fumaça preta.",
+      },
+      {
+        id: "certificacaoEquipamentos",
+        nome: "Certificação de Equipamentos",
+        descricao: "Certificado de conformidade dos equipamentos de içamento.",
       },
     ],
   },
@@ -101,324 +164,260 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
   data,
   anexos,
   isReviewing,
+  cnpj,
+  empresa,
+  id,
+  sharePointService,
 }) => {
-  const getServicoData = (servicoKey: string): any => {
-    return data[servicoKey as keyof IServicosEspeciais];
-  };
+  console.log("🎯 [ServicosEspeciais] Dados recebidos:", {
+    data,
+    anexos,
+    cnpj,
+    empresa,
+    id,
+  });
 
-  const formatDate = (date: Date | undefined): string => {
-    if (!date) return "N/A";
-    return date.toLocaleDateString("pt-BR");
-  };
+  const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
 
-  const diasParaVencimento = (dataVencimento: Date | undefined): number => {
-    if (!dataVencimento) return 0;
-    const hoje = new Date();
-    const diff = dataVencimento.getTime() - hoje.getTime();
-    return Math.ceil(diff / (1000 * 3600 * 24));
-  };
-
-  const getStatusCertificado = (
-    servicoData: { possui?: boolean; dataVencimento?: Date } | undefined
-  ): "ativo" | "vencido" | "vencendo" | "ausente" => {
-    if (!servicoData || !servicoData.possui) return "ausente";
-    if (!servicoData.dataVencimento) return "ativo";
-
-    const dias = diasParaVencimento(servicoData.dataVencimento);
-    if (dias < 0) return "vencido";
-    if (dias <= 30) return "vencendo";
-    return "ativo";
-  };
-
-  const renderStatusBadge = (
-    status: "ativo" | "vencido" | "vencendo" | "ausente"
-  ): React.ReactElement => {
-    const configs = {
-      ativo: {
-        icon: "CheckMark",
-        text: "Ativo",
-        className: styles.statusAtivo,
-      },
-      vencido: {
-        icon: "ErrorBadge",
-        text: "Vencido",
-        className: styles.statusVencido,
-      },
-      vencendo: {
-        icon: "Warning",
-        text: "Vencendo",
-        className: styles.statusVencendo,
-      },
-      ausente: {
-        icon: "Cancel",
-        text: "Ausente",
-        className: styles.statusAusente,
-      },
-    };
-
-    const config = configs[status];
-    return (
-      <span className={`${styles.statusBadge} ${config.className}`}>
-        <Icon iconName={config.icon} />
-        {config.text}
-      </span>
+  const toggleSection = (sectionId: string): void => {
+    setExpandedSections((prev) =>
+      prev.indexOf(sectionId) !== -1
+        ? prev.filter((sid) => sid !== sectionId)
+        : [...prev, sectionId]
     );
   };
 
-  const renderServicoCard = (servico: IServicoItem): React.ReactElement => {
-    const servicoData = getServicoData(servico.key);
-    const status = getStatusCertificado(servicoData);
+  // Função auxiliar para formatar tamanho do arquivo
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  // Função auxiliar para formatar data de upload
+  const formatUploadDate = (dateString: string): string => {
+    if (!dateString) return "Data não disponível";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    } catch {
+      return "Data inválida";
+    }
+  };
+
+  // Verificar se uma seção é aplicável
+  const isSectionApplicable = (sectionId: string): boolean => {
+    console.log("🔍 [ServicosEspeciais] Verificando seção:", {
+      sectionId,
+      data,
+      valorNoData: data?.[sectionId as keyof IServicosEspeciais],
+    });
+
+    if (!data) return false;
+
+    // Mapear IDs para as propriedades corretas no JSON
+    const propertyMap: { [key: string]: string } = {
+      fornecedorEmbarcacoes: "fornecedorEmbarcacoes",
+      fornecedorIcamento: "fornecedorIcamento",
+    };
+
+    const propertyName = propertyMap[sectionId] || sectionId;
+    const value = data[propertyName as keyof IServicosEspeciais];
+
+    console.log("🔍 [ServicosEspeciais] Verificando valor:", {
+      sectionId,
+      propertyName,
+      value,
+      isTrue: value === true,
+    });
+
+    return value === true;
+  };
+
+  // Verificar se uma seção foi selecionada (aplicável)
+  const isSectionSelected = (sectionId: string): boolean => {
+    return isSectionApplicable(sectionId);
+  };
+
+  // Mapeamento de anexos para chaves do objeto anexos
+  const getAnexoKey = (anexoId: string): string => {
+    // As chaves já estão no formato correto conforme a interface IAnexos
+    return anexoId;
+  };
+
+  const handleAnexoAction = (anexo: IFileMetadata): void => {
+    if (anexo.url && anexo.url.trim() !== "") {
+      console.log("🔗 [ServicosEspeciais] Abrindo anexo com URL:", anexo.url);
+      window.open(anexo.url, "_blank");
+    } else {
+      console.warn("⚠️ [ServicosEspeciais] Anexo sem URL:", anexo);
+      alert(
+        `Não foi possível visualizar o arquivo.\n\nArquivo: ${
+          anexo.originalName || anexo.fileName
+        }\nMotivo: URL não encontrada no JSON`
+      );
+    }
+  };
+
+  const renderAnexo = (anexoInfo: IAnexoInfo): React.ReactElement => {
+    const anexoKey = getAnexoKey(anexoInfo.id);
+    const anexoData = anexos[anexoKey as keyof IAnexos] as IFileMetadata[];
+
+    console.log("📎 [ServicosEspeciais] Renderizando anexo:", {
+      anexoInfo,
+      anexoKey,
+      anexoData,
+      todasChavesAnexos: Object.keys(anexos || {}),
+    });
+
+    // Se existem arquivos anexados, renderizar com dados reais
+    if (anexoData && anexoData.length > 0) {
+      return (
+        <div key={anexoInfo.id} className={styles.anexoItem}>
+          <div className={styles.anexoDetails}>
+            <Icon iconName="Attach" className={styles.anexoIcon} />
+            <div>
+              <Text
+                variant="small"
+                style={{ fontWeight: 600, color: "#0078d4" }}
+              >
+                {anexoInfo.nome}
+              </Text>
+              <Text variant="xSmall" style={{ color: "#605e5c" }}>
+                {anexoInfo.descricao}
+              </Text>
+              {anexoData.map((anexo, index) => (
+                <div key={anexo.id || index} style={{ marginTop: "4px" }}>
+                  <Text variant="xSmall" style={{ color: "#107c10" }}>
+                    📄 {anexo.originalName || anexo.fileName || "Arquivo"}
+                  </Text>
+                  <Text
+                    variant="xSmall"
+                    style={{ color: "#666", display: "block" }}
+                  >
+                    Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
+                    {formatUploadDate(anexo.uploadDate || "")}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.anexoActions}>
+            <DefaultButton
+              iconProps={{ iconName: "View" }}
+              text="Visualizar"
+              onClick={() => handleAnexoAction(anexoData[0])}
+              title="Clique para visualizar o arquivo"
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Caso contrário, renderizar anexo sem arquivo anexado
+    return (
+      <div key={anexoInfo.id} className={styles.anexoItem}>
+        <div className={styles.anexoDetails}>
+          <Icon iconName="Attach" className={styles.anexoIcon} />
+          <div>
+            <Text variant="small">{anexoInfo.nome}</Text>
+            <Text variant="xSmall" style={{ color: "#605e5c" }}>
+              {anexoInfo.descricao}
+            </Text>
+            <Text variant="xSmall" style={{ color: "#d13438" }}>
+              Arquivo não anexado
+            </Text>
+          </div>
+        </div>
+        <div className={styles.anexoActions}>
+          <DefaultButton
+            iconProps={{ iconName: "View" }}
+            text="Visualizar"
+            onClick={() => {}} // Função vazia para anexos não disponíveis
+            disabled={true}
+            title="Arquivo não disponível"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderStatusIcon = (isSelected: boolean): React.ReactElement => {
+    if (isSelected) {
+      return <Icon iconName="CheckMark" className={styles.statusComplete} />;
+    }
+    return <Icon iconName="Cancel" className={styles.statusNotSelected} />;
+  };
+
+  const renderSection = (section: ISectionData): React.ReactElement => {
+    const isExpanded = expandedSections.indexOf(section.id) !== -1;
+    const isSelected = isSectionSelected(section.id);
+
+    // Atualizar a seção com o status correto
+    const sectionWithStatus = {
+      ...section,
+      aplicavel: isSelected,
+    };
 
     return (
       <div
-        key={servico.key}
+        key={section.id}
         className={`${styles.servicoCard} ${
-          servico.obrigatorio ? styles.obrigatorio : styles.opcional
+          isSelected ? styles.selected : styles.notSelected
         }`}
       >
-        <div className={styles.servicoHeader}>
-          <div className={styles.servicoInfo}>
-            <Text variant="medium" className={styles.servicoNome}>
-              {servico.nome}
-            </Text>
-            <Text variant="small" className={styles.servicoDescricao}>
-              {servico.descricao}
-            </Text>
-            <Text variant="small" className={styles.servicoTipo}>
-              {servico.obrigatorio ? "🔴 Obrigatório" : "🟡 Opcional"}
-            </Text>
+        <div
+          className={styles.servicoHeader}
+          onClick={() => toggleSection(section.id)}
+        >
+          <div className={styles.servicoTitle}>
+            <div>
+              <Text variant="medium" className={styles.servicoNome}>
+                {section.titulo}
+              </Text>
+            </div>
+            <div className={styles.servicoStatus}>
+              {renderStatusIcon(isSelected)}
+              <Text variant="small" className={styles.statusLabel}>
+                {isSelected ? "SELECIONADO" : "NÃO SELECIONADO"}
+              </Text>
+            </div>
           </div>
-          <div className={styles.servicoStatus}>
-            {renderStatusBadge(status)}
-          </div>
+          <Icon
+            iconName={isExpanded ? "ChevronUp" : "ChevronDown"}
+            style={{ cursor: "pointer" }}
+          />
         </div>
 
-        {servicoData && servicoData.possui && (
-          <div className={styles.servicoDetalhes}>
-            <Stack tokens={{ childrenGap: 12 }}>
-              {servicoData.numeroRegistro && (
-                <div className={styles.detalheItem}>
-                  <Label>Número de Registro:</Label>
-                  <Text>{servicoData.numeroRegistro}</Text>
-                </div>
-              )}
+        {isExpanded && (
+          <div className={styles.servicoContent}>
+            {/* Status da seção */}
+            <div className={styles.field} style={{ marginBottom: "16px" }}>
+              <Text variant="small" style={{ fontWeight: 600 }}>
+                Status:{" "}
+                {isSelected
+                  ? "✅ Serviço selecionado"
+                  : "❌ Serviço não selecionado"}
+              </Text>
+            </div>
 
-              {servicoData.numeroSerie && (
-                <div className={styles.detalheItem}>
-                  <Label>Número de Série:</Label>
-                  <Text>{servicoData.numeroSerie}</Text>
-                </div>
-              )}
-
-              {servicoData.dataVencimento && (
-                <div className={styles.detalheItem}>
-                  <Label>Data de Vencimento:</Label>
-                  <div className={styles.dataVencimento}>
-                    <Text>{formatDate(servicoData.dataVencimento)}</Text>
-                    {status === "vencendo" && (
-                      <Text variant="small" className={styles.alertaVencimento}>
-                        ⚠️ Vence em{" "}
-                        {diasParaVencimento(servicoData.dataVencimento)} dias
-                      </Text>
-                    )}
-                    {status === "vencido" && (
-                      <Text variant="small" className={styles.alertaVencido}>
-                        🚫 Vencido há{" "}
-                        {Math.abs(
-                          diasParaVencimento(servicoData.dataVencimento)
-                        )}{" "}
-                        dias
-                      </Text>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {servicoData.certificacoes &&
-                servicoData.certificacoes.length > 0 && (
-                  <div className={styles.detalheItem}>
-                    <Label>Certificações:</Label>
-                    <div className={styles.certificacoesList}>
-                      {servicoData.certificacoes.map(
-                        (cert: string, index: number) => (
-                          <span key={index} className={styles.certificacaoTag}>
-                            {cert}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-
-              {servicoData.metodos && servicoData.metodos.length > 0 && (
-                <div className={styles.detalheItem}>
-                  <Label>Métodos:</Label>
-                  <div className={styles.metodosList}>
-                    {servicoData.metodos.map(
-                      (metodo: string, index: number) => (
-                        <span key={index} className={styles.metodoTag}>
-                          {metodo}
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {servicoData.anexo && (
-                <div className={styles.detalheItem}>
-                  <Label>Anexo:</Label>
-                  <div className={styles.anexoItem}>
-                    <Icon iconName="Attach" className={styles.anexoIcon} />
-                    <Text>{servicoData.anexo}</Text>
-                    <div className={styles.anexoActions}>
-                      <DefaultButton
-                        iconProps={{ iconName: "Download" }}
-                        text="Baixar"
-                        onClick={() =>
-                          console.log(`Download ${servicoData.anexo}`)
-                        }
-                      />
-                      <DefaultButton
-                        iconProps={{ iconName: "View" }}
-                        text="Visualizar"
-                        onClick={() =>
-                          console.log(`Visualizar ${servicoData.anexo}`)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {servicoData.anexos && servicoData.anexos.length > 0 && (
-                <div className={styles.detalheItem}>
-                  <Label>Anexos Múltiplos:</Label>
-                  <div className={styles.anexosList}>
-                    {servicoData.anexos.map((anexo: string, index: number) => (
-                      <div key={index} className={styles.anexoItem}>
-                        <Icon iconName="Attach" className={styles.anexoIcon} />
-                        <Text>{anexo}</Text>
-                        <div className={styles.anexoActions}>
-                          <DefaultButton
-                            iconProps={{ iconName: "Download" }}
-                            text="Baixar"
-                          />
-                          <DefaultButton
-                            iconProps={{ iconName: "View" }}
-                            text="Visualizar"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </Stack>
+            {/* Anexos */}
+            {sectionWithStatus.anexos.length > 0 && (
+              <div className={styles.field} style={{ marginTop: "16px" }}>
+                <Label>Documentos Relacionados:</Label>
+                <Stack tokens={{ childrenGap: 8 }}>
+                  {sectionWithStatus.anexos.map((anexo) => renderAnexo(anexo))}
+                </Stack>
+              </div>
+            )}
           </div>
         )}
-
-        {(!servicoData || !servicoData.possui) && (
-          <div className={styles.servicoAusente}>
-            <MessageBar messageBarType={MessageBarType.warning}>
-              Este serviço não foi informado no formulário.
-            </MessageBar>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderCategoriaSection = (
-    categoria: IServicoCategoria
-  ): React.ReactElement => (
-    <div key={categoria.titulo} className={styles.categoriaSection}>
-      <div className={styles.categoriaHeader}>
-        <Icon iconName={categoria.icon} className={styles.categoriaIcon} />
-        <div>
-          <Text variant="xLarge" className={styles.categoriaTitulo}>
-            {categoria.titulo}
-          </Text>
-          <Text variant="medium" className={styles.categoriaDescricao}>
-            {categoria.descricao}
-          </Text>
-        </div>
-      </div>
-
-      <div className={styles.servicosGrid}>
-        {categoria.servicos.map((servico) => renderServicoCard(servico))}
-      </div>
-    </div>
-  );
-
-  const renderResumo = (): React.ReactElement => {
-    const totalServicos = servicosMaritimos.reduce(
-      (acc, cat) => acc + cat.servicos.length,
-      0
-    );
-    const servicosAtivos = servicosMaritimos.reduce((acc, cat) => {
-      return (
-        acc +
-        cat.servicos.filter(
-          (s) => getStatusCertificado(getServicoData(s.key)) === "ativo"
-        ).length
-      );
-    }, 0);
-    const servicosVencendo = servicosMaritimos.reduce((acc, cat) => {
-      return (
-        acc +
-        cat.servicos.filter(
-          (s) => getStatusCertificado(getServicoData(s.key)) === "vencendo"
-        ).length
-      );
-    }, 0);
-    const servicosVencidos = servicosMaritimos.reduce((acc, cat) => {
-      return (
-        acc +
-        cat.servicos.filter(
-          (s) => getStatusCertificado(getServicoData(s.key)) === "vencido"
-        ).length
-      );
-    }, 0);
-
-    return (
-      <div className={styles.resumoSection}>
-        <div className={styles.resumoCard}>
-          <Icon iconName="CheckMark" className={styles.resumoIconAtivo} />
-          <div>
-            <Text variant="xLarge">{servicosAtivos}</Text>
-            <Text variant="small">Ativos</Text>
-          </div>
-        </div>
-
-        <div className={styles.resumoCard}>
-          <Icon iconName="Warning" className={styles.resumoIconVencendo} />
-          <div>
-            <Text variant="xLarge">{servicosVencendo}</Text>
-            <Text variant="small">Vencendo</Text>
-          </div>
-        </div>
-
-        <div className={styles.resumoCard}>
-          <Icon iconName="ErrorBadge" className={styles.resumoIconVencido} />
-          <div>
-            <Text variant="xLarge">{servicosVencidos}</Text>
-            <Text variant="small">Vencidos</Text>
-          </div>
-        </div>
-
-        <div className={styles.resumoCard}>
-          <Icon iconName="Cancel" className={styles.resumoIconAusente} />
-          <div>
-            <Text variant="xLarge">
-              {totalServicos -
-                servicosAtivos -
-                servicosVencendo -
-                servicosVencidos}
-            </Text>
-            <Text variant="small">Ausentes</Text>
-          </div>
-        </div>
       </div>
     );
   };
@@ -430,17 +429,30 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
           messageBarType={MessageBarType.info}
           className={styles.reviewAlert}
         >
-          🚢 <strong>Modo Revisão:</strong> Verifique as certificações e
-          validades dos serviços especializados.
+          ⚖️ <strong>Modo Revisão:</strong> Verifique os serviços especiais
+          aplicáveis e sua documentação.
         </MessageBar>
       )}
 
-      {renderResumo()}
-
-      <Stack tokens={{ childrenGap: 32 }}>
-        {servicosMaritimos.map((categoria) =>
-          renderCategoriaSection(categoria)
-        )}
+      <Stack tokens={{ childrenGap: 24 }}>
+        <div style={{ marginBottom: "32px" }}>
+          <div
+            style={{
+              backgroundColor: "#6c757d",
+              color: "white",
+              padding: "12px 16px",
+              borderRadius: "4px",
+              marginBottom: "16px",
+            }}
+          >
+            <Text variant="large" style={{ color: "white", fontWeight: 600 }}>
+              🚢 SERVIÇOS ESPECIAIS
+            </Text>
+          </div>
+          <div className={styles.servicosGrid}>
+            {servicosEspeciaisSections.map((section) => renderSection(section))}
+          </div>
+        </div>
       </Stack>
     </div>
   );
