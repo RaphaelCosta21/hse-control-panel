@@ -202,6 +202,210 @@ export class SharePointService {
     }
   }
 
+  /**
+   * Atualiza o formulário com dados de avaliação e metadata
+   */
+  public async updateFormWithEvaluation(
+    itemId: number,
+    evaluationData: {
+      status: string;
+      responsavel: {
+        name: string;
+        email: string;
+        id: string;
+      };
+      historicoStatusChange: Record<
+        string,
+        { dataAlteracao: string; usuario: string; email: string }
+      >;
+      formData?: any;
+    }
+  ): Promise<void> {
+    let updateData: Record<string, unknown> = {};
+
+    try {
+      // Buscar dados atuais do formulário
+      const currentItem = await this.sp.web.lists
+        .getByTitle(this.listName)
+        .items.getById(itemId)
+        .select("DadosFormulario")();
+
+      let updatedFormData = evaluationData.formData;
+
+      // Se existe dados do formulário, atualizar com metadata
+      if (currentItem.DadosFormulario) {
+        try {
+          const existingData = JSON.parse(currentItem.DadosFormulario);
+
+          // Atualizar dados do formulário APENAS com histórico de status
+          updatedFormData = {
+            ...existingData,
+            status: evaluationData.status, // Atualizar o status no JSON
+            metadata: {
+              ...existingData.metadata,
+              historicoStatusChange: {
+                ...existingData.metadata?.historicoStatusChange,
+                [evaluationData.status]: {
+                  dataAlteracao: new Date().toISOString(),
+                  usuario: evaluationData.responsavel.name,
+                  email: evaluationData.responsavel.email,
+                },
+              },
+              // NÃO criar Avaliacao aqui - será criado apenas no "Enviar Avaliação"
+            },
+          };
+        } catch (parseError) {
+          console.warn("Erro ao parsear dados existentes:", parseError);
+        }
+      }
+
+      // Preparar dados para atualização - APENAS StatusAvaliacao e DadosFormulario
+      updateData = {
+        StatusAvaliacao: evaluationData.status,
+      };
+
+      // Atualizar APENAS o JSON no campo DadosFormulario
+      if (updatedFormData) {
+        updateData.DadosFormulario = JSON.stringify(updatedFormData);
+      }
+
+      console.log("🔄 Atualizando formulário no SharePoint:", {
+        itemId,
+        status: evaluationData.status,
+        responsavel: evaluationData.responsavel.name,
+      });
+
+      await this.sp.web.lists
+        .getByTitle(this.listName)
+        .items.getById(itemId)
+        .update(updateData);
+
+      console.log("✅ Formulário atualizado com sucesso no SharePoint");
+    } catch (error) {
+      console.error(
+        "❌ Erro detalhado ao atualizar formulário com avaliação:",
+        {
+          error,
+          itemId,
+          dados: updateData,
+          listName: this.listName,
+        }
+      );
+
+      // Log mais detalhado do erro
+      if (error && typeof error === "object") {
+        const errorObj = error as Error & { response?: unknown };
+        if (errorObj.message) {
+          console.error("Mensagem do erro:", errorObj.message);
+        }
+        if (errorObj.response) {
+          console.error("Response do erro:", errorObj.response);
+        }
+      }
+
+      throw new Error(`Erro ao atualizar formulário com avaliação: ${error}`);
+    }
+  }
+
+  /**
+   * Finaliza a avaliação adicionando o array Avaliacao ao metadata
+   */
+  public async submitEvaluation(
+    itemId: number,
+    evaluationData: {
+      hseResponsavel: string;
+      email: string;
+      comentarios: string;
+      statusAvaliacao: string;
+    }
+  ): Promise<void> {
+    let updateData: Record<string, unknown> = {};
+
+    try {
+      // Buscar dados atuais do formulário
+      const currentItem = await this.sp.web.lists
+        .getByTitle(this.listName)
+        .items.getById(itemId)
+        .select("DadosFormulario")();
+
+      let updatedFormData = {};
+
+      if (currentItem.DadosFormulario) {
+        try {
+          const existingData = JSON.parse(currentItem.DadosFormulario);
+
+          // Criar estrutura de avaliação conforme especificação
+          const quantidadeAtual =
+            existingData.metadata?.Avaliacao?.QuantidadeAvaliacao || 0;
+          const proximoIndice = quantidadeAtual.toString();
+
+          const novaAvaliacao = {
+            HSEResponsavel: evaluationData.hseResponsavel,
+            DataInicio: new Date().toISOString(), // Data do momento do envio
+            Comentarios: evaluationData.comentarios,
+            StatusAvaliacao: evaluationData.statusAvaliacao,
+          };
+
+          // Atualizar dados do formulário com nova avaliação
+          updatedFormData = {
+            ...existingData,
+            status: evaluationData.statusAvaliacao, // Atualizar status
+            metadata: {
+              ...existingData.metadata,
+              historicoStatusChange: {
+                ...existingData.metadata?.historicoStatusChange,
+                [evaluationData.statusAvaliacao]: {
+                  dataAlteracao: new Date().toISOString(),
+                  usuario: evaluationData.hseResponsavel,
+                  email: evaluationData.email,
+                },
+              },
+              Avaliacao: {
+                ...existingData.metadata?.Avaliacao,
+                QuantidadeAvaliacao: quantidadeAtual + 1,
+                [proximoIndice]: novaAvaliacao,
+              },
+            },
+          };
+        } catch (parseError) {
+          console.warn("Erro ao parsear dados existentes:", parseError);
+        }
+      }
+
+      // Preparar dados para atualização
+      updateData = {
+        StatusAvaliacao: evaluationData.statusAvaliacao,
+      };
+
+      // Atualizar JSON no campo DadosFormulario
+      if (updatedFormData) {
+        updateData.DadosFormulario = JSON.stringify(updatedFormData);
+      }
+
+      console.log("🔄 Finalizando avaliação no SharePoint:", {
+        itemId,
+        status: evaluationData.statusAvaliacao,
+        responsavel: evaluationData.hseResponsavel,
+      });
+
+      await this.sp.web.lists
+        .getByTitle(this.listName)
+        .items.getById(itemId)
+        .update(updateData);
+
+      console.log("✅ Avaliação finalizada com sucesso no SharePoint");
+    } catch (error) {
+      console.error("❌ Erro ao finalizar avaliação:", {
+        error,
+        itemId,
+        dados: updateData,
+        listName: this.listName,
+      });
+
+      throw new Error(`Erro ao finalizar avaliação: ${error}`);
+    }
+  }
+
   private getAttachmentCount(attachments: {
     [key: string]: IAttachmentMetadata[];
   }): number {

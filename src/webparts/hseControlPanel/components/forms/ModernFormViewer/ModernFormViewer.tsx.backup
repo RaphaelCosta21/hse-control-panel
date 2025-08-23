@@ -741,24 +741,17 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
 
                       const metadata = (
                         formData as unknown as {
-                          metadata?: {
+                          metadata?: { 
                             Avaliacao?: Record<string, unknown>;
-                            historicoStatusChange?: Record<
-                              string,
-                              { dataAlteracao?: string; email?: string }
-                            >;
+                            historicoStatusChange?: Record<string, { dataAlteracao?: string; email?: string }>;
                           };
                         }
                       )?.metadata;
-
+                      
                       const avaliacaoData = metadata?.Avaliacao;
-                      const historicoStatusChange =
-                        metadata?.historicoStatusChange;
+                      const historicoStatusChange = metadata?.historicoStatusChange;
 
-                      console.log(
-                        "🔍 [ModernFormViewer] Historico Status Change:",
-                        historicoStatusChange
-                      );
+                      console.log("🔍 [ModernFormViewer] Historico Status Change:", historicoStatusChange);
 
                       // Buscar dados de avaliação
                       let evaluationData: {
@@ -767,10 +760,8 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                       } = {};
 
                       if (avaliacaoData) {
-                        const firstEvaluationKey =
-                          Object.keys(avaliacaoData)[0];
-                        evaluationData = (avaliacaoData[firstEvaluationKey] ||
-                          avaliacaoData["0"]) as {
+                        const firstEvaluationKey = Object.keys(avaliacaoData)[0];
+                        evaluationData = (avaliacaoData[firstEvaluationKey] || avaliacaoData["0"]) as {
                           HSEResponsavel?: string;
                           Comentarios?: string;
                         };
@@ -782,37 +773,18 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
 
                       if (historicoStatusChange) {
                         // Data de início = quando foi para "Em Análise"
-                        if (
-                          historicoStatusChange["Em Análise"]?.dataAlteracao
-                        ) {
-                          dataInicio = new Date(
-                            historicoStatusChange["Em Análise"].dataAlteracao
-                          ).toLocaleString("pt-BR");
+                        if (historicoStatusChange["Em Análise"]?.dataAlteracao) {
+                          dataInicio = new Date(historicoStatusChange["Em Análise"].dataAlteracao).toLocaleString("pt-BR");
                         }
 
                         // Data de conclusão = data do status atual (Aprovado, Rejeitado, ou Pendente Info)
                         const currentStatus = formData.status;
-                        if (
-                          currentStatus === "Aprovado" &&
-                          historicoStatusChange.Aprovado?.dataAlteracao
-                        ) {
-                          dataConclusao = new Date(
-                            historicoStatusChange.Aprovado.dataAlteracao
-                          ).toLocaleString("pt-BR");
-                        } else if (
-                          currentStatus === "Rejeitado" &&
-                          historicoStatusChange.Rejeitado?.dataAlteracao
-                        ) {
-                          dataConclusao = new Date(
-                            historicoStatusChange.Rejeitado.dataAlteracao
-                          ).toLocaleString("pt-BR");
-                        } else if (
-                          currentStatus === "Pendente Informações" &&
-                          historicoStatusChange["Pendente Info"]?.dataAlteracao
-                        ) {
-                          dataConclusao = new Date(
-                            historicoStatusChange["Pendente Info"].dataAlteracao
-                          ).toLocaleString("pt-BR");
+                        if (currentStatus === "Aprovado" && historicoStatusChange.Aprovado?.dataAlteracao) {
+                          dataConclusao = new Date(historicoStatusChange.Aprovado.dataAlteracao).toLocaleString("pt-BR");
+                        } else if (currentStatus === "Rejeitado" && historicoStatusChange.Rejeitado?.dataAlteracao) {
+                          dataConclusao = new Date(historicoStatusChange.Rejeitado.dataAlteracao).toLocaleString("pt-BR");
+                        } else if (currentStatus === "Pendente Informações" && historicoStatusChange["Pendente Info"]?.dataAlteracao) {
+                          dataConclusao = new Date(historicoStatusChange["Pendente Info"].dataAlteracao).toLocaleString("pt-BR");
                         }
                       }
 

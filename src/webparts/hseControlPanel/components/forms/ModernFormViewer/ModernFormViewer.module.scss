@@ -19,7 +19,7 @@
 .header {
   background: linear-gradient(135deg, #003d5c 0%, #0066a3 100%);
   color: white;
-  padding: 24px;
+  padding: 32px;
   margin: -20px -20px 0 -20px;
   box-shadow: 0 4px 12px rgba(0, 61, 92, 0.15);
 
@@ -34,6 +34,105 @@
       color: rgba(255, 255, 255, 0.85);
       font-size: 14px;
     }
+  }
+
+  .title {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+
+  .companyInfo {
+    .companyName {
+      color: white;
+      font-weight: 500;
+    }
+  }
+
+  .cnpjInfo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .cnpjLabel {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .cnpjValue {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+  }
+
+  .statusInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dateInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .infoLabel {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .infoValue {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .statusBadge {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  // Status específicos
+  .statusAprovado {
+    background: rgba(16, 124, 16, 0.2);
+    border-color: rgba(16, 124, 16, 0.4);
+  }
+
+  .statusRejeitado {
+    background: rgba(164, 38, 44, 0.2);
+    border-color: rgba(164, 38, 44, 0.4);
+  }
+
+  .statusEmAnálise {
+    background: rgba(255, 185, 0, 0.2);
+    border-color: rgba(255, 185, 0, 0.4);
+  }
+
+  .statusEnviado {
+    background: rgba(0, 120, 212, 0.2);
+    border-color: rgba(0, 120, 212, 0.4);
+  }
+
+  .statusPendenteInformações {
+    background: rgba(255, 140, 0, 0.2);
+    border-color: rgba(255, 140, 0, 0.4);
+  }
+
+  .statusEmAndamento {
+    background: rgba(0, 102, 163, 0.2);
+    border-color: rgba(0, 102, 163, 0.4);
   }
 
   .reviewerSection {
@@ -85,6 +184,20 @@
 
       &:hover {
         background: #003d5c;
+      }
+    }
+  }
+
+  .secondaryAction {
+    :global(.ms-Button) {
+      background: transparent;
+      color: #0066a3;
+      border: 1px solid #0066a3;
+
+      &:hover {
+        background: rgba(0, 102, 163, 0.1);
+        border-color: #003d5c;
+        color: #003d5c;
       }
     }
   }
@@ -285,4 +398,34 @@
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* Estilos para a seção de avaliação detalhada */
+.evaluationSection {
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+  border: 2px solid #0066cc;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.1);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.evaluationTitle {
+  color: #003d5c;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 8px;
+}
+
+.statusBadge {
+  background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(255, 149, 0, 0.3);
 }
