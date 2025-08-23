@@ -1,0 +1,112 @@
+.header {
+  padding: 24px;
+  border-bottom: 1px solid #e1e5ea;
+  background-color: #fafafa;
+
+  .title {
+    color: #323130;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .companyInfo {
+    .companyName {
+      color: #106ebe;
+      font-weight: 600;
+    }
+  }
+
+  .cnpjInfo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .cnpjLabel {
+      color: #605e5c;
+      font-size: 14px;
+    }
+
+    .cnpjValue {
+      color: #323130;
+      font-weight: 500;
+      font-size: 14px;
+    }
+  }
+
+  .reviewerSection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .reviewerLabel {
+      color: #605e5c;
+      font-size: 12px;
+    }
+
+    .reviewerCard {
+      border-radius: 4px;
+    }
+  }
+
+  .statusInfo,
+  .dateInfo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .infoLabel {
+      color: #605e5c;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .infoValue {
+      color: #323130;
+      font-size: 13px;
+    }
+  }
+
+  .statusBadge {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &.statusAprovado {
+      background-color: #dff6dd;
+      color: #107c10;
+    }
+
+    &.statusRejeitado {
+      background-color: #fde7e9;
+      color: #d13438;
+    }
+
+    &.statusEmAnalise {
+      background-color: #e1f5fe;
+      color: #0078d4;
+    }
+
+    &.statusEnviado {
+      background-color: #fff4ce;
+      color: #8a8886;
+    }
+
+    &.statusPendenteInformacoes {
+      background-color: #fff4ce;
+      color: #f7630c;
+    }
+
+    &.statusEmAndamento {
+      background-color: #f3f2f1;
+      color: #605e5c;
+    }
+  }
+
+  .reviewingAlert {
+    margin-top: 16px;
+  }
+}
