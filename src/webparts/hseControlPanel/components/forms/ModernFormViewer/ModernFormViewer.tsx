@@ -76,21 +76,6 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
     currentUser,
   });
 
-  // Função para obter classe CSS de status
-  const getStatusClass = React.useCallback((status?: string): string => {
-    if (!status) return "";
-    const statusKey = `status${status.replace(/\s+/g, "")}`;
-    const statusClasses: Record<string, string> = {
-      statusAprovado: styles.statusAprovado || "",
-      statusRejeitado: styles.statusRejeitado || "",
-      statusEmAnálise: styles.statusEmAnálise || "",
-      statusEnviado: styles.statusEnviado || "",
-      statusPendenteInformações: styles.statusPendenteInformações || "",
-      statusEmAndamento: styles.statusEmAndamento || "",
-    };
-    return statusClasses[statusKey] || "";
-  }, []);
-
   const [formData, setFormData] = React.useState<IHSEFormData | undefined>(
     undefined
   );
