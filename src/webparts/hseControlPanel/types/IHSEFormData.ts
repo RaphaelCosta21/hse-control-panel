@@ -193,6 +193,8 @@ export interface IHSEFormData {
     | "Pendente Informações";
   dataSubmissao?: Date;
   dataUltimaModificacao?: Date;
+  dataEnvio?: Date; // Campo adicionado
+  dataAvaliacao?: Date; // Campo adicionado
   observacoes?: string;
   anexos: IAnexos;
 

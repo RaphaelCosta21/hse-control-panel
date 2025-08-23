@@ -379,6 +379,7 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         onDismiss={handleCloseViewer}
         form={selectedForm}
         sharePointService={sharePointService}
+        context={context}
         onFormUpdate={handleFormUpdate}
         currentUser={{
           name:
