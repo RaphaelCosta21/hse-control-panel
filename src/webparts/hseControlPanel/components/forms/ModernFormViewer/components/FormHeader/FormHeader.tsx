@@ -23,7 +23,10 @@ const FormHeader: React.FC<IFormHeaderProps> = ({ formData, isReviewing }) => {
     const numbers = cnpj.replace(/\D/g, "");
     // Aplica a máscara XX.XXX.XXX/XXXX-XX
     if (numbers.length === 14) {
-      return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+      return numbers.replace(
+        /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+        "$1.$2.$3/$4-$5"
+      );
     }
     return cnpj; // Retorna o valor original se não tiver 14 dígitos
   };

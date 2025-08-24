@@ -45,7 +45,9 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
   currentUser,
 }) => {
   // Estado para gerenciar a página principal
-  const [selectedMainPage, setSelectedMainPage] = React.useState<string>("avaliacao-documentos");
+  const [selectedMainPage, setSelectedMainPage] = React.useState<string>(
+    "avaliacao-documentos"
+  );
 
   // Hooks para gerenciar dados do formulário
   const {
@@ -141,8 +143,8 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
         {
           key: "evaluationDetails",
           text: showEvaluationDetails ? "Ocultar Avaliação" : "Ver Avaliação",
-          iconProps: { 
-            iconName: showEvaluationDetails ? "ChevronUp" : "ChevronDown" 
+          iconProps: {
+            iconName: showEvaluationDetails ? "ChevronUp" : "ChevronDown",
           },
           onClick: () => {
             setShowEvaluationDetails(!showEvaluationDetails);
@@ -218,99 +220,116 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
         />
 
         {/* Navegação principal entre páginas */}
-        <div style={{
-          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-          borderRadius: '8px 8px 0 0',
-          marginTop: '20px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          border: '1px solid #dee2e6',
-          borderBottom: 'none'
-        }}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+            borderRadius: "8px 8px 0 0",
+            marginTop: "20px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            border: "1px solid #dee2e6",
+            borderBottom: "none",
+          }}
+        >
           <Pivot
             selectedKey={selectedMainPage}
             onLinkClick={(item) =>
               setSelectedMainPage(item?.props.itemKey || "avaliacao-documentos")
             }
             className={styles.pivot}
-            style={{ 
-              background: 'transparent',
-              borderBottom: 'none'
+            style={{
+              background: "transparent",
+              borderBottom: "none",
             }}
             linkSize="large"
             linkFormat="tabs"
           >
-            <PivotItem 
-              headerText="📋 Dados do Formulário" 
+            <PivotItem
+              headerText="📋 Dados do Formulário"
               itemKey="avaliacao-documentos"
-              style={{ color: '#495057', fontWeight: '600', fontSize: '16px' }}
+              style={{ color: "#495057", fontWeight: "600", fontSize: "16px" }}
             >
-              <div style={{ 
-                backgroundColor: '#ffffff', 
-                padding: '0',
-                borderRadius: '0 0 8px 8px',
-                minHeight: '500px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                border: '1px solid #dee2e6',
-                borderTop: 'none'
-              }}>
+              <div
+                style={{
+                  backgroundColor: "#ffffff",
+                  padding: "0",
+                  borderRadius: "0 0 8px 8px",
+                  minHeight: "500px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  border: "1px solid #dee2e6",
+                  borderTop: "none",
+                }}
+              >
                 {/* Cabeçalho da seção */}
-                <div style={{
-                  background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                  padding: '20px 24px',
-                  borderBottom: '1px solid #e9ecef',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px'
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    background: 'linear-gradient(135deg, #17a2b8, #138496)',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '18px',
-                    boxShadow: '0 2px 4px rgba(23, 162, 184, 0.3)'
-                  }}>
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
+                    padding: "20px 24px",
+                    borderBottom: "1px solid #e9ecef",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #17a2b8, #138496)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: "18px",
+                      boxShadow: "0 2px 4px rgba(23, 162, 184, 0.3)",
+                    }}
+                  >
                     📋
                   </div>
                   <div>
-                    <h3 style={{ 
-                      margin: '0',
-                      fontSize: '20px',
-                      fontWeight: '600',
-                      color: '#2c3e50'
-                    }}>
+                    <h3
+                      style={{
+                        margin: "0",
+                        fontSize: "20px",
+                        fontWeight: "600",
+                        color: "#2c3e50",
+                      }}
+                    >
                       Dados do Formulário HSE
                     </h3>
-                    <p style={{
-                      margin: '4px 0 0 0',
-                      fontSize: '14px',
-                      color: '#6c757d'
-                    }}>
-                      Informações detalhadas sobre dados gerais, conformidade legal e serviços especiais
+                    <p
+                      style={{
+                        margin: "4px 0 0 0",
+                        fontSize: "14px",
+                        color: "#6c757d",
+                      }}
+                    >
+                      Informações detalhadas sobre dados gerais, conformidade
+                      legal e serviços especiais
                     </p>
                   </div>
                 </div>
 
                 {/* Sub-abas com design diferenciado */}
-                <div style={{ padding: '0 24px' }}>
+                <div style={{ padding: "0 24px" }}>
                   <Pivot
                     selectedKey={selectedTab}
                     onLinkClick={(item) =>
                       setSelectedTab(item?.props.itemKey || "dadosGerais")
                     }
                     className={styles.pivot}
-                    style={{ 
-                      marginTop: '0',
-                      borderBottom: '1px solid #e9ecef'
+                    style={{
+                      marginTop: "0",
+                      borderBottom: "1px solid #e9ecef",
                     }}
                     linkSize="normal"
                     linkFormat="links"
                   >
-                    <PivotItem headerText="📊 Dados Gerais" itemKey="dadosGerais">
+                    <PivotItem
+                      headerText="📊 Dados Gerais"
+                      itemKey="dadosGerais"
+                    >
                       <div className={styles.pivotItem}>
                         <DadosGeraisSection
                           data={formData.dadosGerais}
@@ -348,7 +367,9 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                           anexos={formData.anexos}
                           isReviewing={isReviewing}
                           cnpj={formData.dadosGerais?.cnpj || ""}
-                          empresa={String(formData.dadosGerais?.nomeEmpresa || "")}
+                          empresa={String(
+                            formData.dadosGerais?.nomeEmpresa || ""
+                          )}
                           id={String(formData.dadosGerais?.id || "")}
                           sharePointService={sharePointService}
                         />
@@ -358,119 +379,142 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                 </div>
               </div>
             </PivotItem>
-          
-          <PivotItem 
-            headerText="🔄 Fluxo Detalhado" 
-            itemKey="fluxo-detalhado"
-            style={{ color: '#495057', fontWeight: '600', fontSize: '16px' }}
-          >
-            <div style={{ 
-              backgroundColor: '#ffffff', 
-              padding: '0',
-              borderRadius: '0 0 8px 8px',
-              minHeight: '500px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-              border: '1px solid #dee2e6',
-              borderTop: 'none'
-            }}>
-              {/* Cabeçalho da seção */}
-              <div style={{
-                background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                padding: '20px 24px',
-                borderBottom: '1px solid #e9ecef',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  background: 'linear-gradient(135deg, #28a745, #20c997)',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '18px',
-                  boxShadow: '0 2px 4px rgba(40, 167, 69, 0.3)'
-                }}>
-                  🔄
-                </div>
-                <div>
-                  <h3 style={{ 
-                    margin: '0',
-                    fontSize: '20px',
-                    fontWeight: '600',
-                    color: '#2c3e50'
-                  }}>
-                    Timeline do Processo
-                  </h3>
-                  <p style={{
-                    margin: '4px 0 0 0',
-                    fontSize: '14px',
-                    color: '#6c757d'
-                  }}>
-                    Acompanhamento detalhado do fluxo de avaliação HSE
-                  </p>
-                </div>
-              </div>
 
-              {/* Conteúdo do placeholder */}
-              <div style={{ padding: '24px' }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '60px 20px',
-                  textAlign: 'center',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  border: '1px solid #e1e4e8'
-                }}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #0078d4, #106ebe)',
-                    borderRadius: '50%',
-                    width: '80px',
-                    height: '80px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '32px',
-                    marginBottom: '24px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    color: 'white'
-                  }}>
-                    �
+            <PivotItem
+              headerText="🔄 Fluxo Detalhado"
+              itemKey="fluxo-detalhado"
+              style={{ color: "#495057", fontWeight: "600", fontSize: "16px" }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#ffffff",
+                  padding: "0",
+                  borderRadius: "0 0 8px 8px",
+                  minHeight: "500px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  border: "1px solid #dee2e6",
+                  borderTop: "none",
+                }}
+              >
+                {/* Cabeçalho da seção */}
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
+                    padding: "20px 24px",
+                    borderBottom: "1px solid #e9ecef",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #28a745, #20c997)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: "18px",
+                      boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
+                    }}
+                  >
+                    🔄
                   </div>
-                  <h3 style={{
-                    margin: '0 0 16px 0',
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: '#323130'
-                  }}>
-                    Em Desenvolvimento
-                  </h3>
-                  <p style={{
-                    margin: '0 0 12px 0',
-                    fontSize: '16px',
-                    color: '#605e5c',
-                    maxWidth: '500px'
-                  }}>
-                    Esta funcionalidade será implementada em breve e permitirá visualizar a timeline completa do processo de avaliação.
-                  </p>
-                  <p style={{
-                    margin: '0',
-                    fontSize: '14px',
-                    color: '#8a8886',
-                    maxWidth: '500px'
-                  }}>
-                    Incluirá etapas, prazos, responsáveis e histórico de ações realizadas.
-                  </p>
+                  <div>
+                    <h3
+                      style={{
+                        margin: "0",
+                        fontSize: "20px",
+                        fontWeight: "600",
+                        color: "#2c3e50",
+                      }}
+                    >
+                      Timeline do Processo
+                    </h3>
+                    <p
+                      style={{
+                        margin: "4px 0 0 0",
+                        fontSize: "14px",
+                        color: "#6c757d",
+                      }}
+                    >
+                      Acompanhamento detalhado do fluxo de avaliação HSE
+                    </p>
+                  </div>
+                </div>
+
+                {/* Conteúdo do placeholder */}
+                <div style={{ padding: "24px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "60px 20px",
+                      textAlign: "center",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "8px",
+                      border: "1px solid #e1e4e8",
+                    }}
+                  >
+                    <div
+                      style={{
+                        background: "linear-gradient(135deg, #0078d4, #106ebe)",
+                        borderRadius: "50%",
+                        width: "80px",
+                        height: "80px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "32px",
+                        marginBottom: "24px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        color: "white",
+                      }}
+                    >
+                      �
+                    </div>
+                    <h3
+                      style={{
+                        margin: "0 0 16px 0",
+                        fontSize: "24px",
+                        fontWeight: "600",
+                        color: "#323130",
+                      }}
+                    >
+                      Em Desenvolvimento
+                    </h3>
+                    <p
+                      style={{
+                        margin: "0 0 12px 0",
+                        fontSize: "16px",
+                        color: "#605e5c",
+                        maxWidth: "500px",
+                      }}
+                    >
+                      Esta funcionalidade será implementada em breve e permitirá
+                      visualizar a timeline completa do processo de avaliação.
+                    </p>
+                    <p
+                      style={{
+                        margin: "0",
+                        fontSize: "14px",
+                        color: "#8a8886",
+                        maxWidth: "500px",
+                      }}
+                    >
+                      Incluirá etapas, prazos, responsáveis e histórico de ações
+                      realizadas.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </PivotItem>
+            </PivotItem>
           </Pivot>
         </div>
       </>
