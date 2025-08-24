@@ -16,6 +16,18 @@ export interface IFormHeaderProps {
 }
 
 const FormHeader: React.FC<IFormHeaderProps> = ({ formData, isReviewing }) => {
+  // Função para formatar CNPJ
+  const formatCNPJ = (cnpj: string): string => {
+    if (!cnpj) return "";
+    // Remove todos os caracteres não numéricos
+    const numbers = cnpj.replace(/\D/g, "");
+    // Aplica a máscara XX.XXX.XXX/XXXX-XX
+    if (numbers.length === 14) {
+      return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    }
+    return cnpj; // Retorna o valor original se não tiver 14 dígitos
+  };
+
   return (
     <div className={styles.header}>
       <Stack tokens={{ childrenGap: 20 }}>
@@ -43,7 +55,7 @@ const FormHeader: React.FC<IFormHeaderProps> = ({ formData, isReviewing }) => {
                 <div className={styles.cnpjInfo}>
                   <Text className={styles.cnpjLabel}>CNPJ:</Text>
                   <Text className={styles.cnpjValue}>
-                    {formData?.dadosGerais.cnpj}
+                    {formatCNPJ(formData?.dadosGerais.cnpj || "")}
                   </Text>
                 </div>
               </Stack>

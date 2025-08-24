@@ -178,12 +178,37 @@
 
   .primaryAction {
     :global(.ms-Button) {
-      background: #0066a3;
+      background: linear-gradient(135deg, #17a2b8, #138496);
       color: white;
       border: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+      transition: all 0.2s ease;
+      font-weight: 500;
 
       &:hover {
-        background: #003d5c;
+        background: linear-gradient(135deg, #138496, #117a8b);
+        box-shadow: 0 4px 8px rgba(23, 162, 184, 0.4);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+      }
+
+      :global(.ms-Button-icon) {
+        transition: transform 0.2s ease;
+      }
+
+      :global(.ms-Button-label) {
+        font-weight: 500;
+      }
+
+      :global(.ms-Button-description) {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        margin-top: 2px;
       }
     }
   }
