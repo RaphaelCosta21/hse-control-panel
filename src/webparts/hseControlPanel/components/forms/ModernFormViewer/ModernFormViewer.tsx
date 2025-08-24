@@ -18,6 +18,7 @@ import DadosGeraisSection from "./sections/DadosGeraisSection";
 import ConformidadeLegalSection from "./sections/ConformidadeLegalSection";
 import ServicosEspeciaisSection from "./sections/ServicosEspeciaisSection";
 import { FormHeader, EvaluationDetails, ReviewDialogs } from "./components";
+import { FlowTimeline } from "./components/FlowTimeline";
 import { useEvaluation, useReview, useFormData } from "./hooks";
 import styles from "./ModernFormViewer.module.scss";
 
@@ -256,7 +257,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                   minHeight: "500px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                   border: "1px solid #dee2e6",
-                  borderTop: "none",
+                  borderTop: "3px solid rgb(3, 120, 124)",
                 }}
               >
                 {/* Cabeçalho da seção */}
@@ -393,7 +394,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                   minHeight: "500px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                   border: "1px solid #dee2e6",
-                  borderTop: "none",
+                  borderTop: "3px solid rgb(3, 120, 124)",
                 }}
               >
                 {/* Cabeçalho da seção */}
@@ -447,72 +448,8 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                   </div>
                 </div>
 
-                {/* Conteúdo do placeholder */}
-                <div style={{ padding: "24px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "60px 20px",
-                      textAlign: "center",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "8px",
-                      border: "1px solid #e1e4e8",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "linear-gradient(135deg, #0078d4, #106ebe)",
-                        borderRadius: "50%",
-                        width: "80px",
-                        height: "80px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "32px",
-                        marginBottom: "24px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        color: "white",
-                      }}
-                    >
-                      �
-                    </div>
-                    <h3
-                      style={{
-                        margin: "0 0 16px 0",
-                        fontSize: "24px",
-                        fontWeight: "600",
-                        color: "#323130",
-                      }}
-                    >
-                      Em Desenvolvimento
-                    </h3>
-                    <p
-                      style={{
-                        margin: "0 0 12px 0",
-                        fontSize: "16px",
-                        color: "#605e5c",
-                        maxWidth: "500px",
-                      }}
-                    >
-                      Esta funcionalidade será implementada em breve e permitirá
-                      visualizar a timeline completa do processo de avaliação.
-                    </p>
-                    <p
-                      style={{
-                        margin: "0",
-                        fontSize: "14px",
-                        color: "#8a8886",
-                        maxWidth: "500px",
-                      }}
-                    >
-                      Incluirá etapas, prazos, responsáveis e histórico de ações
-                      realizadas.
-                    </p>
-                  </div>
-                </div>
+                {/* Conteúdo do FlowTimeline */}
+                {formData && <FlowTimeline formData={formData} />}
               </div>
             </PivotItem>
           </Pivot>
