@@ -80,7 +80,8 @@ export class SharePointService {
           "NomePreenchimento",
           "AnexosCount",
           "Modified",
-          "Created"
+          "Created",
+          "DadosFormulario"
         )
         .orderBy("Created", false)();
 

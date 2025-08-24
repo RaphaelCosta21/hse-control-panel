@@ -4,7 +4,6 @@ import {
   IColumn,
   DetailsListLayoutMode,
   SelectionMode,
-  ProgressIndicator,
   DefaultButton,
 } from "@fluentui/react";
 import { StatusBadge, UserCard } from "../../ui";
@@ -166,9 +165,6 @@ const FormsTable: React.FC<IFormsTableProps> = ({
   // Função para extrair número da revisão do JSON DadosFormulario
   const getRevisionNumber = (item: IFormListItem): string => {
     try {
-      console.log("=== DEBUG REVISÃO ===");
-      console.log("Item completo:", item);
-
       // O JSON está na propriedade DadosFormulario ou similar
       let dadosFormulario = null;
 
@@ -185,32 +181,23 @@ const FormsTable: React.FC<IFormsTableProps> = ({
             : item.DadosFormulario;
       }
 
-      console.log("Dados do formulário:", dadosFormulario);
-
       if (
         dadosFormulario &&
         dadosFormulario.metadata &&
         dadosFormulario.metadata.historicoRevisoes
       ) {
         const historicoRevisoes = dadosFormulario.metadata.historicoRevisoes;
-        console.log("Histórico de revisões:", historicoRevisoes);
 
         if (Array.isArray(historicoRevisoes) && historicoRevisoes.length > 0) {
           // Pega o último item do array de revisões
           const ultimaRevisao = historicoRevisoes[historicoRevisoes.length - 1];
-          console.log("Última revisão:", ultimaRevisao);
 
           if (ultimaRevisao && ultimaRevisao.numeroRevisao !== undefined) {
-            console.log(
-              "Número da revisão encontrado:",
-              ultimaRevisao.numeroRevisao
-            );
             return `Rev. ${ultimaRevisao.numeroRevisao}`;
           }
         }
       }
 
-      console.log("Retornando Rev. 1 (fallback)");
       return "Rev. 1";
     } catch (error) {
       console.error("Erro ao extrair número da revisão:", error);
@@ -229,11 +216,11 @@ const FormsTable: React.FC<IFormsTableProps> = ({
           typeof item.metadata === "string"
             ? JSON.parse(item.metadata)
             : item.metadata;
-      } else if ((item as any).DadosFormulario) {
+      } else if (item.DadosFormulario) {
         dadosFormulario =
-          typeof (item as any).DadosFormulario === "string"
-            ? JSON.parse((item as any).DadosFormulario)
-            : (item as any).DadosFormulario;
+          typeof item.DadosFormulario === "string"
+            ? JSON.parse(item.DadosFormulario)
+            : item.DadosFormulario;
       }
 
       if (
@@ -324,27 +311,6 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       ),
     },
     {
-      key: "completionPercentage",
-      name: "% Concl.",
-      fieldName: "completionPercentage",
-      minWidth: 100,
-      maxWidth: 120,
-      isResizable: true,
-      onRender: (item: IFormListItem) => {
-        const percentage =
-          item.completionPercentage || item.percentualConclusao || 0;
-        return (
-          <div className={styles.progressCell}>
-            <ProgressIndicator
-              percentComplete={percentage / 100}
-              description={`${percentage}%`}
-              className={styles.progressBar}
-            />
-          </div>
-        );
-      },
-    },
-    {
       key: "revisionNumber",
       name: "Revisão Atual",
       fieldName: "revisionNumber",
@@ -361,18 +327,32 @@ const FormsTable: React.FC<IFormsTableProps> = ({
     },
     {
       key: "assignedReviewer",
-      name: "Análise por",
+      name: "Revisor",
       fieldName: "assignedReviewer",
       minWidth: 150,
       maxWidth: 200,
       isResizable: true,
-      onRender: (item: IFormListItem) => (
-        <UserCard
-          user={item.avaliadorAtribuido}
-          showNotSelected={true}
-          className={styles.userCell}
-        />
-      ),
+      onRender: (item: IFormListItem) => {
+        // Usa o usuário de análise já processado pelo FormsList
+        if (item.usuarioAnalise) {
+          return (
+            <UserCard
+              user={item.usuarioAnalise}
+              showNotSelected={false}
+              className={styles.userCell}
+            />
+          );
+        } else {
+          // Fallback para avaliador atribuído se não tiver usuário de análise
+          return (
+            <UserCard
+              user={item.avaliadorAtribuido}
+              showNotSelected={true}
+              className={styles.userCell}
+            />
+          );
+        }
+      },
     },
     {
       key: "actions",
@@ -392,7 +372,7 @@ const FormsTable: React.FC<IFormsTableProps> = ({
               style={{ marginRight: "8px" }}
             />
             <DefaultButton
-              text="Download PDF"
+              text="Download Form"
               iconProps={{ iconName: "PDF" }}
               onClick={() => onDownloadPDF && onDownloadPDF(item)}
               className={styles.actionButton}

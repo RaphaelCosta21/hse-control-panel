@@ -82,6 +82,62 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
     []
   );
 
+  // Função para extrair usuário responsável pela análise atual do JSON DadosFormulario
+  const extractAnalysisUser = React.useCallback(
+    (
+      dadosFormularioJson: string | null
+    ):
+      | {
+          name: string;
+          email: string;
+          photoUrl?: string;
+          isActive?: boolean;
+        }
+      | undefined => {
+      try {
+        if (!dadosFormularioJson) {
+          return undefined;
+        }
+
+        // Parse do JSON
+        const jsonData =
+          typeof dadosFormularioJson === "string"
+            ? JSON.parse(dadosFormularioJson)
+            : dadosFormularioJson;
+
+        // Verifica se existe metadata.historicoStatusChange
+        if (
+          jsonData &&
+          jsonData.metadata &&
+          jsonData.metadata.historicoStatusChange
+        ) {
+          const historicoStatusChange = jsonData.metadata.historicoStatusChange;
+
+          // Verifica se existe "Em Análise"
+          if (historicoStatusChange["Em Análise"]) {
+            const analysisData = historicoStatusChange["Em Análise"];
+
+            // Verifica se tem as propriedades usuario e email
+            if (analysisData.usuario && analysisData.email) {
+              return {
+                name: analysisData.usuario,
+                email: analysisData.email,
+                photoUrl: `/_layouts/15/userphoto.aspx?size=S&username=${analysisData.email}`,
+                isActive: true,
+              };
+            }
+          }
+        }
+
+        return undefined;
+      } catch (error) {
+        console.error("Erro ao extrair usuário da análise:", error);
+        return undefined;
+      }
+    },
+    []
+  );
+
   // Load real data from SharePoint
   const loadForms = React.useCallback(async () => {
     try {
@@ -104,6 +160,8 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         anexosCount: item.AnexosCount || 0,
         dataAvaliacao: item.Modified ? new Date(item.Modified) : undefined,
         criadoPor: item.NomePreenchimento || "Sistema",
+        // Adicionar o campo DadosFormulario do SharePoint
+        DadosFormulario: item.DadosFormulario || null,
         // Deprecated fields for backward compatibility
         prioridade: "Média", // Default value since we removed PrioridadeAvaliacao
         companyName: item.Title || "",
@@ -112,6 +170,8 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         completionPercentage: item.PercentualConclusao || 0,
         // Novo campo: dados do avaliador atribuído
         avaliadorAtribuido: extractAssignedReviewer(item),
+        // Novo campo: usuário responsável pela análise atual
+        usuarioAnalise: extractAnalysisUser(item.DadosFormulario),
       }));
 
       setForms(convertedForms);

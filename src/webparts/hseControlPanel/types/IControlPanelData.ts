@@ -52,6 +52,13 @@ export interface IFormListItem {
     photoUrl?: string;
     isActive?: boolean;
   };
+  // Usuário responsável pela análise atual (extraído do JSON DadosFormulario)
+  usuarioAnalise?: {
+    name: string;
+    email: string;
+    photoUrl?: string;
+    isActive?: boolean;
+  };
 }
 
 export interface IFormsFilters {
