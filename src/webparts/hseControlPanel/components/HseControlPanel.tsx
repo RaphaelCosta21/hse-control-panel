@@ -7,6 +7,7 @@ import type { IHseControlPanelProps } from "./IHseControlPanelProps";
 import { escape } from "@microsoft/sp-lodash-subset";
 import { Dashboard } from "./dashboard";
 import { FormsList } from "./forms";
+import { ReportsView } from "./reports";
 import { SettingsNavigation } from "./settings";
 import { Footer } from "./common/Footer";
 import { getDefaultSharePointConfig } from "../config/sharePointConfig";
@@ -194,11 +195,7 @@ const HseControlPanel: React.FC<IHseControlPanelProps> = ({
         )}
 
         {activeTab === "reports" && (
-          <div className={styles.comingSoon}>
-            <Icon iconName="ReportDocument" className={styles.comingSoonIcon} />
-            <Text variant="large">📈 Relatórios</Text>
-            <Text variant="medium">Em desenvolvimento...</Text>
-          </div>
+          <ReportsView context={context} serviceConfig={serviceConfig} />
         )}
 
         {activeTab === "settings" && (

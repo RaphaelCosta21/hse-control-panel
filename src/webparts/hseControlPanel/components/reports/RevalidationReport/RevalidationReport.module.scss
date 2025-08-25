@@ -1,0 +1,156 @@
+.revalidationReport {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.description {
+  color: #666;
+  margin-top: 8px;
+}
+
+.filters {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e1e1e1;
+}
+
+.statistics {
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  min-width: 120px;
+
+  &.statCardRed {
+    border-left: 4px solid #d83b01;
+  }
+
+  &.statCardYellow {
+    border-left: 4px solid #ffb900;
+  }
+
+  &.statCardGreen {
+    border-left: 4px solid #107c10;
+  }
+}
+
+.statNumber {
+  font-weight: 600;
+  display: block;
+}
+
+.tableContainer {
+  flex: 1;
+}
+
+.detailsList {
+  height: 100%;
+}
+
+.statusCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusIconGreen {
+  color: #107c10;
+}
+
+.statusIconYellow {
+  color: #ffb900;
+}
+
+.statusIconRed {
+  color: #d83b01;
+}
+
+.statusText {
+  font-weight: 500;
+}
+
+.companyCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.companyName {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.companyCNPJ {
+  font-size: 12px;
+  color: #666;
+}
+
+.dateCell {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.daysOk {
+  color: #107c10;
+  font-weight: 500;
+}
+
+.daysWarning {
+  color: #ffb900;
+  font-weight: 500;
+}
+
+.daysCritical {
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+.daysExpired {
+  color: #d83b01;
+  font-weight: 600;
+}
+
+.actionButton {
+  font-size: 12px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.emptySubtext {
+  font-size: 14px;
+}
