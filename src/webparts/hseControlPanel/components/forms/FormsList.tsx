@@ -41,7 +41,9 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
   const uniqueCompanies = React.useMemo(() => {
     const companies = forms
       .map((form) => form.empresa)
-      .filter((empresa, index, arr) => empresa && arr.indexOf(empresa) === index)
+      .filter(
+        (empresa, index, arr) => empresa && arr.indexOf(empresa) === index
+      )
       .sort();
     return companies;
   }, [forms]);
@@ -49,7 +51,10 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
   const uniqueRevisors = React.useMemo(() => {
     const revisors = forms
       .map((form) => form.usuarioAnalise?.name)
-      .filter((name): name is string => name !== undefined && name !== null && name !== "")
+      .filter(
+        (name): name is string =>
+          name !== undefined && name !== null && name !== ""
+      )
       .filter((name, index, arr) => arr.indexOf(name) === index)
       .sort();
     return revisors;
@@ -234,7 +239,9 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
 
     // Revisor filter
     if (filters.revisor) {
-      filtered = filtered.filter((form) => form.usuarioAnalise?.name === filters.revisor);
+      filtered = filtered.filter(
+        (form) => form.usuarioAnalise?.name === filters.revisor
+      );
     }
 
     // Date range filter
