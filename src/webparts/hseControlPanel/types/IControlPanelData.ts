@@ -31,7 +31,6 @@ export interface IFormListItem {
   dataSubmissao: Date;
   dataAvaliacao?: Date;
   avaliador?: string;
-  grauRisco: string;
   percentualConclusao: number;
   prioridade?: "Alta" | "Média" | "Baixa";
   criadoPor?: string;
@@ -63,7 +62,7 @@ export interface IFormListItem {
 
 export interface IFormsFilters {
   status?: string;
-  grauRisco?: string;
+  revisor?: string;
   dataInicio?: Date;
   dataFim?: Date;
   empresa?: string;

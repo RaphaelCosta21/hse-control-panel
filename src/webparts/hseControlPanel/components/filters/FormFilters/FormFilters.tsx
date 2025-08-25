@@ -10,11 +10,13 @@ import styles from "./FormFilters.module.scss";
 
 export interface IFormFiltersProps {
   onStatusChange?: (status: string) => void;
-  onRiskChange?: (risk: string) => void;
+  onCompanyChange?: (company: string) => void;
+  onRevisorChange?: (revisor: string) => void;
   onDateRangeChange?: (startDate?: Date, endDate?: Date) => void;
   onReset?: () => void;
   selectedStatus?: string;
-  selectedRisk?: string;
+  selectedCompany?: string;
+  selectedRevisor?: string;
   startDate?: Date;
   endDate?: Date;
   className?: string;
@@ -22,15 +24,19 @@ export interface IFormFiltersProps {
   filters?: IFormsFilters;
   onFiltersChange?: (newFilters: Partial<IFormsFilters>) => void;
   showSearch?: boolean;
+  companies?: string[];
+  revisors?: string[];
 }
 
 const FormFilters: React.FC<IFormFiltersProps> = ({
   onStatusChange,
-  onRiskChange,
+  onCompanyChange,
+  onRevisorChange,
   onDateRangeChange,
   onReset,
   selectedStatus,
-  selectedRisk,
+  selectedCompany,
+  selectedRevisor,
   startDate,
   endDate,
   className = "",
@@ -38,15 +44,18 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
   filters,
   onFiltersChange,
   showSearch = true,
+  companies = [],
+  revisors = [],
 }) => {
   // Use legacy props or new filters prop
   const currentStatus = selectedStatus || filters?.status || "";
-  const currentRisk = selectedRisk || filters?.grauRisco || "";
+  const currentCompany = selectedCompany || filters?.empresa || "";
+  const currentRevisor = selectedRevisor || filters?.revisor || "";
 
   const handleStatusChange = (
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption
-  ) => {
+  ): void => {
     const newStatus = option?.key as string;
     if (onStatusChange) {
       onStatusChange(newStatus);
@@ -56,33 +65,49 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
     }
   };
 
-  const handleRiskChange = (
+  const handleCompanyChange = (
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption
-  ) => {
-    const newRisk = option?.key as string;
-    if (onRiskChange) {
-      onRiskChange(newRisk);
+  ): void => {
+    const newCompany = option?.key as string;
+    if (onCompanyChange) {
+      onCompanyChange(newCompany);
     }
     if (onFiltersChange) {
-      onFiltersChange({ grauRisco: newRisk });
+      onFiltersChange({ empresa: newCompany });
+    }
+  };
+
+  const handleRevisorChange = (
+    event: React.FormEvent<HTMLDivElement>,
+    option?: IDropdownOption
+  ): void => {
+    const newRevisor = option?.key as string;
+    if (onRevisorChange) {
+      onRevisorChange(newRevisor);
+    }
+    if (onFiltersChange) {
+      onFiltersChange({ revisor: newRevisor });
     }
   };
   const statusOptions: IDropdownOption[] = [
     { key: "", text: "Todos os Status" },
-    { key: "Em Análise", text: "🔄 Em Análise" },
+    { key: "Em Andamento", text: "🔄 Em Andamento" },
+    { key: "Enviado", text: "📤 Enviado" },
+    { key: "Em Análise", text: "� Em Análise" },
     { key: "Aprovado", text: "✅ Aprovado" },
     { key: "Rejeitado", text: "❌ Rejeitado" },
     { key: "Pendente Informações", text: "⏳ Pendente Informações" },
-    { key: "Enviado", text: "📤 Enviado" },
   ];
 
-  const riskOptions: IDropdownOption[] = [
-    { key: "", text: "Todos os Riscos" },
-    { key: "1", text: "🟢 Risco 1 (Baixo)" },
-    { key: "2", text: "🟡 Risco 2 (Médio)" },
-    { key: "3", text: "🟠 Risco 3 (Alto)" },
-    { key: "4", text: "🔴 Risco 4 (Crítico)" },
+  const companyOptions: IDropdownOption[] = [
+    { key: "", text: "Todas as Empresas" },
+    ...companies.map((company) => ({ key: company, text: company })),
+  ];
+
+  const revisorOptions: IDropdownOption[] = [
+    { key: "", text: "Todos os Revisores" },
+    ...revisors.map((revisor) => ({ key: revisor, text: revisor })),
   ];
 
   return (
@@ -100,12 +125,23 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
         </div>
 
         <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Risco:</label>
+          <label className={styles.filterLabel}>Empresa:</label>
           <Dropdown
-            options={riskOptions}
-            selectedKey={currentRisk}
-            onChange={handleRiskChange}
-            placeholder="Selecionar risco"
+            options={companyOptions}
+            selectedKey={currentCompany}
+            onChange={handleCompanyChange}
+            placeholder="Selecionar empresa"
+            className={styles.filterDropdown}
+          />
+        </div>
+
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Revisor:</label>
+          <Dropdown
+            options={revisorOptions}
+            selectedKey={currentRevisor}
+            onChange={handleRevisorChange}
+            placeholder="Selecionar revisor"
             className={styles.filterDropdown}
           />
         </div>

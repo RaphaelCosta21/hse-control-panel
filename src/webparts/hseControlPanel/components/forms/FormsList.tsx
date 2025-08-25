@@ -37,6 +37,24 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
   >(undefined);
   const [isViewerOpen, setIsViewerOpen] = React.useState(false);
 
+  // Extract unique companies and revisors for filters
+  const uniqueCompanies = React.useMemo(() => {
+    const companies = forms
+      .map((form) => form.empresa)
+      .filter((empresa, index, arr) => empresa && arr.indexOf(empresa) === index)
+      .sort();
+    return companies;
+  }, [forms]);
+
+  const uniqueRevisors = React.useMemo(() => {
+    const revisors = forms
+      .map((form) => form.usuarioAnalise?.name)
+      .filter((name): name is string => name !== undefined && name !== null && name !== "")
+      .filter((name, index, arr) => arr.indexOf(name) === index)
+      .sort();
+    return revisors;
+  }, [forms]);
+
   // SharePoint Service instance
   const sharePointService = React.useMemo(
     () =>
@@ -153,7 +171,6 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
         cnpj: item.CNPJ || "",
         status: item.StatusAvaliacao || "Em Andamento",
         dataSubmissao: new Date(item.Created),
-        grauRisco: item.GrauRisco || "1",
         percentualConclusao: item.PercentualConclusao || 0,
         emailPreenchimento: item.EmailPreenchimento || "",
         nomePreenchimento: item.NomePreenchimento || "",
@@ -210,11 +227,14 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
       filtered = filtered.filter((form) => form.status === filters.status);
     }
 
-    // Risk filter
-    if (filters.grauRisco) {
-      filtered = filtered.filter(
-        (form) => form.grauRisco === filters.grauRisco
-      );
+    // Company filter
+    if (filters.empresa) {
+      filtered = filtered.filter((form) => form.empresa === filters.empresa);
+    }
+
+    // Revisor filter
+    if (filters.revisor) {
+      filtered = filtered.filter((form) => form.usuarioAnalise?.name === filters.revisor);
     }
 
     // Date range filter
@@ -412,6 +432,8 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
               onFiltersChange={handleFiltersChange}
               onDateRangeChange={handleDateRangeChange}
               onReset={handleResetFilters}
+              companies={uniqueCompanies}
+              revisors={uniqueRevisors}
             />
           </div>
         </Stack>
