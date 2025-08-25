@@ -36,7 +36,7 @@ export class SettingsNavigation extends React.Component<
   private getNavGroups(): INavLinkGroup[] {
     return [
       {
-        name: "Configurações do Sistema",
+        name: "Configurações",
         links: [
           {
             name: "Geral",
@@ -261,25 +261,10 @@ export class SettingsNavigation extends React.Component<
           >
             <Stack
               tokens={{ childrenGap: 20 }}
-              styles={{ root: { padding: "20px" } }}
+              styles={{
+                root: { padding: "20px", borderRight: "1px solid #d1d1d1" },
+              }}
             >
-              <Stack
-                horizontal
-                horizontalAlign="space-between"
-                verticalAlign="center"
-              >
-                <Text variant="large" styles={{ root: { fontWeight: "600" } }}>
-                  Configurações
-                </Text>
-                {this.props.onBack && (
-                  <DefaultButton
-                    iconProps={{ iconName: "Back" }}
-                    onClick={this.props.onBack}
-                    ariaLabel="Voltar ao Dashboard"
-                  />
-                )}
-              </Stack>
-
               <Nav
                 groups={this.getNavGroups()}
                 selectedKey={selectedKey}

@@ -315,7 +315,7 @@ export class SettingsPage extends React.Component<
                 tokens={{ childrenGap: 12 }}
               >
                 <Icon iconName="Settings" className={styles.headerIcon} />
-                <Text variant="xLarge">⚙️ Configurações do Sistema</Text>
+                <Text variant="xLarge">⚙️ Configurações</Text>
               </Stack>
 
               {this.props.onBack && (
@@ -338,6 +338,7 @@ export class SettingsPage extends React.Component<
 
     return (
       <div className={styles.settingsPage}>
+        {/* Header fixo */}
         <div className={styles.header}>
           <Stack
             horizontal
@@ -368,23 +369,65 @@ export class SettingsPage extends React.Component<
           </Text>
         </div>
 
-        {saveMessage && (
-          <MessageBar
-            messageBarType={saveMessageType}
-            onDismiss={() => this.setState({ saveMessage: undefined })}
-          >
-            {saveMessage}
-          </MessageBar>
-        )}
+        {/* Container principal com layout sidebar + conteúdo */}
+        <div className={styles.mainContainer}>
+          {/* Sidebar de navegação */}
+          <div className={styles.sidebar}>
+            <nav className={styles.navigation}>
+              {Object.keys(configGroups).map((type) => {
+                const groupTitles: { [key: string]: string } = {
+                  NOTIFICATION_CONFIG: "Notificações",
+                  DEADLINE_CONFIG: "Prazos",
+                  EMAIL_TEMPLATE: "Templates de Email",
+                };
+                const groupIcons: { [key: string]: string } = {
+                  NOTIFICATION_CONFIG: "Ringer",
+                  DEADLINE_CONFIG: "Clock",
+                  EMAIL_TEMPLATE: "Mail",
+                };
 
-        <div className={styles.content}>
-          <form className={styles.settingsForm}>
-            {Object.keys(configGroups).map((type) =>
-              this.renderConfigurationGroup(type, configGroups[type])
+                return (
+                  <div key={type} className={styles.navItem}>
+                    <Stack
+                      horizontal
+                      verticalAlign="center"
+                      tokens={{ childrenGap: 8 }}
+                    >
+                      <Icon
+                        iconName={groupIcons[type]}
+                        className={styles.navIcon}
+                      />
+                      <Text variant="medium">{groupTitles[type]}</Text>
+                    </Stack>
+                  </div>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Área de conteúdo principal */}
+          <div className={styles.contentArea}>
+            {saveMessage && (
+              <MessageBar
+                messageBarType={saveMessageType}
+                onDismiss={() => this.setState({ saveMessage: undefined })}
+                className={styles.messageBar}
+              >
+                {saveMessage}
+              </MessageBar>
             )}
-          </form>
+
+            <div className={styles.content}>
+              <form className={styles.settingsForm}>
+                {Object.keys(configGroups).map((type) =>
+                  this.renderConfigurationGroup(type, configGroups[type])
+                )}
+              </form>
+            </div>
+          </div>
         </div>
 
+        {/* Footer fixo */}
         <div className={styles.footer}>
           <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 12 }}>
             <DefaultButton

@@ -1,9 +1,9 @@
 .settingsPage {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: var(--ms-color-white);
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--ms-color-neutralLighterAlt);
+  overflow: hidden;
 }
 
 .loadingContainer {
@@ -16,9 +16,26 @@
 }
 
 .header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--ms-color-neutralLight);
+  padding: 20px 24px;
+  background-color: var(--ms-color-white);
+  border-bottom: 2px solid var(--ms-color-neutralLight);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--ms-color-themePrimary) 0%,
+      var(--ms-color-themeSecondary) 100%
+    );
+  }
 }
 
 .headerIcon {
@@ -31,20 +48,116 @@
   color: var(--ms-color-neutralSecondary);
 }
 
+.mainContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--ms-color-white);
+  border-right: 1px solid #d1d1d1;
+  padding: 24px 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.navigation {
+  padding: 0 24px;
+}
+
+.navItem {
+  padding: 14px 16px;
+  margin: 6px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  position: relative;
+
+  &:hover {
+    background-color: var(--ms-color-neutralLighter);
+    border-color: var(--ms-color-neutralLight);
+    transform: translateX(2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background-color: var(--ms-color-themePrimary);
+    border-radius: 0 2px 2px 0;
+    transition: height 0.3s ease;
+  }
+
+  &:hover::before {
+    height: 60%;
+  }
+}
+
+.navIcon {
+  font-size: 16px;
+  color: var(--ms-color-themePrimary);
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--ms-color-neutralLighter) 20%,
+      var(--ms-color-neutralLighter) 80%,
+      transparent 100%
+    );
+  }
+}
+
+.messageBar {
+  margin: 16px 24px 0;
+}
+
 .content {
-  margin-bottom: 32px;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
 }
 
 .settingsForm {
-  max-width: 800px;
+  max-width: none;
+  width: 100%;
 }
 
 .configGroup {
   margin-bottom: 32px;
-  padding: 20px;
-  border: 1px solid var(--neutral-lighter);
-  border-radius: 8px;
-  background-color: var(--neutral-lighter-alt);
+  padding: 24px;
+  border: 1px solid var(--ms-color-neutralLight);
+  border-radius: 12px;
+  background-color: var(--ms-color-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .groupHeader {
@@ -55,45 +168,14 @@
 }
 
 .groupIcon {
-  font-size: 18px;
+  font-size: 20px;
   color: var(--ms-color-themePrimary);
-}
-
-// Estilos para o componente de membros
-.settingsContainer {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.statsCard {
-  padding: 16px 20px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color) 0%,
-    var(--secondary-color) 100%
-  );
-  border-radius: 12px;
-  color: white;
-  min-width: 150px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  &:first-child {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #1976d2 100%);
-  }
-
-  &:last-child {
-    background: linear-gradient(
-      135deg,
-      var(--secondary-color) 0%,
-      #7b1fa2 100%
-    );
-  }
 }
 
 .groupTitle {
   font-weight: 600;
   color: var(--ms-color-neutralPrimary);
+  font-size: 18px;
 }
 
 .configFields {
@@ -104,47 +186,112 @@
 }
 
 .configField {
-  padding: 16px;
-  background-color: var(--ms-color-neutralLighter);
-  border-radius: 4px;
+  padding: 20px;
+  background-color: var(--ms-color-neutralLighterAlt);
+  border-radius: 8px;
   border-left: 4px solid var(--ms-color-themePrimary);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--ms-color-neutralLighter);
+    border-left-width: 6px;
+  }
 }
 
 .fieldDescription {
-  margin-top: 4px;
+  margin-top: 8px;
   color: var(--ms-color-neutralSecondary);
   font-style: italic;
+  font-size: 12px;
 }
 
 .footer {
-  position: sticky;
-  bottom: 0;
   background-color: var(--ms-color-white);
-  padding: 16px 0;
-  border-top: 1px solid var(--ms-color-neutralLight);
-  margin-top: 24px;
+  padding: 20px 24px;
+  border-top: 2px solid var(--ms-color-neutralLight);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--ms-color-themePrimary) 0%,
+      var(--ms-color-themeSecondary) 100%
+    );
+  }
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-  .settingsPage {
+  .mainContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--ms-color-neutralLight);
+    padding: 16px 0;
+  }
+
+  .navigation {
+    padding: 0 16px;
+  }
+
+  .navItem {
+    padding: 8px 12px;
+    margin: 2px 0;
+  }
+
+  .content {
     padding: 16px;
   }
 
-  .settingsForm {
-    max-width: 100%;
+  .configField {
+    padding: 16px;
+  }
+
+  .header {
+    padding: 16px;
+  }
+
+  .configGroup {
+    margin-bottom: 24px;
+    padding: 16px;
+  }
+
+  .footer {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 12px;
+  }
+
+  .content {
+    padding: 12px;
+  }
+
+  .configGroup {
+    padding: 12px;
   }
 
   .configField {
     padding: 12px;
   }
 
-  .header {
-    margin-bottom: 16px;
-  }
-
-  .configGroup {
-    margin-bottom: 24px;
+  .footer {
+    padding: 12px;
   }
 }
 
@@ -155,11 +302,28 @@
     color: var(--ms-color-white);
   }
 
+  .header {
+    background-color: var(--ms-color-neutralDarker);
+  }
+
+  .sidebar {
+    background-color: var(--ms-color-neutralDarker);
+  }
+
+  .configGroup {
+    background-color: var(--ms-color-neutralDarker);
+    border-color: var(--ms-color-neutralQuaternary);
+  }
+
   .configField {
-    background-color: var(--ms-color-neutralQuaternaryAlt);
+    background-color: var(--ms-color-neutralDark);
   }
 
   .footer {
+    background-color: var(--ms-color-neutralDarker);
+  }
+
+  .navItem:hover {
     background-color: var(--ms-color-neutralDark);
   }
 }
