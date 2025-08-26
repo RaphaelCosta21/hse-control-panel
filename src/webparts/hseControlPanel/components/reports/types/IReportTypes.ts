@@ -14,6 +14,14 @@ export interface IRevalidationItem {
   approvedBy: string;
 }
 
+export interface IInviteItem {
+  id: number;
+  Title: string;
+  FornecedorEmail: string;
+  ConvidadoPor: string;
+  DataEnvio: Date;
+}
+
 export interface IReportComponentProps {
   context: WebPartContext;
   serviceConfig: ISharePointConfig;
@@ -28,5 +36,6 @@ export interface IReportMenuItem {
 
 export interface IReportData {
   revalidationItems: IRevalidationItem[];
+  inviteItems: IInviteItem[];
   // Adicionar outros tipos de dados de relatório aqui futuramente
 }

@@ -11,6 +11,7 @@ import {
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { ISharePointConfig } from "../../../types/ISharePointConfig";
 import { RevalidationReport } from "../RevalidationReport/RevalidationReport";
+import InvitesReport from "../InvitesReport/InvitesReport";
 import { IReportMenuItem } from "../types/IReportTypes";
 import styles from "./ReportsContainer.module.scss";
 
@@ -33,6 +34,12 @@ const ReportsContainer: React.FC<IReportsContainerProps> = ({
       text: "Revalidação de Formulários",
       iconName: "Refresh",
       component: RevalidationReport,
+    },
+    {
+      key: "invites",
+      text: "Convites Realizados",
+      iconName: "Send",
+      component: InvitesReport,
     },
     // Futuros relatórios serão adicionados aqui
     // {

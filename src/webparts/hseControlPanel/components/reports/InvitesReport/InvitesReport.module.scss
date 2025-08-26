@@ -1,0 +1,86 @@
+.invitesReport {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.description {
+  color: #666666;
+  margin-top: 8px;
+}
+
+.commandBar {
+  margin-bottom: 16px;
+}
+
+.tableContainer {
+  background-color: #ffffff;
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.detailsList {
+  :global(.ms-DetailsHeader) {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #0078d4;
+  }
+
+  :global(.ms-DetailsHeader-cell) {
+    font-weight: 600;
+    color: #323130;
+  }
+
+  :global(.ms-DetailsRow) {
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+
+  :global(.ms-DetailsRow-cell) {
+    padding: 12px 8px;
+    border-bottom: 1px solid #edebe9;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #666666;
+
+  > span:first-child {
+    margin-bottom: 8px;
+    color: #323130;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .invitesReport {
+    padding: 12px;
+  }
+
+  .tableContainer {
+    overflow-x: auto;
+  }
+
+  .detailsList {
+    min-width: 600px;
+  }
+}
