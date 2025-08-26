@@ -9,6 +9,7 @@ import {
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import styles from "./SettingsPage.module.scss";
 import { MembersManagement } from "./members/MembersManagement";
+import { EmailTemplatesPage } from "./EmailTemplatesPage";
 
 export interface ISettingsNavigationProps {
   context: WebPartContext;
@@ -179,50 +180,10 @@ export class SettingsNavigation extends React.Component<
 
   private renderEmailTemplates(): React.ReactElement {
     return (
-      <Stack tokens={{ childrenGap: 20 }}>
-        <Stack
-          horizontal
-          horizontalAlign="space-between"
-          verticalAlign="center"
-        >
-          <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }}>
-            <DefaultButton
-              iconProps={{ iconName: "Back" }}
-              onClick={() => this.setState({ selectedKey: "main" })}
-              ariaLabel="Voltar"
-            />
-            <Text variant="xLarge" styles={{ root: { fontWeight: "600" } }}>
-              📧 Templates de Email
-            </Text>
-          </Stack>
-        </Stack>
-
-        <Text
-          variant="medium"
-          styles={{ root: { color: "var(--neutral-secondary)" } }}
-        >
-          Aqui você poderá gerenciar os templates de email utilizados pelo
-          sistema:
-        </Text>
-
-        <Stack tokens={{ childrenGap: 10 }}>
-          <Text>• Template de novo fornecedor aprovado</Text>
-          <Text>• Template de lembrete de avaliação</Text>
-          <Text>• Template de aprovação de formulário</Text>
-          <Text>• Template de rejeição com motivos</Text>
-          <Text>• Templates personalizados por equipe</Text>
-        </Stack>
-
-        <Text
-          variant="medium"
-          styles={{
-            root: { fontStyle: "italic", color: "var(--warning-color)" },
-          }}
-        >
-          🚧 Em desenvolvimento - Templates serão carregados da lista
-          hse-control-panel-config
-        </Text>
-      </Stack>
+      <EmailTemplatesPage
+        context={this.props.context}
+        onBack={() => this.setState({ selectedKey: "main" })}
+      />
     );
   }
 

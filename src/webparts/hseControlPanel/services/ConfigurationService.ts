@@ -167,6 +167,8 @@ export class ConfigurationService {
       "email_approval",
       "email_reminder",
       "email_new_supplier",
+      "email_pendente",
+      "email_formsent",
     ];
 
     const processedConfigs: IProcessedConfiguration[] = [];
@@ -350,6 +352,22 @@ export class ConfigurationService {
         type: "EMAIL_TEMPLATE" as ConfigType,
         inputType: "textarea" as const,
         placeholder: "Bem-vindo ao processo de avaliação HSE...",
+        validation: { required: true },
+      },
+      email_formsent: {
+        title: "Template Email - Enviado",
+        description: "Modelo de email enviado quando formulário é submetido",
+        type: "EMAIL_TEMPLATE" as ConfigType,
+        inputType: "textarea" as const,
+        placeholder: "Confirmamos o recebimento do seu formulário...",
+        validation: { required: true },
+      },
+      email_pendente: {
+        title: "Template Email - Pendente Info",
+        description: "Modelo de email enviado quando há informações pendentes",
+        type: "EMAIL_TEMPLATE" as ConfigType,
+        inputType: "textarea" as const,
+        placeholder: "Seu formulário precisa de correções...",
         validation: { required: true },
       },
     };

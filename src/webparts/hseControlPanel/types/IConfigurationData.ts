@@ -41,6 +41,8 @@ export interface ISystemConfigurations {
   email_approval: string;
   email_reminder: string;
   email_new_supplier: string;
+  email_pendente: string;
+  email_formsent: string;
 }
 
 // Interface para resultado de operação de salvamento
