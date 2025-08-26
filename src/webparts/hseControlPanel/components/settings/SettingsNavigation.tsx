@@ -10,6 +10,7 @@ import { WebPartContext } from "@microsoft/sp-webpart-base";
 import styles from "./SettingsPage.module.scss";
 import { MembersManagement } from "./members/MembersManagement";
 import { EmailTemplatesPage } from "./EmailTemplatesPage";
+import { NotificationsPage } from "./NotificationsPage";
 
 export interface ISettingsNavigationProps {
   context: WebPartContext;
@@ -95,11 +96,14 @@ export class SettingsNavigation extends React.Component<
               Gerencie como e quando as notificações são enviadas aos usuários
               do sistema.
             </Text>
-            <DefaultButton
-              text="Configurar Notificações"
-              iconProps={{ iconName: "Ringer" }}
-              onClick={() => this.setState({ selectedKey: "notifications" })}
-            />
+            <div>
+              <DefaultButton
+                text="Configurar Notificações"
+                iconProps={{ iconName: "Ringer" }}
+                onClick={() => this.setState({ selectedKey: "notifications" })}
+                styles={{ root: { marginTop: "8px" } }}
+              />
+            </div>
           </div>
 
           <div className={styles.configGroup}>
@@ -112,11 +116,16 @@ export class SettingsNavigation extends React.Component<
               Configure os templates de email para aprovações, lembretes e
               notificações automáticas.
             </Text>
-            <DefaultButton
-              text="Gerenciar Templates"
-              iconProps={{ iconName: "Mail" }}
-              onClick={() => this.setState({ selectedKey: "email-templates" })}
-            />
+            <div>
+              <DefaultButton
+                text="Gerenciar Templates"
+                iconProps={{ iconName: "Mail" }}
+                onClick={() =>
+                  this.setState({ selectedKey: "email-templates" })
+                }
+                styles={{ root: { marginTop: "8px" } }}
+              />
+            </div>
           </div>
 
           <div className={styles.configGroup}>
@@ -129,11 +138,14 @@ export class SettingsNavigation extends React.Component<
               Gerencie os membros das equipes HSE e Compras que têm acesso ao
               sistema.
             </Text>
-            <DefaultButton
-              text="Gerenciar Membros"
-              iconProps={{ iconName: "People" }}
-              onClick={() => this.setState({ selectedKey: "members" })}
-            />
+            <div>
+              <DefaultButton
+                text="Gerenciar Membros"
+                iconProps={{ iconName: "People" }}
+                onClick={() => this.setState({ selectedKey: "members" })}
+                styles={{ root: { marginTop: "8px" } }}
+              />
+            </div>
           </div>
         </Stack>
       </Stack>
@@ -142,39 +154,10 @@ export class SettingsNavigation extends React.Component<
 
   private renderNotifications(): React.ReactElement {
     return (
-      <Stack tokens={{ childrenGap: 20 }}>
-        <Stack
-          horizontal
-          horizontalAlign="space-between"
-          verticalAlign="center"
-        >
-          <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }}>
-            <DefaultButton
-              iconProps={{ iconName: "Back" }}
-              onClick={() => this.setState({ selectedKey: "main" })}
-              ariaLabel="Voltar"
-            />
-            <Text variant="xLarge" styles={{ root: { fontWeight: "600" } }}>
-              🔔 Configurações de Notificação
-            </Text>
-          </Stack>
-        </Stack>
-
-        <Text
-          variant="medium"
-          styles={{ root: { color: "var(--neutral-secondary)" } }}
-        >
-          Esta funcionalidade está em desenvolvimento. Em breve você poderá
-          configurar:
-        </Text>
-
-        <Stack tokens={{ childrenGap: 10 }}>
-          <Text>• Frequência de lembretes automáticos</Text>
-          <Text>• Tipos de notificação por email</Text>
-          <Text>• Configurações de notificação por equipe</Text>
-          <Text>• Templates de notificação personalizados</Text>
-        </Stack>
-      </Stack>
+      <NotificationsPage
+        context={this.props.context}
+        onBack={() => this.setState({ selectedKey: "main" })}
+      />
     );
   }
 

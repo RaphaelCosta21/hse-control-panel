@@ -1,0 +1,161 @@
+/* NotificationsPage.module.scss */
+
+.notificationsPage {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #faf9f8;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.header {
+  background-color: white;
+  padding: 24px 32px;
+  border-bottom: 1px solid #edebe9;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerIcon {
+  font-size: 24px;
+  color: #ff8c00;
+}
+
+.headerDescription {
+  margin-top: 8px;
+  color: #605e5c;
+}
+
+.messageBar {
+  margin: 0 32px 16px 32px;
+  border-radius: 4px;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px;
+}
+
+.configSection {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.configCard {
+  background-color: white;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.configHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.configIcon {
+  font-size: 20px;
+  color: #0078d4;
+  margin-top: 4px;
+}
+
+.configTitle {
+  font-weight: 600;
+  color: #323130;
+  margin-bottom: 4px;
+}
+
+.configDescription {
+  color: #605e5c;
+  line-height: 1.4;
+}
+
+.configContent {
+  margin-left: 36px;
+}
+
+.toggleDescription {
+  color: #605e5c;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.footer {
+  background-color: white;
+  padding: 16px 32px;
+  border-top: 1px solid #edebe9;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    padding: 16px 20px;
+  }
+
+  .content {
+    padding: 16px 20px;
+  }
+
+  .footer {
+    padding: 12px 20px;
+  }
+
+  .configCard {
+    padding: 16px;
+  }
+
+  .configHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .configContent {
+    margin-left: 0;
+  }
+}
+
+/* Icon specific colors */
+.configCard:nth-child(1) .configIcon {
+  color: #0078d4; /* Clock - Blue */
+}
+
+.configCard:nth-child(2) .configIcon {
+  color: #ff8c00; /* Ringer - Orange */
+}
+
+.configCard:nth-child(3) .configIcon {
+  color: #107c10; /* Mail - Green */
+}
+
+/* Input field styling */
+:global(.ms-TextField-fieldGroup) {
+  border-radius: 4px;
+  transition: border-color 0.2s ease;
+}
+
+:global(.ms-TextField-fieldGroup:hover) {
+  border-color: #0078d4;
+}
+
+:global(.ms-Toggle) {
+  margin-bottom: 8px;
+}
