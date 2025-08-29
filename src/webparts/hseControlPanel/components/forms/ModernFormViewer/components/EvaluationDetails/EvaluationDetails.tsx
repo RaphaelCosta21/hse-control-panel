@@ -12,7 +12,6 @@ import styles from "./EvaluationDetails.module.scss";
 
 export interface IEvaluationDetailsProps {
   formData: IHSEFormData;
-  showEvaluationDetails: boolean;
   evaluationStarted: boolean;
   selectedHSEResponsible: IPersonaProps | undefined;
   evaluationResult: "Aprovado" | "Pendente Info." | "Rejeitado";
@@ -30,7 +29,6 @@ export interface IEvaluationDetailsProps {
 
 const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
   formData,
-  showEvaluationDetails,
   evaluationStarted,
   selectedHSEResponsible,
   evaluationResult,
@@ -43,9 +41,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
   setShowStartConfirmation,
   setShowSendConfirmation,
 }) => {
-  if (!showEvaluationDetails) {
-    return null;
-  }
+  // Removido a verificação showEvaluationDetails pois a seção deve sempre aparecer
 
   const shouldShowEvaluationSection =
     formData.status === "Em Andamento" ||

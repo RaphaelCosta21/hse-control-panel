@@ -19,8 +19,6 @@ export const useEvaluation = ({
   onFormUpdate,
   reloadFormData,
 }: IEvaluationHookProps): {
-  showEvaluationDetails: boolean;
-  setShowEvaluationDetails: React.Dispatch<React.SetStateAction<boolean>>;
   selectedHSEResponsible: IPersonaProps | undefined;
   setSelectedHSEResponsible: React.Dispatch<
     React.SetStateAction<IPersonaProps | undefined>
@@ -44,8 +42,6 @@ export const useEvaluation = ({
   handleStartEvaluation: () => Promise<void>;
   handleSendEvaluation: () => Promise<void>;
 } => {
-  const [showEvaluationDetails, setShowEvaluationDetails] =
-    React.useState(false);
   const [selectedHSEResponsible, setSelectedHSEResponsible] = React.useState<
     IPersonaProps | undefined
   >(undefined);
@@ -180,7 +176,6 @@ export const useEvaluation = ({
 
       // Fechar diálogos
       setShowSendConfirmation(false);
-      setShowEvaluationDetails(false);
 
       // Notificar sucesso
       alert("Avaliação enviada com sucesso!");
@@ -197,13 +192,10 @@ export const useEvaluation = ({
     onFormUpdate,
     reloadFormData,
     setShowSendConfirmation,
-    setShowEvaluationDetails,
   ]);
 
   return {
     // States
-    showEvaluationDetails,
-    setShowEvaluationDetails,
     selectedHSEResponsible,
     setSelectedHSEResponsible,
     evaluationStarted,

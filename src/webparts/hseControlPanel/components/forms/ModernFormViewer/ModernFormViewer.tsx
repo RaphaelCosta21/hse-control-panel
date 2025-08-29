@@ -88,8 +88,6 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
 
   // Hooks para gerenciar avaliação
   const {
-    showEvaluationDetails,
-    setShowEvaluationDetails,
     selectedHSEResponsible,
     setSelectedHSEResponsible,
     evaluationStarted,
@@ -129,39 +127,12 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
       ];
     }
 
-    // Mostrar botão "Detalhes Avaliação" para todos os status válidos
-    const validStatuses = [
-      "Em Andamento",
-      "Enviado",
-      "Em Análise",
-      "Aprovado",
-      "Rejeitado",
-      "Pendente Informações",
-    ];
-
-    if (validStatuses.includes(formData.status) && currentUser) {
-      return [
-        {
-          key: "evaluationDetails",
-          text: showEvaluationDetails ? "Ocultar Avaliação" : "Ver Avaliação",
-          iconProps: {
-            iconName: showEvaluationDetails ? "ChevronUp" : "ChevronDown",
-          },
-          onClick: () => {
-            setShowEvaluationDetails(!showEvaluationDetails);
-          },
-          className: styles.primaryAction,
-        },
-      ];
-    }
-
+    // Removido o botão "Ver Avaliação" pois a seção estará sempre visível
     return [];
   }, [
     formData,
     isReviewing,
     currentUser,
-    showEvaluationDetails,
-    setShowEvaluationDetails,
     handleStartReview,
     handleFinishReview,
   ]);
@@ -206,7 +177,6 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
         {/* Componente de Avaliação Detalhada */}
         <EvaluationDetails
           formData={formData}
-          showEvaluationDetails={showEvaluationDetails}
           evaluationStarted={evaluationStarted}
           selectedHSEResponsible={selectedHSEResponsible}
           evaluationResult={evaluationResult}
