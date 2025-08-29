@@ -4,9 +4,9 @@
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 51, 102, 0.08);
   border: 1px solid #e8eaed;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  /* Removido height: 100% que estava causando overflow */
 
   h3 {
     margin: 0 0 16px 0;
@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 250px;
+    height: 250px; /* Altura fixa menor para evitar overflow */
     margin-bottom: 16px;
   }
 
@@ -116,7 +116,7 @@
     padding: 16px;
 
     .chartContainer {
-      min-height: 200px;
+      height: 200px; /* Altura menor em mobile */
     }
 
     .chartStats {

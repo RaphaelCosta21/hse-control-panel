@@ -42,14 +42,14 @@ const Dashboard: React.FC<IDashboardProps> = ({
           {
             id: 1,
             type: "Evaluation",
-            description: "🔄 Petrobras - Em análise (2h)",
+            description: "🔄 HidroPartes - Em análise (2h)",
             timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
             user: "Sistema",
           },
           {
             id: 2,
             type: "Approval",
-            description: "✅ Vale S.A. - Aprovado (4h)",
+            description: "✅ Artig - Aprovado (4h)",
             timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
             user: "Avaliador HSE",
           },
@@ -63,7 +63,7 @@ const Dashboard: React.FC<IDashboardProps> = ({
           {
             id: 4,
             type: "Submission",
-            description: "⏳ Sabesp - Pendente info (2d)",
+            description: "⏳ Hidratight - Pendente info (2d)",
             timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
             user: "Sistema",
           },

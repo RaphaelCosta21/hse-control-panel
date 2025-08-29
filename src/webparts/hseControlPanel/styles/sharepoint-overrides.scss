@@ -51,13 +51,15 @@ button[aria-label*="My account"] {
 */
 
 // Ocultar botões de ação da página (Editar, etc)
-// Descomente se quiser ocultar também
-/*
 .ms-CommandBar,
-[data-automation-id="pageCommandBar"] {
+[data-automation-id="pageCommandBar"],
+.commandBarWrapper,
+[class*="commandBar"],
+[class*="CommandBar"],
+[id*="commandBar"],
+[id*="CommandBar"] {
   display: none !important;
 }
-*/
 
 // Força o conteúdo principal a ocupar mais espaço
 #workbenchPageContent,
@@ -151,4 +153,25 @@ div[data-sp-feature-tag="Site header"] {
   visibility: hidden !important;
   width: 0 !important;
   overflow: hidden !important;
+}
+
+// Regras adicionais para ocultar elementos persistentes do SharePoint
+.commandBarWrapper,
+[class*="commandBarWrapper"],
+[id*="commandBarWrapper"],
+div[class*="commandBar"]:not([class*="hse"]):not([class*="HSE"]),
+div[id*="commandBar"]:not([id*="hse"]):not([id*="HSE"]),
+[data-sp-feature-tag*="Command"],
+[aria-label*="Command bar"],
+[role="menubar"]:not([class*="hse"]):not([class*="HSE"]) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+// Ocultar barras de ferramentas do SharePoint moderno
+.spPageChromeAppHeaderWrapper .ms-CommandBar,
+.spPageChromeAppHeaderWrapper [class*="commandBar"] {
+  display: none !important;
 }

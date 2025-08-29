@@ -47,8 +47,10 @@
   .dashboardGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto; /* Altura automática baseada no conteúdo */
     gap: 20px;
     margin-top: 16px;
+    align-items: start; /* Alinha os itens no topo para evitar esticamento */
     /* Removido height fixa para permitir que o conteúdo flua naturalmente */
 
     .chartSection {
@@ -58,6 +60,10 @@
       box-shadow: 0 4px 12px rgba(0, 51, 102, 0.08);
       border: 1px solid #e8eaed;
       border-left: 4px solid #2e4857;
+      overflow: hidden; /* Garante que o conteúdo não ultrapasse o container */
+      display: flex;
+      flex-direction: column;
+      min-height: 0; /* Permite que o flex item shrink */
     }
 
     .sidebarSection {
