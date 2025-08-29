@@ -101,9 +101,9 @@
   padding: 0;
   color: "[theme:bodyText, default: #323130]";
   color: var(--bodyText);
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Removido min-height fixa para permitir que o layout flua naturalmente */
 
   &.teams {
     font-family: $ms-font-family-fallbacks;
@@ -279,7 +279,7 @@
 .mainContent {
   flex: 1;
   background: var(--colorNeutralBackground2);
-  min-height: calc(100vh - 200px);
+  /* Removido min-height fixa que estava causando problemas com o footer */
 }
 
 .comingSoon {
