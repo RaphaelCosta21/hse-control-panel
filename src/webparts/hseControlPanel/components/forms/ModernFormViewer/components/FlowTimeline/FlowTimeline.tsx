@@ -21,29 +21,13 @@ interface IHistoricoEntry {
   email: string;
 }
 
-const statusDisplayNames: { [key: string]: string } = {
-  Cadastrado: "Cadastrado",
-  "Em Análise HSE": "Em Análise HSE",
-  Aprovado: "Aprovado",
-  Reprovado: "Reprovado",
-  "Pendente Documentação": "Pendente Documentação",
-  "Aguardando Revisão": "Aguardando Revisão",
-  "Em Revisão": "Em Revisão",
-  "Revisão Concluída": "Revisão Concluída",
-};
-
 const statusColors: { [key: string]: string } = {
-  Cadastrado: "#5a9fd4", // Azul mais suave
   "Em Andamento": "#ffb366", // Laranja mais suave
   Enviado: "#5a9fd4", // Azul mais suave
   "Em Análise": "#a688d4", // Roxo mais suave
-  "Em Análise HSE": "#a688d4",
   Aprovado: "#4a9c4a", // Verde mais suave
-  Reprovado: "#d16666", // Vermelho mais suave
-  "Pendente Documentação": "#9d7bc8", // Roxo mais suave
-  "Aguardando Revisão": "#5cbddb", // Azul claro mais suave
-  "Em Revisão": "#ffab5c", // Laranja mais suave
-  "Revisão Concluída": "#6b9c35", // Verde mais suave
+  Rejeitado: "#d16666", // Vermelho mais suave
+  "Pendente Info.": "#c87bbbff", // Roxo mais suave
 };
 
 const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
@@ -245,9 +229,7 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
                 }}
               >
                 <div className={styles.stepNumber}>{index + 1}</div>
-                <div className={styles.stepStatus}>
-                  {statusDisplayNames[step.status] || step.status}
-                </div>
+                <div className={styles.stepStatus}>{step.status}</div>
                 <div className={styles.stepDate}>
                   {formatDate(step.timestamp)}
                 </div>

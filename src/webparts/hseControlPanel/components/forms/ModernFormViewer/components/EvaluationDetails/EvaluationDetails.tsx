@@ -145,16 +145,9 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
         <Text>
           <strong>Data de Conclusão:</strong> {dataConclusao}
         </Text>
-        {evaluationData.Comentarios && (
-          <div className={styles.commentsSection}>
-            <Text>
-              <strong>Comentários:</strong>
-            </Text>
-            <div className={styles.commentsBox}>
-              <Text>{evaluationData.Comentarios}</Text>
-            </div>
-          </div>
-        )}
+        <Text>
+          <strong>Comentários:</strong> {evaluationData.Comentarios || "N/A"}
+        </Text>
       </Stack>
     );
   };
