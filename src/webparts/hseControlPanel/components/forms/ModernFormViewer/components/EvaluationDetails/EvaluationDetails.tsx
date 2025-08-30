@@ -253,7 +253,6 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
         ) : (
           /* Estado 3: Após a avaliação - Mostra informações somente leitura */
           <Stack tokens={{ childrenGap: 16 }}>
-            <Text variant="large">📋 Avaliação Finalizada</Text>
             {renderEvaluationFinalized()}
           </Stack>
         )}
