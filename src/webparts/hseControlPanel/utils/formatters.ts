@@ -5,9 +5,9 @@
  */
 export const formatCNPJ = (cnpj: string): string => {
   const cleanCNPJ = cnpj.replace(/[^\d]/g, "");
-  
+
   if (cleanCNPJ.length !== 14) return cnpj;
-  
+
   return cleanCNPJ.replace(
     /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
     "$1.$2.$3/$4-$5"
@@ -19,13 +19,13 @@ export const formatCNPJ = (cnpj: string): string => {
  */
 export const formatPhone = (phone: string): string => {
   const cleanPhone = phone.replace(/[^\d]/g, "");
-  
+
   if (cleanPhone.length === 10) {
     return cleanPhone.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
   } else if (cleanPhone.length === 11) {
     return cleanPhone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
   }
-  
+
   return phone;
 };
 
@@ -34,9 +34,9 @@ export const formatPhone = (phone: string): string => {
  */
 export const formatDate = (date: Date | string): string => {
   const parsedDate = typeof date === "string" ? new Date(date) : date;
-  
+
   if (isNaN(parsedDate.getTime())) return "";
-  
+
   return parsedDate.toLocaleDateString("pt-BR");
 };
 
@@ -45,9 +45,9 @@ export const formatDate = (date: Date | string): string => {
  */
 export const formatDateTime = (date: Date | string): string => {
   const parsedDate = typeof date === "string" ? new Date(date) : date;
-  
+
   if (isNaN(parsedDate.getTime())) return "";
-  
+
   return parsedDate.toLocaleString("pt-BR");
 };
 
@@ -56,11 +56,11 @@ export const formatDateTime = (date: Date | string): string => {
  */
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return "0 Bytes";
-  
+
   const k = 1024;
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
@@ -77,13 +77,13 @@ export const formatPercentage = (value: number): string => {
 export const formatStatus = (status: string): string => {
   const statusMap: { [key: string]: string } = {
     "Em Andamento": "Em Andamento",
-    "Enviado": "Enviado",
-    "Em Análise": "Em Análise", 
-    "Aprovado": "Aprovado",
-    "Rejeitado": "Rejeitado",
-    "Pendente Informações": "Pendente Informações"
+    Enviado: "Enviado",
+    "Em Análise": "Em Análise",
+    Aprovado: "Aprovado",
+    Rejeitado: "Rejeitado",
+    "Pendente Info.": "Pendente Info.",
   };
-  
+
   return statusMap[status] || status;
 };
 
@@ -93,11 +93,11 @@ export const formatStatus = (status: string): string => {
 export const formatRiskLevel = (level: string): string => {
   const riskMap: { [key: string]: string } = {
     "1": "Baixo",
-    "2": "Médio", 
+    "2": "Médio",
     "3": "Alto",
-    "4": "Muito Alto"
+    "4": "Muito Alto",
   };
-  
+
   return riskMap[level] || `Nível ${level}`;
 };
 
@@ -116,7 +116,7 @@ export const formatProperName = (name: string): string => {
   return name
     .toLowerCase()
     .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 

@@ -62,7 +62,7 @@ export const useFormData = ({
           | "Em Análise"
           | "Aprovado"
           | "Rejeitado"
-          | "Pendente Informações",
+          | "Pendente Info.",
         dadosGerais: {
           empresa: formDetails.Title || "",
           cnpj: formDetails.CNPJ || "",

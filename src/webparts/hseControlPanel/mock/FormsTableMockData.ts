@@ -56,7 +56,7 @@ export const mockFormularios = [
     Id: 3,
     Title: "Sabesp",
     CNPJ: "43.776.517/0001-80",
-    StatusAvaliacao: "Pendente Informações",
+    StatusAvaliacao: "Pendente Info.",
     Created: "2024-08-05T08:30:00Z",
     Modified: "2024-08-07T13:20:00Z",
     GrauRisco: "2",

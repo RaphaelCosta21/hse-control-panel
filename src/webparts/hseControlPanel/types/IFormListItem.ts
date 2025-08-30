@@ -9,7 +9,7 @@ export interface IFormListItem {
     | "Em Análise"
     | "Aprovado"
     | "Rejeitado"
-    | "Pendente Informações";
+    | "Pendente Info.";
   submissionDate: string;
   riskLevel: 1 | 2 | 3 | 4;
   completionPercentage: number;

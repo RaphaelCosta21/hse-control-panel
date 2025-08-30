@@ -2,7 +2,7 @@
 export interface IHSEFormEvaluation {
   id?: number;
   formId: number;
-  status: "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações";
+  status: "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Info.";
   comentarios: string;
   observacoes: string;
   questoesPendentes?: string[];
@@ -26,7 +26,7 @@ export interface IEvaluationHistory {
 }
 
 export interface IFormEvaluationStatus {
-  status: "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Informações";
+  status: "Em Análise" | "Aprovado" | "Rejeitado" | "Pendente Info.";
   dataStatus: Date;
   avaliador: string;
   comentarios?: string;

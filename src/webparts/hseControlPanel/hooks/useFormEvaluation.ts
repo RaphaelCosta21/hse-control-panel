@@ -91,7 +91,7 @@ export const useFormEvaluation = (formId?: number): IFormEvaluationHookData => {
           {
             id: 2,
             formId: formId,
-            status: "Pendente Informações",
+            status: "Pendente Info.",
             comentarios: "Solicitadas informações adicionais",
             observacoes: "Certificação NR-12 pendente",
             avaliador: "Admin HSE",

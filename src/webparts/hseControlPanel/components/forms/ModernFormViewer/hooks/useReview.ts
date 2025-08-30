@@ -20,7 +20,7 @@ export const useReview = ({
 }: IReviewHookProps) => {
   const [showReviewDialog, setShowReviewDialog] = React.useState(false);
   const [reviewStatus, setReviewStatus] = React.useState<
-    "Aprovado" | "Rejeitado" | "Pendente Informações"
+    "Aprovado" | "Rejeitado" | "Pendente Info."
   >("Aprovado");
   const [reviewComments, setReviewComments] = React.useState("");
   const [submittingReview, setSubmittingReview] = React.useState(false);
@@ -88,9 +88,7 @@ export const useReview = ({
       const updatedForm: IFormListItem = {
         ...form,
         status:
-          reviewStatus === "Pendente Informações"
-            ? "Pendente Informações"
-            : reviewStatus,
+          reviewStatus === "Pendente Info." ? "Pendente Info." : reviewStatus,
         dataAvaliacao: new Date(),
       };
 

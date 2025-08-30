@@ -56,6 +56,197 @@ export const useEvaluation = ({
   const [showSendConfirmation, setShowSendConfirmation] = React.useState(false);
   const [submittingReview, setSubmittingReview] = React.useState(false);
 
+  // useEffect para resgatar dados de avaliação salvos no SharePoint
+  React.useEffect(() => {
+    if (!formData) return;
+
+    console.log("🔍 [useEvaluation] Verificando dados salvos:", formData);
+
+    // Verificar se há dados de avaliação salvos - formData pode ter uma estrutura aninhada
+    const formDataWithMetadata = formData as unknown as {
+      metadata?: {
+        Avaliacao?: Record<string, unknown>;
+        historicoStatusChange?: Record<
+          string,
+          { dataAlteracao?: string; email?: string; usuario?: string }
+        >;
+      };
+      historicoStatusChange?: Record<
+        string,
+        { dataAlteracao?: string; email?: string; usuario?: string }
+      >;
+    };
+
+    const metadata = formDataWithMetadata?.metadata;
+    const historicoStatusChange =
+      formDataWithMetadata?.historicoStatusChange ||
+      metadata?.historicoStatusChange;
+
+    console.log("📊 [useEvaluation] Metadata encontrada:", metadata);
+    console.log(
+      "📅 [useEvaluation] Histórico de status:",
+      historicoStatusChange
+    );
+
+    // Tentar buscar dados de avaliação em diferentes estruturas possíveis
+    let avaliacaoData: {
+      HSEResponsavel?: string;
+      Comentarios?: string;
+      Resultado?: string;
+    } | null = null;
+
+    if (metadata?.Avaliacao) {
+      const firstEvaluationKey = Object.keys(metadata.Avaliacao)[0];
+      avaliacaoData = (metadata.Avaliacao[firstEvaluationKey] ||
+        metadata.Avaliacao["0"]) as {
+        HSEResponsavel?: string;
+        Comentarios?: string;
+        Resultado?: string;
+      };
+    }
+
+    if (avaliacaoData) {
+      console.log(
+        "📋 [useEvaluation] Dados de avaliação encontrados:",
+        avaliacaoData
+      );
+
+      // Restaurar responsável HSE
+      if (avaliacaoData.HSEResponsavel) {
+        const responsavelPersona: IPersonaProps = {
+          text: avaliacaoData.HSEResponsavel,
+          secondaryText: "", // Email pode estar no histórico
+          id: avaliacaoData.HSEResponsavel,
+        };
+
+        // Tentar buscar email do histórico de status
+        if (historicoStatusChange) {
+          // Buscar a entrada mais recente de "Em Análise"
+          const entradasEmAnalise = Object.keys(historicoStatusChange)
+            .filter((key) => key.includes("Em Análise"))
+            .map((key) => ({
+              key,
+              data: historicoStatusChange[key],
+              dataAlteracao: new Date(
+                historicoStatusChange[key].dataAlteracao || ""
+              ),
+            }))
+            .sort(
+              (a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime()
+            );
+
+          if (entradasEmAnalise.length > 0) {
+            responsavelPersona.secondaryText =
+              entradasEmAnalise[0].data.email || "";
+          }
+        }
+
+        setSelectedHSEResponsible(responsavelPersona);
+        console.log(
+          "👤 [useEvaluation] Responsável HSE restaurado:",
+          responsavelPersona
+        );
+      }
+
+      // Restaurar comentários
+      if (avaliacaoData.Comentarios) {
+        setEvaluationComments(avaliacaoData.Comentarios);
+        console.log(
+          "💬 [useEvaluation] Comentários restaurados:",
+          avaliacaoData.Comentarios
+        );
+      }
+
+      // Restaurar resultado
+      if (avaliacaoData.Resultado) {
+        const resultado = avaliacaoData.Resultado as
+          | "Aprovado"
+          | "Pendente Info."
+          | "Rejeitado";
+        setEvaluationResult(resultado);
+        console.log("✅ [useEvaluation] Resultado restaurado:", resultado);
+      }
+    }
+
+    // Caso não tenha encontrado dados em metadata.Avaliacao, tentar buscar do histórico
+    if (!avaliacaoData && historicoStatusChange) {
+      // Buscar a entrada mais recente de "Em Análise"
+      const entradasEmAnalise = Object.keys(historicoStatusChange)
+        .filter((key) => key.includes("Em Análise"))
+        .map((key) => ({
+          key,
+          data: historicoStatusChange[key],
+          dataAlteracao: new Date(
+            historicoStatusChange[key].dataAlteracao || ""
+          ),
+        }))
+        .sort((a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime());
+
+      if (entradasEmAnalise.length > 0 && entradasEmAnalise[0].data.usuario) {
+        const ultimaEntrada = entradasEmAnalise[0].data;
+        const responsavelPersona: IPersonaProps = {
+          text: ultimaEntrada.usuario,
+          secondaryText: ultimaEntrada.email || "",
+          id: ultimaEntrada.usuario,
+        };
+        setSelectedHSEResponsible(responsavelPersona);
+        console.log(
+          "👤 [useEvaluation] Responsável HSE restaurado do histórico (fallback):",
+          responsavelPersona
+        );
+      }
+    }
+
+    // Verificar se a avaliação já foi iniciada (status Em Análise)
+    if (formData.status === "Em Análise" && historicoStatusChange) {
+      // Buscar a entrada mais recente de "Em Análise" caso haja múltiplas
+      let ultimaEntradaEmAnalise = historicoStatusChange["Em Análise"];
+
+      // Se há múltiplas entradas, buscar todas as chaves que começam com "Em Análise"
+      const entradasEmAnalise = Object.keys(historicoStatusChange)
+        .filter((key) => key.includes("Em Análise"))
+        .map((key) => ({
+          key,
+          data: historicoStatusChange[key],
+          dataAlteracao: new Date(
+            historicoStatusChange[key].dataAlteracao || ""
+          ),
+        }))
+        .sort((a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime()); // Mais recente primeiro
+
+      if (entradasEmAnalise.length > 0) {
+        ultimaEntradaEmAnalise = entradasEmAnalise[0].data;
+
+        setEvaluationStarted(true);
+
+        // Restaurar responsável HSE se não foi restaurado antes
+        if (!selectedHSEResponsible && ultimaEntradaEmAnalise.usuario) {
+          const responsavelPersona: IPersonaProps = {
+            text: ultimaEntradaEmAnalise.usuario,
+            secondaryText: ultimaEntradaEmAnalise.email || "",
+            id: ultimaEntradaEmAnalise.usuario,
+          };
+          setSelectedHSEResponsible(responsavelPersona);
+          console.log(
+            "👤 [useEvaluation] Responsável HSE restaurado do histórico:",
+            responsavelPersona
+          );
+        }
+
+        // Restaurar data de início
+        const dataInicio = ultimaEntradaEmAnalise.dataAlteracao;
+        if (dataInicio) {
+          const dataFormatada = new Date(dataInicio).toLocaleString("pt-BR");
+          setStartDate(dataFormatada);
+          console.log(
+            "📅 [useEvaluation] Data de início restaurada:",
+            dataFormatada
+          );
+        }
+      }
+    }
+  }, [formData]);
+
   const handleStartEvaluation = React.useCallback(async () => {
     console.log("🔄 handleStartEvaluation iniciado");
     if (!form || !selectedHSEResponsible) {
@@ -157,14 +348,11 @@ export const useEvaluation = ({
       if (onFormUpdate) {
         const mappedStatus =
           evaluationResult === "Pendente Info."
-            ? "Pendente Informações"
+            ? "Pendente Info."
             : evaluationResult;
         const updatedForm: IFormListItem = {
           ...form,
-          status: mappedStatus as
-            | "Aprovado"
-            | "Rejeitado"
-            | "Pendente Informações",
+          status: mappedStatus as "Aprovado" | "Rejeitado" | "Pendente Info.",
         };
         onFormUpdate(updatedForm);
       }

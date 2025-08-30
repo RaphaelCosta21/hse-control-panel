@@ -190,7 +190,7 @@ export interface IHSEFormData {
     | "Em Análise"
     | "Aprovado"
     | "Rejeitado"
-    | "Pendente Informações";
+    | "Pendente Info.";
   dataSubmissao?: Date;
   dataUltimaModificacao?: Date;
   dataEnvio?: Date; // Campo adicionado

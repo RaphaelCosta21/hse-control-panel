@@ -110,7 +110,7 @@ const FormHeader: React.FC<IFormHeaderProps> = ({ formData, isReviewing }) => {
                 {formData?.status === "Rejeitado" && "❌"}
                 {formData?.status === "Em Análise" && "🔄"}
                 {formData?.status === "Enviado" && "📤"}
-                {formData?.status === "Pendente Informações" && "⚠️"}
+                {formData?.status === "Pendente Info." && "⚠️"}
                 {formData?.status === "Em Andamento" && "⏳"} {formData?.status}
               </span>
             </div>

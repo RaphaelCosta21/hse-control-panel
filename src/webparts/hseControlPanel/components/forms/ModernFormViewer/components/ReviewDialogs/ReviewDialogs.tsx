@@ -23,9 +23,9 @@ export interface IReviewDialogsProps {
   // Review Progress Dialog
   isReviewing: boolean;
   setIsReviewing: (reviewing: boolean) => void;
-  reviewStatus: "Aprovado" | "Rejeitado" | "Pendente Informações";
+  reviewStatus: "Aprovado" | "Rejeitado" | "Pendente Info.";
   setReviewStatus: (
-    status: "Aprovado" | "Rejeitado" | "Pendente Informações"
+    status: "Aprovado" | "Rejeitado" | "Pendente Info."
   ) => void;
   reviewComments: string;
   setReviewComments: (comments: string) => void;
@@ -68,7 +68,7 @@ const ReviewDialogs: React.FC<IReviewDialogsProps> = ({
   const reviewStatusOptions: IDropdownOption[] = [
     { key: "Aprovado", text: "✅ Aprovado" },
     { key: "Rejeitado", text: "❌ Rejeitado" },
-    { key: "Pendente Informações", text: "⚠️ Pendente Informações" },
+    { key: "Pendente Info.", text: "⚠️ Pendente Info." },
   ];
 
   return (
@@ -116,10 +116,7 @@ const ReviewDialogs: React.FC<IReviewDialogsProps> = ({
               selectedKey={reviewStatus}
               onChange={(_, option) =>
                 setReviewStatus(
-                  option?.key as
-                    | "Aprovado"
-                    | "Rejeitado"
-                    | "Pendente Informações"
+                  option?.key as "Aprovado" | "Rejeitado" | "Pendente Info."
                 )
               }
             />

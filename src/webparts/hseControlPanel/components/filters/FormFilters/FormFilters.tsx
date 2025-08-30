@@ -97,7 +97,7 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
     { key: "Em Análise", text: "� Em Análise" },
     { key: "Aprovado", text: "✅ Aprovado" },
     { key: "Rejeitado", text: "❌ Rejeitado" },
-    { key: "Pendente Informações", text: "⏳ Pendente Informações" },
+    { key: "Pendente Info.", text: "⏳ Pendente Info." },
   ];
 
   const companyOptions: IDropdownOption[] = [

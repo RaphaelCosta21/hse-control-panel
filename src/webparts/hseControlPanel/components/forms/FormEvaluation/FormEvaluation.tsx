@@ -55,7 +55,7 @@ export const FormEvaluation: React.FC<IFormEvaluationProps> = ({
           | "Em Análise"
           | "Aprovado"
           | "Rejeitado"
-          | "Pendente Informações",
+          | "Pendente Info.",
         comentarios: comments,
         observacoes: observations,
         avaliador: "Admin HSE", // TODO: Get from context

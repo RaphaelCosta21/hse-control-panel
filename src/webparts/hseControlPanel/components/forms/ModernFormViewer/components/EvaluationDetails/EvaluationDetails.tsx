@@ -49,7 +49,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     formData.status === "Em Análise" ||
     formData.status === "Aprovado" ||
     formData.status === "Rejeitado" ||
-    formData.status === "Pendente Informações";
+    formData.status === "Pendente Info.";
 
   if (!shouldShowEvaluationSection) {
     return null;
@@ -121,7 +121,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
           historicoStatusChange.Rejeitado.dataAlteracao
         ).toLocaleString("pt-BR");
       } else if (
-        currentStatus === "Pendente Informações" &&
+        currentStatus === "Pendente Info." &&
         historicoStatusChange["Pendente Info"]?.dataAlteracao
       ) {
         dataConclusao = new Date(
@@ -230,7 +230,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
                 { key: "Aprovado", text: "✅ Aprovado" },
                 {
                   key: "Pendente Info.",
-                  text: "⏳ Pendente Informações",
+                  text: "⏳ Pendente Info.",
                 },
                 { key: "Rejeitado", text: "❌ Rejeitado" },
               ]}

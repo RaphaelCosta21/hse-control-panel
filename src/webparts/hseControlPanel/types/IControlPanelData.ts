@@ -27,7 +27,7 @@ export interface IFormListItem {
     | "Em Análise"
     | "Aprovado"
     | "Rejeitado"
-    | "Pendente Informações";
+    | "Pendente Info.";
   dataSubmissao: Date;
   dataAvaliacao?: Date;
   avaliador?: string;
