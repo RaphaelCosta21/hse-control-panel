@@ -215,10 +215,12 @@ export class SharePointService {
         email: string;
         id: string;
       };
-      historicoStatusChange: Record<
-        string,
-        { dataAlteracao: string; usuario: string; email: string }
-      >;
+      historicoStatusChange: Array<{
+        status: string;
+        dataAlteracao: string;
+        usuario: string;
+        email: string;
+      }>;
       formData?: any;
     }
   ): Promise<void> {
@@ -238,20 +240,27 @@ export class SharePointService {
         try {
           const existingData = JSON.parse(currentItem.DadosFormulario);
 
-          // Atualizar dados do formulário APENAS com histórico de status
+          // Atualizar dados do formulário APENAS com histórico de status (formato array)
+          const historicoExistente =
+            existingData.metadata?.historicoStatusChange || [];
+          const novoHistorico = Array.isArray(historicoExistente)
+            ? [
+                ...historicoExistente,
+                {
+                  status: evaluationData.status,
+                  dataAlteracao: new Date().toISOString(),
+                  usuario: evaluationData.responsavel.name,
+                  email: evaluationData.responsavel.email,
+                },
+              ]
+            : evaluationData.historicoStatusChange;
+
           updatedFormData = {
             ...existingData,
             status: evaluationData.status, // Atualizar o status no JSON
             metadata: {
               ...existingData.metadata,
-              historicoStatusChange: {
-                ...existingData.metadata?.historicoStatusChange,
-                [evaluationData.status]: {
-                  dataAlteracao: new Date().toISOString(),
-                  usuario: evaluationData.responsavel.name,
-                  email: evaluationData.responsavel.email,
-                },
-              },
+              historicoStatusChange: novoHistorico,
               // NÃO criar Avaliacao aqui - será criado apenas no "Enviar Avaliação"
             },
           };

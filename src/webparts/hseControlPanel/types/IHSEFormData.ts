@@ -203,11 +203,12 @@ export interface IHSEFormData {
   dataAnalise?: Date;
   comentariosRevisao?: string;
 
-  // Histórico de mudanças de status (objeto, não array)
-  historicoStatusChange?: Record<string, IStatusChange>;
+  // Histórico de mudanças de status (array apenas)
+  historicoStatusChange?: IStatusChangeArray[];
 }
 
-export interface IStatusChange {
+export interface IStatusChangeArray {
+  status: string;
   dataAlteracao: string;
   usuario: string;
   email: string;

@@ -16,6 +16,7 @@ export interface ITimelineStep {
 }
 
 interface IHistoricoEntry {
+  status: string;
   dataAlteracao: string;
   usuario: string;
   email: string;
@@ -76,58 +77,49 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
     }
   };
 
-  const processTimelineData = (
-    historico: string,
+  const processTimelineArrayData = (
+    historicoArray: IHistoricoEntry[],
     currentStatus: string
   ): ITimelineStep[] => {
     try {
-      const historicoData = JSON.parse(historico);
       const steps: ITimelineStep[] = [];
 
-      // Ordenar por dataAlteracao
-      const sortedEntries = Object.entries(historicoData).sort(
-        ([, a], [, b]) => {
-          const timestampA = new Date(
-            (a as IHistoricoEntry).dataAlteracao
-          ).getTime();
-          const timestampB = new Date(
-            (b as IHistoricoEntry).dataAlteracao
-          ).getTime();
-          return timestampA - timestampB;
-        }
-      );
+      // Ordenar por dataAlteracao (mais antigo primeiro)
+      const sortedEntries = [...historicoArray].sort((a, b) => {
+        return (
+          new Date(a.dataAlteracao).getTime() -
+          new Date(b.dataAlteracao).getTime()
+        );
+      });
 
-      sortedEntries.forEach(([status, data], index) => {
-        const stepData = data as IHistoricoEntry;
+      sortedEntries.forEach((entry, index) => {
         let duration = "";
 
         // Calcular duração se não for o último step
         if (index < sortedEntries.length - 1) {
-          const currentTime = new Date(stepData.dataAlteracao);
-          const nextTime = new Date(
-            (sortedEntries[index + 1][1] as IHistoricoEntry).dataAlteracao
-          );
+          const currentTime = new Date(entry.dataAlteracao);
+          const nextTime = new Date(sortedEntries[index + 1].dataAlteracao);
           duration = calculateDuration(currentTime, nextTime);
-        } else if (status !== currentStatus) {
+        } else if (entry.status !== currentStatus) {
           // Se não é o status atual, calcular até agora
-          const currentTime = new Date(stepData.dataAlteracao);
+          const currentTime = new Date(entry.dataAlteracao);
           const now = new Date();
           duration = calculateDuration(currentTime, now);
         }
 
         steps.push({
-          status: status,
-          timestamp: stepData.dataAlteracao,
-          user: stepData.usuario || "",
-          email: stepData.email || "",
+          status: entry.status,
+          timestamp: entry.dataAlteracao,
+          user: entry.usuario || "",
+          email: entry.email || "",
           duration: duration,
-          isCurrentStatus: status === currentStatus,
+          isCurrentStatus: entry.status === currentStatus,
         });
       });
 
       return steps;
     } catch (error) {
-      console.error("Erro ao processar histórico:", error);
+      console.error("Erro ao processar histórico array:", error);
       return [];
     }
   };
@@ -136,26 +128,26 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
     // Verificar se existe histórico (está dentro da metadata do IHSEFormData)
     const formDataExtended = formData as IHSEFormData & {
       metadata?: {
-        historicoStatusChange?: Record<string, IHistoricoEntry>;
+        historicoStatusChange?: IHistoricoEntry[];
       };
       status?: string;
     };
 
     // O histórico está em formData.metadata.historicoStatusChange
     const historicoField = formDataExtended.metadata?.historicoStatusChange;
-    const currentStatus = formDataExtended.status || "Cadastrado";
+    const currentStatus = formDataExtended.status || "Em Andamento";
 
     console.log("🔍 FlowTimeline - Dados recebidos:", {
       hasMetadata: !!formDataExtended.metadata,
       hasHistorico: !!historicoField,
       currentStatus,
       historicoData: historicoField,
+      isArray: Array.isArray(historicoField),
     });
 
-    if (historicoField && typeof historicoField === "object") {
-      // Converter objeto para string JSON e processar
-      const historicoJson = JSON.stringify(historicoField);
-      const steps = processTimelineData(historicoJson, currentStatus);
+    if (historicoField && Array.isArray(historicoField)) {
+      console.log("🔍 FlowTimeline - Processando histórico como array");
+      const steps = processTimelineArrayData(historicoField, currentStatus);
       setTimelineSteps(steps);
       setTotalProcessTime(calculateTotalProcessTime(steps));
     } else {
@@ -173,7 +165,7 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
   }, [
     formData,
     calculateDuration,
-    processTimelineData,
+    processTimelineArrayData,
     calculateTotalProcessTime,
   ]);
 

@@ -66,15 +66,19 @@ export const useEvaluation = ({
     const formDataWithMetadata = formData as unknown as {
       metadata?: {
         Avaliacao?: Record<string, unknown>;
-        historicoStatusChange?: Record<
-          string,
-          { dataAlteracao?: string; email?: string; usuario?: string }
-        >;
+        historicoStatusChange?: Array<{
+          status: string;
+          dataAlteracao?: string;
+          email?: string;
+          usuario?: string;
+        }>;
       };
-      historicoStatusChange?: Record<
-        string,
-        { dataAlteracao?: string; email?: string; usuario?: string }
-      >;
+      historicoStatusChange?: Array<{
+        status: string;
+        dataAlteracao?: string;
+        email?: string;
+        usuario?: string;
+      }>;
     };
 
     const metadata = formDataWithMetadata?.metadata;
@@ -120,16 +124,13 @@ export const useEvaluation = ({
         };
 
         // Tentar buscar email do histórico de status
-        if (historicoStatusChange) {
+        if (historicoStatusChange && Array.isArray(historicoStatusChange)) {
           // Buscar a entrada mais recente de "Em Análise"
-          const entradasEmAnalise = Object.keys(historicoStatusChange)
-            .filter((key) => key.includes("Em Análise"))
-            .map((key) => ({
-              key,
-              data: historicoStatusChange[key],
-              dataAlteracao: new Date(
-                historicoStatusChange[key].dataAlteracao || ""
-              ),
+          const entradasEmAnalise = historicoStatusChange
+            .filter((entry) => entry.status === "Em Análise")
+            .map((entry) => ({
+              entry,
+              dataAlteracao: new Date(entry.dataAlteracao || ""),
             }))
             .sort(
               (a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime()
@@ -137,7 +138,7 @@ export const useEvaluation = ({
 
           if (entradasEmAnalise.length > 0) {
             responsavelPersona.secondaryText =
-              entradasEmAnalise[0].data.email || "";
+              entradasEmAnalise[0].entry.email || "";
           }
         }
 
@@ -169,21 +170,22 @@ export const useEvaluation = ({
     }
 
     // Caso não tenha encontrado dados em metadata.Avaliacao, tentar buscar do histórico
-    if (!avaliacaoData && historicoStatusChange) {
+    if (
+      !avaliacaoData &&
+      historicoStatusChange &&
+      Array.isArray(historicoStatusChange)
+    ) {
       // Buscar a entrada mais recente de "Em Análise"
-      const entradasEmAnalise = Object.keys(historicoStatusChange)
-        .filter((key) => key.includes("Em Análise"))
-        .map((key) => ({
-          key,
-          data: historicoStatusChange[key],
-          dataAlteracao: new Date(
-            historicoStatusChange[key].dataAlteracao || ""
-          ),
+      const entradasEmAnalise = historicoStatusChange
+        .filter((entry) => entry.status === "Em Análise")
+        .map((entry) => ({
+          entry,
+          dataAlteracao: new Date(entry.dataAlteracao || ""),
         }))
         .sort((a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime());
 
-      if (entradasEmAnalise.length > 0 && entradasEmAnalise[0].data.usuario) {
-        const ultimaEntrada = entradasEmAnalise[0].data;
+      if (entradasEmAnalise.length > 0 && entradasEmAnalise[0].entry.usuario) {
+        const ultimaEntrada = entradasEmAnalise[0].entry;
         const responsavelPersona: IPersonaProps = {
           text: ultimaEntrada.usuario,
           secondaryText: ultimaEntrada.email || "",
@@ -198,24 +200,22 @@ export const useEvaluation = ({
     }
 
     // Verificar se a avaliação já foi iniciada (status Em Análise)
-    if (formData.status === "Em Análise" && historicoStatusChange) {
+    if (
+      formData.status === "Em Análise" &&
+      historicoStatusChange &&
+      Array.isArray(historicoStatusChange)
+    ) {
       // Buscar a entrada mais recente de "Em Análise" caso haja múltiplas
-      let ultimaEntradaEmAnalise = historicoStatusChange["Em Análise"];
-
-      // Se há múltiplas entradas, buscar todas as chaves que começam com "Em Análise"
-      const entradasEmAnalise = Object.keys(historicoStatusChange)
-        .filter((key) => key.includes("Em Análise"))
-        .map((key) => ({
-          key,
-          data: historicoStatusChange[key],
-          dataAlteracao: new Date(
-            historicoStatusChange[key].dataAlteracao || ""
-          ),
+      const entradasEmAnalise = historicoStatusChange
+        .filter((entry) => entry.status === "Em Análise")
+        .map((entry) => ({
+          entry,
+          dataAlteracao: new Date(entry.dataAlteracao || ""),
         }))
         .sort((a, b) => b.dataAlteracao.getTime() - a.dataAlteracao.getTime()); // Mais recente primeiro
 
       if (entradasEmAnalise.length > 0) {
-        ultimaEntradaEmAnalise = entradasEmAnalise[0].data;
+        const ultimaEntradaEmAnalise = entradasEmAnalise[0].entry;
 
         setEvaluationStarted(true);
 
@@ -261,16 +261,20 @@ export const useEvaluation = ({
       console.log("⏳ Iniciando processo de avaliação...");
       setSubmittingReview(true);
 
-      // Criar histórico de mudança de status (objeto, não array)
+      // Criar histórico de mudança de status (array)
       const statusAtual = "Em Análise";
-      const novoHistoricoStatus = {
-        ...formData?.historicoStatusChange,
-        [statusAtual]: {
+      const historicoStatusChangeArray = formData?.historicoStatusChange || [];
+
+      // Adicionar nova entrada no array
+      const novoHistoricoStatus = [
+        ...historicoStatusChangeArray,
+        {
+          status: statusAtual,
           dataAlteracao: new Date().toISOString(),
           usuario: selectedHSEResponsible.text || "",
           email: selectedHSEResponsible.secondaryText || "",
         },
-      };
+      ];
 
       // Preparar dados da avaliação
       const evaluationData = {
