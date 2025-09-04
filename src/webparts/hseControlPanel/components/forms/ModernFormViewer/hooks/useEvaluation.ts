@@ -263,7 +263,21 @@ export const useEvaluation = ({
 
       // Criar histórico de mudança de status (array)
       const statusAtual = "Em Análise";
-      const historicoStatusChangeArray = formData?.historicoStatusChange || [];
+      // Buscar historicoStatusChange considerando ambas as estruturas possíveis
+      const formDataWithMetadata = formData as IHSEFormData & {
+        metadata?: {
+          historicoStatusChange?: Array<{
+            status: string;
+            dataAlteracao: string;
+            usuario: string;
+            email: string;
+          }>;
+        };
+      };
+      const historicoStatusChangeArray =
+        formDataWithMetadata?.metadata?.historicoStatusChange ||
+        formData?.historicoStatusChange ||
+        [];
 
       // Adicionar nova entrada no array
       const novoHistoricoStatus = [

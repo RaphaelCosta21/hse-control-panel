@@ -72,13 +72,17 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
 
   // Função auxiliar para extrair dados do avaliador
   const extractAssignedReviewer = React.useCallback(
-    (item: Record<string, any>) => {
+    (item: Record<string, unknown>) => {
       try {
         // Verifica se tem avaliador atribuído na coluna AvaliadorResponsavel
         if (item.AvaliadorResponsavel) {
+          const avaliador = item.AvaliadorResponsavel as {
+            Title?: string;
+            EMail?: string;
+          };
           return {
-            name: item.AvaliadorResponsavel.Title || item.AvaliadorResponsavel,
-            email: item.AvaliadorResponsavel.EMail || "",
+            name: avaliador.Title || String(item.AvaliadorResponsavel),
+            email: avaliador.EMail || "",
             photoUrl: undefined, // Será carregado posteriormente se necessário
             isActive: true,
           };
@@ -128,27 +132,30 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
             ? JSON.parse(dadosFormularioJson)
             : dadosFormularioJson;
 
-        // Verifica se existe metadata.historicoStatusChange
+        // Verifica se existe metadata.historicoStatusChange (como ARRAY)
         if (
           jsonData &&
           jsonData.metadata &&
-          jsonData.metadata.historicoStatusChange
+          Array.isArray(jsonData.metadata.historicoStatusChange)
         ) {
           const historicoStatusChange = jsonData.metadata.historicoStatusChange;
 
-          // Verifica se existe "Em Análise"
-          if (historicoStatusChange["Em Análise"]) {
-            const analysisData = historicoStatusChange["Em Análise"];
+          // Procura pelo último status "Em Análise" no array
+          const analiseEntry = historicoStatusChange
+            .slice()
+            .reverse()
+            .find(
+              (entry: { status: string; usuario?: string; email?: string }) =>
+                entry.status === "Em Análise"
+            );
 
-            // Verifica se tem as propriedades usuario e email
-            if (analysisData.usuario && analysisData.email) {
-              return {
-                name: analysisData.usuario,
-                email: analysisData.email,
-                photoUrl: `/_layouts/15/userphoto.aspx?size=S&username=${analysisData.email}`,
-                isActive: true,
-              };
-            }
+          if (analiseEntry && analiseEntry.usuario && analiseEntry.email) {
+            return {
+              name: analiseEntry.usuario,
+              email: analiseEntry.email,
+              photoUrl: `/_layouts/15/userphoto.aspx?size=S&username=${analiseEntry.email}`,
+              isActive: true,
+            };
           }
         }
 

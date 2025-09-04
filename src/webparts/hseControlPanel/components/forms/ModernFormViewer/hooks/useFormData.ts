@@ -141,7 +141,15 @@ export const useFormData = ({
           // SEMPRE usar o status da coluna SharePoint, não do JSON
           parsedData.status = formDetails.StatusAvaliacao || "Em Andamento";
 
-          setFormData(parsedData);
+          // Preservar a estrutura completa para que o FlowTimeline funcione
+          // mas garantir que tenha as propriedades básicas de IHSEFormData
+          const formDataWithDefaults = {
+            ...createBasicFormData(formDetails),
+            ...parsedData,
+            status: formDetails.StatusAvaliacao || "Em Andamento", // Override final
+          };
+
+          setFormData(formDataWithDefaults);
         } catch {
           // Se não conseguir parsear, usar dados básicos do formulário
           const basicData = createBasicFormData(formDetails);

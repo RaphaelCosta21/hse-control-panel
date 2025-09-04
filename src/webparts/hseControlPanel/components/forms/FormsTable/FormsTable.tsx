@@ -77,16 +77,18 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       if (
         dadosFormulario &&
         dadosFormulario.metadata &&
-        dadosFormulario.metadata.historicoStatusChange
+        Array.isArray(dadosFormulario.metadata.historicoStatusChange)
       ) {
         const statusChange = dadosFormulario.metadata.historicoStatusChange;
 
-        // Procura por "Em Andamento" no histórico de status
-        if (
-          statusChange["Em Andamento"] &&
-          statusChange["Em Andamento"].dataAlteracao
-        ) {
-          return formatDate(statusChange["Em Andamento"].dataAlteracao);
+        // Procura por "Em Andamento" no histórico de status (array)
+        const emAndamentoEntry = statusChange.find(
+          (entry: { status: string; dataAlteracao?: string }) =>
+            entry.status === "Em Andamento"
+        );
+
+        if (emAndamentoEntry && emAndamentoEntry.dataAlteracao) {
+          return formatDate(emAndamentoEntry.dataAlteracao);
         }
       }
 
@@ -123,22 +125,20 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       if (
         dadosFormulario &&
         dadosFormulario.metadata &&
-        dadosFormulario.metadata.historicoStatusChange
+        Array.isArray(dadosFormulario.metadata.historicoStatusChange)
       ) {
         const statusChange = dadosFormulario.metadata.historicoStatusChange;
 
-        // Pega todas as chaves de status e encontra a mais recente
-        const statusKeys = Object.keys(statusChange);
+        // Encontra a entrada mais recente no array
         let ultimaData = null;
 
-        for (const status of statusKeys) {
-          const statusData = statusChange[status];
-          if (statusData && statusData.dataAlteracao) {
+        for (const entry of statusChange) {
+          if (entry && entry.dataAlteracao) {
             if (
               !ultimaData ||
-              new Date(statusData.dataAlteracao) > new Date(ultimaData)
+              new Date(entry.dataAlteracao) > new Date(ultimaData)
             ) {
-              ultimaData = statusData.dataAlteracao;
+              ultimaData = entry.dataAlteracao;
             }
           }
         }
@@ -226,16 +226,18 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       if (
         dadosFormulario &&
         dadosFormulario.metadata &&
-        dadosFormulario.metadata.historicoStatusChange
+        Array.isArray(dadosFormulario.metadata.historicoStatusChange)
       ) {
         const statusChange = dadosFormulario.metadata.historicoStatusChange;
 
         // Procura por "Em Andamento" no histórico de status para pegar quem criou
-        if (
-          statusChange["Em Andamento"] &&
-          statusChange["Em Andamento"].usuario
-        ) {
-          return statusChange["Em Andamento"].usuario;
+        const emAndamentoEntry = statusChange.find(
+          (entry: { status: string; usuario?: string }) =>
+            entry.status === "Em Andamento"
+        );
+
+        if (emAndamentoEntry && emAndamentoEntry.usuario) {
+          return emAndamentoEntry.usuario;
         }
       }
 

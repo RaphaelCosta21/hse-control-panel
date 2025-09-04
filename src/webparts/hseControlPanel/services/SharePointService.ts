@@ -357,19 +357,29 @@ export class SharePointService {
           };
 
           // Atualizar dados do formulário com nova avaliação
+          // Atualizar histórico de status como ARRAY
+          const historicoExistente = Array.isArray(
+            existingData.metadata?.historicoStatusChange
+          )
+            ? existingData.metadata.historicoStatusChange
+            : [];
+
+          const novoHistorico = [
+            ...historicoExistente,
+            {
+              status: evaluationData.statusAvaliacao,
+              dataAlteracao: new Date().toISOString(),
+              usuario: evaluationData.hseResponsavel,
+              email: evaluationData.email,
+            },
+          ];
+
           updatedFormData = {
             ...existingData,
             status: evaluationData.statusAvaliacao, // Atualizar status
             metadata: {
               ...existingData.metadata,
-              historicoStatusChange: {
-                ...existingData.metadata?.historicoStatusChange,
-                [evaluationData.statusAvaliacao]: {
-                  dataAlteracao: new Date().toISOString(),
-                  usuario: evaluationData.hseResponsavel,
-                  email: evaluationData.email,
-                },
-              },
+              historicoStatusChange: novoHistorico,
               Avaliacao: {
                 ...existingData.metadata?.Avaliacao,
                 QuantidadeAvaliacao: quantidadeAtual + 1,

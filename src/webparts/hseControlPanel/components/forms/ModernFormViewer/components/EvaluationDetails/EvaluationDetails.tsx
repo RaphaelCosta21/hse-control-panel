@@ -96,37 +96,32 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     let dataInicio = "N/A";
     let dataConclusao = "N/A";
 
-    if (historicoStatusChange) {
+    if (Array.isArray(historicoStatusChange)) {
       // Data de início = quando foi para "Em Análise"
-      if (historicoStatusChange["Em Análise"]?.dataAlteracao) {
-        dataInicio = new Date(
-          historicoStatusChange["Em Análise"].dataAlteracao
-        ).toLocaleString("pt-BR");
+      const emAnaliseEntry = historicoStatusChange.find(
+        (entry: { status: string; dataAlteracao?: string }) =>
+          entry.status === "Em Análise"
+      );
+      if (emAnaliseEntry?.dataAlteracao) {
+        dataInicio = new Date(emAnaliseEntry.dataAlteracao).toLocaleString(
+          "pt-BR"
+        );
       }
 
       // Data de conclusão = data do status atual
       const currentStatus = formData.status;
-      if (
-        currentStatus === "Aprovado" &&
-        historicoStatusChange.Aprovado?.dataAlteracao
-      ) {
-        dataConclusao = new Date(
-          historicoStatusChange.Aprovado.dataAlteracao
-        ).toLocaleString("pt-BR");
-      } else if (
-        currentStatus === "Rejeitado" &&
-        historicoStatusChange.Rejeitado?.dataAlteracao
-      ) {
-        dataConclusao = new Date(
-          historicoStatusChange.Rejeitado.dataAlteracao
-        ).toLocaleString("pt-BR");
-      } else if (
-        currentStatus === "Pendente Info." &&
-        historicoStatusChange["Pendente Info"]?.dataAlteracao
-      ) {
-        dataConclusao = new Date(
-          historicoStatusChange["Pendente Info"].dataAlteracao
-        ).toLocaleString("pt-BR");
+      const statusEntry = historicoStatusChange
+        .slice()
+        .reverse()
+        .find(
+          (entry: { status: string; dataAlteracao?: string }) =>
+            entry.status === currentStatus
+        );
+
+      if (statusEntry?.dataAlteracao) {
+        dataConclusao = new Date(statusEntry.dataAlteracao).toLocaleString(
+          "pt-BR"
+        );
       }
     }
 

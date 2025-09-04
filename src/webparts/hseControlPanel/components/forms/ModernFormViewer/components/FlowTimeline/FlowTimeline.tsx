@@ -35,6 +35,33 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
   const [timelineSteps, setTimelineSteps] = React.useState<ITimelineStep[]>([]);
   const [totalProcessTime, setTotalProcessTime] = React.useState<string>("");
 
+  // Função para normalizar historicoStatusChange sempre para array
+  const normalizeHistoricoToArray = (historico: unknown): IHistoricoEntry[] => {
+    if (!historico) return [];
+
+    if (Array.isArray(historico)) {
+      return historico as IHistoricoEntry[];
+    }
+
+    // Se for um objeto com chaves numéricas (como "0", "1", "2"), converter para array
+    if (typeof historico === "object" && historico !== null) {
+      const historicoObj = historico as Record<string, unknown>;
+      const keys = Object.keys(historicoObj);
+
+      // Verificar se as chaves são numéricas sequenciais
+      const numericKeys = keys
+        .filter((key) => /^\d+$/.test(key))
+        .sort((a, b) => parseInt(a) - parseInt(b));
+
+      if (numericKeys.length > 0) {
+        // Converter objeto com chaves numéricas para array
+        return numericKeys.map((key) => historicoObj[key] as IHistoricoEntry);
+      }
+    }
+
+    return [];
+  };
+
   const calculateDuration = (start: Date, end: Date): string => {
     const diffMs = end.getTime() - start.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -125,7 +152,7 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
   };
 
   React.useEffect(() => {
-    // Verificar se existe histórico (está dentro da metadata do IHSEFormData)
+    // Verificar múltiplas estruturas possíveis para encontrar o histórico
     const formDataExtended = formData as IHSEFormData & {
       metadata?: {
         historicoStatusChange?: IHistoricoEntry[];
@@ -133,24 +160,45 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
       status?: string;
     };
 
-    // O histórico está em formData.metadata.historicoStatusChange
-    const historicoField = formDataExtended.metadata?.historicoStatusChange;
-    const currentStatus = formDataExtended.status || "Em Andamento";
+    // Tentar buscar histórico em diferentes locais
+    let historicoField: IHistoricoEntry[] = [];
+
+    // 1. Primeiro, tentar em formData.metadata.historicoStatusChange (estrutura completa do JSON)
+    if (formDataExtended.metadata?.historicoStatusChange) {
+      historicoField = normalizeHistoricoToArray(
+        formDataExtended.metadata.historicoStatusChange
+      );
+    }
+    // 2. Segundo, tentar em formData.historicoStatusChange (interface IHSEFormData)
+    else if (formData.historicoStatusChange) {
+      historicoField = normalizeHistoricoToArray(
+        formData.historicoStatusChange
+      );
+    }
+
+    const currentStatus =
+      formDataExtended.status || formData.status || "Em Andamento";
 
     console.log("🔍 FlowTimeline - Dados recebidos:", {
       hasMetadata: !!formDataExtended.metadata,
-      hasHistorico: !!historicoField,
+      hasHistoricoInMetadata:
+        !!formDataExtended.metadata?.historicoStatusChange,
+      hasHistoricoInRoot: !!formData.historicoStatusChange,
+      historicoField,
       currentStatus,
-      historicoData: historicoField,
       isArray: Array.isArray(historicoField),
+      fullFormData: formData,
     });
 
-    if (historicoField && Array.isArray(historicoField)) {
+    if (historicoField && historicoField.length > 0) {
       console.log("🔍 FlowTimeline - Processando histórico como array");
       const steps = processTimelineArrayData(historicoField, currentStatus);
       setTimelineSteps(steps);
       setTotalProcessTime(calculateTotalProcessTime(steps));
     } else {
+      console.log(
+        "🔍 FlowTimeline - Nenhum histórico encontrado, criando entrada básica"
+      );
       // Se não há histórico, criar entrada básica baseada no status atual
       const currentStep: ITimelineStep = {
         status: currentStatus,
