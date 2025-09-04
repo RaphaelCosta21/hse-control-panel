@@ -97,15 +97,20 @@ export const useEvaluation = ({
       HSEResponsavel?: string;
       Comentarios?: string;
       Resultado?: string;
+      DataInicio?: string;
     } | null = null;
 
     if (metadata?.Avaliacao) {
-      const firstEvaluationKey = Object.keys(metadata.Avaliacao)[0];
+      const firstEvaluationKey =
+        Object.keys(metadata.Avaliacao).find(
+          (key) => key !== "QuantidadeAvaliacao"
+        ) || "0";
       avaliacaoData = (metadata.Avaliacao[firstEvaluationKey] ||
         metadata.Avaliacao["0"]) as {
         HSEResponsavel?: string;
         Comentarios?: string;
         Resultado?: string;
+        DataInicio?: string;
       };
     }
 
@@ -167,6 +172,19 @@ export const useEvaluation = ({
         setEvaluationResult(resultado);
         console.log("✅ [useEvaluation] Resultado restaurado:", resultado);
       }
+
+      // Restaurar data de início da Avaliacao
+      if (avaliacaoData.DataInicio) {
+        const dataFormatada = new Date(avaliacaoData.DataInicio).toLocaleString(
+          "pt-BR"
+        );
+        setStartDate(dataFormatada);
+        console.log(
+          "📅 [useEvaluation] Data de início restaurada da Avaliacao:",
+          dataFormatada
+        );
+        setEvaluationStarted(true);
+      }
     }
 
     // Caso não tenha encontrado dados em metadata.Avaliacao, tentar buscar do histórico
@@ -200,8 +218,10 @@ export const useEvaluation = ({
     }
 
     // Verificar se a avaliação já foi iniciada (status Em Análise)
+    // Só procurar no histórico se não encontrou data na estrutura Avaliacao
     if (
       formData.status === "Em Análise" &&
+      !avaliacaoData?.DataInicio && // Só se não encontrou DataInicio na Avaliacao
       historicoStatusChange &&
       Array.isArray(historicoStatusChange)
     ) {
@@ -261,34 +281,8 @@ export const useEvaluation = ({
       console.log("⏳ Iniciando processo de avaliação...");
       setSubmittingReview(true);
 
-      // Criar histórico de mudança de status (array)
+      // Criar dados da avaliação (o SharePointService vai gerenciar o histórico)
       const statusAtual = "Em Análise";
-      // Buscar historicoStatusChange considerando ambas as estruturas possíveis
-      const formDataWithMetadata = formData as IHSEFormData & {
-        metadata?: {
-          historicoStatusChange?: Array<{
-            status: string;
-            dataAlteracao: string;
-            usuario: string;
-            email: string;
-          }>;
-        };
-      };
-      const historicoStatusChangeArray =
-        formDataWithMetadata?.metadata?.historicoStatusChange ||
-        formData?.historicoStatusChange ||
-        [];
-
-      // Adicionar nova entrada no array
-      const novoHistoricoStatus = [
-        ...historicoStatusChangeArray,
-        {
-          status: statusAtual,
-          dataAlteracao: new Date().toISOString(),
-          usuario: selectedHSEResponsible.text || "",
-          email: selectedHSEResponsible.secondaryText || "",
-        },
-      ];
 
       // Preparar dados da avaliação
       const evaluationData = {
@@ -298,7 +292,6 @@ export const useEvaluation = ({
           email: selectedHSEResponsible.secondaryText || "",
           id: selectedHSEResponsible.id || "",
         },
-        historicoStatusChange: novoHistoricoStatus,
         formData: formData,
       };
 

@@ -132,7 +132,48 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
             ? JSON.parse(dadosFormularioJson)
             : dadosFormularioJson;
 
-        // Verifica se existe metadata.historicoStatusChange (como ARRAY)
+        // Primeiro, verifica se existe Avaliacao no metadata (nova estrutura)
+        if (jsonData && jsonData.metadata && jsonData.metadata.Avaliacao) {
+          const avaliacao = jsonData.metadata.Avaliacao;
+
+          // Busca pela última avaliação criada
+          const quantidadeAvaliacao = avaliacao.QuantidadeAvaliacao || 0;
+          if (quantidadeAvaliacao > 0) {
+            const ultimaAvaliacaoIndex = (quantidadeAvaliacao - 1).toString();
+            const ultimaAvaliacao = avaliacao[ultimaAvaliacaoIndex];
+
+            if (ultimaAvaliacao && ultimaAvaliacao.HSEResponsavel) {
+              // Tentar extrair email do historicoStatusChange
+              let email = "";
+              if (jsonData.metadata.historicoStatusChange) {
+                const historico = jsonData.metadata.historicoStatusChange;
+                // Procurar por entrada "Em Análise"
+                const entries = Object.values(historico) as Array<{
+                  status: string;
+                  usuario?: string;
+                  email?: string;
+                }>;
+                const analiseEntry = entries.find(
+                  (entry) => entry.status === "Em Análise"
+                );
+                if (analiseEntry && analiseEntry.email) {
+                  email = analiseEntry.email;
+                }
+              }
+
+              return {
+                name: ultimaAvaliacao.HSEResponsavel,
+                email: email,
+                photoUrl: email
+                  ? `/_layouts/15/userphoto.aspx?size=S&username=${email}`
+                  : undefined,
+                isActive: true,
+              };
+            }
+          }
+        }
+
+        // Fallback: Verifica se existe metadata.historicoStatusChange (para compatibilidade)
         if (
           jsonData &&
           jsonData.metadata &&

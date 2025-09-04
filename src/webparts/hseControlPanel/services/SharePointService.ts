@@ -215,7 +215,7 @@ export class SharePointService {
         email: string;
         id: string;
       };
-      historicoStatusChange: Array<{
+      historicoStatusChange?: Array<{
         status: string;
         dataAlteracao: string;
         usuario: string;
@@ -240,20 +240,24 @@ export class SharePointService {
         try {
           const existingData = JSON.parse(currentItem.DadosFormulario);
 
-          // Atualizar dados do formulário APENAS com histórico de status (formato array)
+          // Buscar histórico existente (formato objeto com chaves numéricas)
           const historicoExistente =
-            existingData.metadata?.historicoStatusChange || [];
-          const novoHistorico = Array.isArray(historicoExistente)
-            ? [
-                ...historicoExistente,
-                {
-                  status: evaluationData.status,
-                  dataAlteracao: new Date().toISOString(),
-                  usuario: evaluationData.responsavel.name,
-                  email: evaluationData.responsavel.email,
-                },
-              ]
-            : evaluationData.historicoStatusChange;
+            existingData.metadata?.historicoStatusChange || {};
+
+          // Encontrar a próxima chave numérica
+          const chaves = Object.keys(historicoExistente);
+          const proximaChave = chaves.length.toString();
+
+          // Adicionar nova entrada preservando as existentes
+          const novoHistorico = {
+            ...historicoExistente,
+            [proximaChave]: {
+              status: evaluationData.status,
+              dataAlteracao: new Date().toISOString(),
+              usuario: evaluationData.responsavel.name,
+              email: evaluationData.responsavel.email,
+            },
+          };
 
           updatedFormData = {
             ...existingData,
@@ -261,7 +265,22 @@ export class SharePointService {
             metadata: {
               ...existingData.metadata,
               historicoStatusChange: novoHistorico,
-              // NÃO criar Avaliacao aqui - será criado apenas no "Enviar Avaliação"
+              // Criar estrutura inicial da Avaliacao ao iniciar avaliação
+              Avaliacao: {
+                ...existingData.metadata?.Avaliacao,
+                QuantidadeAvaliacao:
+                  (existingData.metadata?.Avaliacao?.QuantidadeAvaliacao || 0) +
+                  1,
+                [(
+                  existingData.metadata?.Avaliacao?.QuantidadeAvaliacao || 0
+                ).toString()]: {
+                  HSEResponsavel: evaluationData.responsavel.name,
+                  DataInicio: new Date().toISOString(),
+                  DataFim: "", // Vazio inicialmente
+                  Comentarios: "", // Vazio inicialmente
+                  StatusAvaliacao: "", // Vazio inicialmente
+                },
+              },
             },
           };
         } catch (parseError) {
@@ -318,7 +337,7 @@ export class SharePointService {
   }
 
   /**
-   * Finaliza a avaliação adicionando o array Avaliacao ao metadata
+   * Finaliza a avaliação atualizando os campos DataFim, Comentarios e StatusAvaliacao
    */
   public async submitEvaluation(
     itemId: number,
@@ -344,35 +363,41 @@ export class SharePointService {
         try {
           const existingData = JSON.parse(currentItem.DadosFormulario);
 
-          // Criar estrutura de avaliação conforme especificação
-          const quantidadeAtual =
-            existingData.metadata?.Avaliacao?.QuantidadeAvaliacao || 0;
-          const proximoIndice = quantidadeAtual.toString();
+          // Buscar a avaliação atual para atualizar (última entrada)
+          const avaliacaoAtual = existingData.metadata?.Avaliacao;
+          if (!avaliacaoAtual) {
+            throw new Error("Nenhuma avaliação encontrada para finalizar");
+          }
 
-          const novaAvaliacao = {
-            HSEResponsavel: evaluationData.hseResponsavel,
-            DataInicio: new Date().toISOString(), // Data do momento do envio
+          const quantidadeAtual = avaliacaoAtual.QuantidadeAvaliacao || 0;
+          const indiceAtual = (quantidadeAtual - 1).toString(); // Última avaliação criada
+
+          // Atualizar apenas os campos específicos da avaliação existente
+          const avaliacaoAtualizada = {
+            ...avaliacaoAtual[indiceAtual],
+            DataFim: new Date().toISOString(),
             Comentarios: evaluationData.comentarios,
             StatusAvaliacao: evaluationData.statusAvaliacao,
           };
 
-          // Atualizar dados do formulário com nova avaliação
-          // Atualizar histórico de status como ARRAY
-          const historicoExistente = Array.isArray(
-            existingData.metadata?.historicoStatusChange
-          )
-            ? existingData.metadata.historicoStatusChange
-            : [];
+          // Atualizar dados do formulário mantendo histórico
+          const historicoExistente =
+            existingData.metadata?.historicoStatusChange || {};
 
-          const novoHistorico = [
+          // Encontrar a próxima chave numérica
+          const chaves = Object.keys(historicoExistente);
+          const proximaChave = chaves.length.toString();
+
+          // Adicionar nova entrada preservando as existentes
+          const novoHistorico = {
             ...historicoExistente,
-            {
+            [proximaChave]: {
               status: evaluationData.statusAvaliacao,
               dataAlteracao: new Date().toISOString(),
               usuario: evaluationData.hseResponsavel,
               email: evaluationData.email,
             },
-          ];
+          };
 
           updatedFormData = {
             ...existingData,
@@ -381,9 +406,8 @@ export class SharePointService {
               ...existingData.metadata,
               historicoStatusChange: novoHistorico,
               Avaliacao: {
-                ...existingData.metadata?.Avaliacao,
-                QuantidadeAvaliacao: quantidadeAtual + 1,
-                [proximoIndice]: novaAvaliacao,
+                ...avaliacaoAtual,
+                [indiceAtual]: avaliacaoAtualizada,
               },
             },
           };

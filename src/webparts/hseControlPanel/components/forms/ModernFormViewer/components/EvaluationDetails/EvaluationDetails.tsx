@@ -81,47 +81,85 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     let evaluationData: {
       HSEResponsavel?: string;
       Comentarios?: string;
+      DataInicio?: string;
+      DataFim?: string;
     } = {};
 
     if (avaliacaoData) {
-      const firstEvaluationKey = Object.keys(avaliacaoData)[0];
+      const firstEvaluationKey =
+        Object.keys(avaliacaoData).find(
+          (key) => key !== "QuantidadeAvaliacao"
+        ) || "0";
       evaluationData = (avaliacaoData[firstEvaluationKey] ||
         avaliacaoData["0"]) as {
         HSEResponsavel?: string;
         Comentarios?: string;
+        DataInicio?: string;
+        DataFim?: string;
       };
     }
 
-    // Buscar datas do histórico de status
+    // Buscar datas - PRIMEIRO da estrutura Avaliacao, depois do histórico como fallback
     let dataInicio = "N/A";
     let dataConclusao = "N/A";
 
-    if (Array.isArray(historicoStatusChange)) {
-      // Data de início = quando foi para "Em Análise"
-      const emAnaliseEntry = historicoStatusChange.find(
-        (entry: { status: string; dataAlteracao?: string }) =>
-          entry.status === "Em Análise"
-      );
-      if (emAnaliseEntry?.dataAlteracao) {
-        dataInicio = new Date(emAnaliseEntry.dataAlteracao).toLocaleString(
-          "pt-BR"
-        );
+    // Priorizar datas da estrutura Avaliacao
+    if (evaluationData.DataInicio) {
+      dataInicio = new Date(evaluationData.DataInicio).toLocaleString("pt-BR");
+    }
+
+    if (evaluationData.DataFim) {
+      dataConclusao = new Date(evaluationData.DataFim).toLocaleString("pt-BR");
+    }
+
+    // Fallback para histórico se não encontrou nas datas da Avaliacao
+    if (
+      (dataInicio === "N/A" || dataConclusao === "N/A") &&
+      historicoStatusChange
+    ) {
+      // Converter histórico para array se estiver em formato de objeto
+      let historicoArray: Array<{ status: string; dataAlteracao?: string }> =
+        [];
+
+      if (Array.isArray(historicoStatusChange)) {
+        historicoArray = historicoStatusChange;
+      } else if (typeof historicoStatusChange === "object") {
+        // Converter objeto com chaves numéricas para array
+        historicoArray = Object.values(historicoStatusChange) as Array<{
+          status: string;
+          dataAlteracao?: string;
+        }>;
       }
 
-      // Data de conclusão = data do status atual
-      const currentStatus = formData.status;
-      const statusEntry = historicoStatusChange
-        .slice()
-        .reverse()
-        .find(
+      // Data de início = quando foi para "Em Análise" (se não encontrou na Avaliacao)
+      if (dataInicio === "N/A") {
+        const emAnaliseEntry = historicoArray.find(
           (entry: { status: string; dataAlteracao?: string }) =>
-            entry.status === currentStatus
+            entry.status === "Em Análise"
         );
+        if (emAnaliseEntry?.dataAlteracao) {
+          dataInicio = new Date(emAnaliseEntry.dataAlteracao).toLocaleString(
+            "pt-BR"
+          );
+        }
+      }
 
-      if (statusEntry?.dataAlteracao) {
-        dataConclusao = new Date(statusEntry.dataAlteracao).toLocaleString(
-          "pt-BR"
-        );
+      // Data de conclusão = data do status atual (se não encontrou na Avaliacao)
+      if (dataConclusao === "N/A") {
+        const currentStatus = formData.status;
+        const statusEntry = historicoArray
+          .slice()
+          .reverse()
+          .find(
+            (entry: { status: string; dataAlteracao?: string }) =>
+              entry.status === currentStatus
+          );
+
+        if (statusEntry?.dataAlteracao) {
+          dataConclusao = new Date(statusEntry.dataAlteracao).toLocaleString(
+            "pt-BR"
+          );
+        }
       }
     }
 
