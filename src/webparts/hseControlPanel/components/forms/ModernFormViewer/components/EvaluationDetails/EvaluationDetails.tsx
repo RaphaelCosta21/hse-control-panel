@@ -55,6 +55,121 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     return null;
   }
 
+  // Função para buscar todas as avaliações
+  const getAllAvaliacoes = (): Array<{
+    indice: string;
+    HSEResponsavel?: string;
+    Comentarios?: string;
+    DataInicio?: string;
+    DataFim?: string;
+    StatusAvaliacao?: string;
+  }> => {
+    const metadata = (
+      formData as unknown as {
+        metadata?: {
+          Avaliacao?: Record<string, unknown>;
+        };
+      }
+    )?.metadata;
+
+    const avaliacaoData = metadata?.Avaliacao;
+    const todasAvaliacoes: Array<{
+      indice: string;
+      HSEResponsavel?: string;
+      Comentarios?: string;
+      DataInicio?: string;
+      DataFim?: string;
+      StatusAvaliacao?: string;
+    }> = [];
+
+    if (avaliacaoData) {
+      const quantidadeAvaliacao =
+        (avaliacaoData.QuantidadeAvaliacao as number) || 0;
+
+      // Coletar todas as avaliações
+      for (let i = 0; i < quantidadeAvaliacao; i++) {
+        const avaliacaoAtual = avaliacaoData[i.toString()] as {
+          HSEResponsavel?: string;
+          Comentarios?: string;
+          DataInicio?: string;
+          DataFim?: string;
+          StatusAvaliacao?: string;
+        };
+
+        if (avaliacaoAtual) {
+          todasAvaliacoes.push({
+            indice: i.toString(),
+            ...avaliacaoAtual,
+          });
+        }
+      }
+    }
+
+    return todasAvaliacoes;
+  };
+
+  // Função para renderizar histórico de avaliações
+  const renderHistoricoAvaliacoes = (
+    todasAvaliacoes: Array<{
+      indice: string;
+      HSEResponsavel?: string;
+      Comentarios?: string;
+      DataInicio?: string;
+      DataFim?: string;
+      StatusAvaliacao?: string;
+    }>
+  ): JSX.Element | null => {
+    if (todasAvaliacoes.length === 0) return null;
+
+    return (
+      <Stack tokens={{ childrenGap: 12 }} style={{ marginTop: "20px" }}>
+        <Text variant="mediumPlus" style={{ fontWeight: "bold" }}>
+          📋 Histórico de Avaliações ({todasAvaliacoes.length} avaliação
+          {todasAvaliacoes.length > 1 ? "ões" : ""})
+        </Text>
+        {todasAvaliacoes.map((avaliacao, index) => (
+          <Stack
+            key={avaliacao.indice}
+            tokens={{ childrenGap: 4 }}
+            style={{
+              padding: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              backgroundColor:
+                index === todasAvaliacoes.length - 1 ? "#f0f8ff" : "#f9f9f9",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>
+              Avaliação #{parseInt(avaliacao.indice) + 1}{" "}
+              {index === todasAvaliacoes.length - 1 && "(Mais Recente)"}
+            </Text>
+            <Text>
+              <strong>Responsável:</strong> {avaliacao.HSEResponsavel || "N/A"}
+            </Text>
+            <Text>
+              <strong>Status:</strong> {avaliacao.StatusAvaliacao || "N/A"}
+            </Text>
+            {avaliacao.DataInicio && (
+              <Text>
+                <strong>Início:</strong>{" "}
+                {new Date(avaliacao.DataInicio).toLocaleString("pt-BR")}
+              </Text>
+            )}
+            {avaliacao.DataFim && (
+              <Text>
+                <strong>Conclusão:</strong>{" "}
+                {new Date(avaliacao.DataFim).toLocaleString("pt-BR")}
+              </Text>
+            )}
+            <Text>
+              <strong>Comentários:</strong> {avaliacao.Comentarios || "N/A"}
+            </Text>
+          </Stack>
+        ))}
+      </Stack>
+    );
+  };
+
   const renderEvaluationFinalized = (): React.ReactElement => {
     // Debug: Log dos dados para verificar estrutura
     console.log(
@@ -275,6 +390,9 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
         {/* Estado 1: Antes da avaliação - Formulário enviado, aguardando início */}
         {formData.status === "Enviado" && !evaluationStarted ? (
           <Stack tokens={{ childrenGap: 16 }}>
+            {/* Mostrar histórico de avaliações anteriores, se existir */}
+            {renderHistoricoAvaliacoes(getAllAvaliacoes())}
+
             <Text>Selecione um responsável HSE para iniciar a avaliação:</Text>
             <Dropdown
               label="Responsável HSE"
