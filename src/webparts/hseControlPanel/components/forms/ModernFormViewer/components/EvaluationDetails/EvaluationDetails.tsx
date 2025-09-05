@@ -77,7 +77,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     const avaliacaoData = metadata?.Avaliacao;
     const historicoStatusChange = metadata?.historicoStatusChange;
 
-    // Buscar dados de avaliação
+    // Buscar dados da ÚLTIMA avaliação (mais recente)
     let evaluationData: {
       HSEResponsavel?: string;
       Comentarios?: string;
@@ -85,18 +85,47 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
       DataFim?: string;
     } = {};
 
+    const todasAvaliacoes: Array<{
+      indice: string;
+      HSEResponsavel?: string;
+      Comentarios?: string;
+      DataInicio?: string;
+      DataFim?: string;
+      StatusAvaliacao?: string;
+    }> = [];
+
     if (avaliacaoData) {
-      const firstEvaluationKey =
-        Object.keys(avaliacaoData).find(
-          (key) => key !== "QuantidadeAvaliacao"
-        ) || "0";
-      evaluationData = (avaliacaoData[firstEvaluationKey] ||
-        avaliacaoData["0"]) as {
-        HSEResponsavel?: string;
-        Comentarios?: string;
-        DataInicio?: string;
-        DataFim?: string;
-      };
+      const quantidadeAvaliacao =
+        (avaliacaoData.QuantidadeAvaliacao as number) || 0;
+
+      // Coletar todas as avaliações
+      for (let i = 0; i < quantidadeAvaliacao; i++) {
+        const avaliacaoAtual = avaliacaoData[i.toString()] as {
+          HSEResponsavel?: string;
+          Comentarios?: string;
+          DataInicio?: string;
+          DataFim?: string;
+          StatusAvaliacao?: string;
+        };
+
+        if (avaliacaoAtual) {
+          todasAvaliacoes.push({
+            indice: i.toString(),
+            ...avaliacaoAtual,
+          });
+        }
+      }
+
+      // Pegar a ÚLTIMA avaliação (mais recente) para exibir nos detalhes principais
+      if (quantidadeAvaliacao > 0) {
+        const ultimaAvaliacaoIndex = (quantidadeAvaliacao - 1).toString();
+        evaluationData = avaliacaoData[ultimaAvaliacaoIndex] as {
+          HSEResponsavel?: string;
+          Comentarios?: string;
+          DataInicio?: string;
+          DataFim?: string;
+        };
+      }
     }
 
     // Buscar datas - PRIMEIRO da estrutura Avaliacao, depois do histórico como fallback
@@ -181,6 +210,57 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
         <Text>
           <strong>Comentários:</strong> {evaluationData.Comentarios || "N/A"}
         </Text>
+
+        {/* Mostrar histórico de todas as avaliações se houver mais de uma */}
+        {todasAvaliacoes.length > 1 && (
+          <Stack tokens={{ childrenGap: 12 }} style={{ marginTop: "20px" }}>
+            <Text variant="mediumPlus" style={{ fontWeight: "bold" }}>
+              📋 Histórico de Avaliações ({todasAvaliacoes.length} avaliações)
+            </Text>
+            {todasAvaliacoes.map((avaliacao, index) => (
+              <Stack
+                key={avaliacao.indice}
+                tokens={{ childrenGap: 4 }}
+                style={{
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  backgroundColor:
+                    index === todasAvaliacoes.length - 1
+                      ? "#f0f8ff"
+                      : "#f9f9f9",
+                }}
+              >
+                <Text style={{ fontWeight: "bold" }}>
+                  Avaliação #{parseInt(avaliacao.indice) + 1}{" "}
+                  {index === todasAvaliacoes.length - 1 && "(Mais Recente)"}
+                </Text>
+                <Text>
+                  <strong>Responsável:</strong>{" "}
+                  {avaliacao.HSEResponsavel || "N/A"}
+                </Text>
+                <Text>
+                  <strong>Status:</strong> {avaliacao.StatusAvaliacao || "N/A"}
+                </Text>
+                {avaliacao.DataInicio && (
+                  <Text>
+                    <strong>Início:</strong>{" "}
+                    {new Date(avaliacao.DataInicio).toLocaleString("pt-BR")}
+                  </Text>
+                )}
+                {avaliacao.DataFim && (
+                  <Text>
+                    <strong>Conclusão:</strong>{" "}
+                    {new Date(avaliacao.DataFim).toLocaleString("pt-BR")}
+                  </Text>
+                )}
+                <Text>
+                  <strong>Comentários:</strong> {avaliacao.Comentarios || "N/A"}
+                </Text>
+              </Stack>
+            ))}
+          </Stack>
+        )}
       </Stack>
     );
   };

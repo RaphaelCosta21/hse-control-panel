@@ -217,9 +217,11 @@ export const useEvaluation = ({
       }
     }
 
-    // Verificar se a avaliação já foi iniciada (status Em Análise)
-    // Só procurar no histórico se não encontrou data na estrutura Avaliacao
-    if (
+    // Verificar se a avaliação já foi iniciada baseado no status atual
+    // IMPORTANTE: Resetar evaluationStarted se status for "Enviado" para permitir múltiplas avaliações
+    if (formData.status === "Enviado") {
+      setEvaluationStarted(false);
+    } else if (
       formData.status === "Em Análise" &&
       !avaliacaoData?.DataInicio && // Só se não encontrou DataInicio na Avaliacao
       historicoStatusChange &&
