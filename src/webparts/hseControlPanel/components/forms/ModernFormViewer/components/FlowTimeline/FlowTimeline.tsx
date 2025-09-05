@@ -37,9 +37,18 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
 
   // Função para normalizar historicoStatusChange sempre para array
   const normalizeHistoricoToArray = (historico: unknown): IHistoricoEntry[] => {
-    if (!historico) return [];
+    console.log("🔍 normalizeHistoricoToArray - Entrada:", historico);
+
+    if (!historico) {
+      console.log("🔍 normalizeHistoricoToArray - Histórico vazio");
+      return [];
+    }
 
     if (Array.isArray(historico)) {
+      console.log(
+        "🔍 normalizeHistoricoToArray - Já é array, retornando:",
+        historico
+      );
       return historico as IHistoricoEntry[];
     }
 
@@ -47,18 +56,34 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
     if (typeof historico === "object" && historico !== null) {
       const historicoObj = historico as Record<string, unknown>;
       const keys = Object.keys(historicoObj);
+      console.log("🔍 normalizeHistoricoToArray - Chaves do objeto:", keys);
 
       // Verificar se as chaves são numéricas sequenciais
       const numericKeys = keys
         .filter((key) => /^\d+$/.test(key))
         .sort((a, b) => parseInt(a) - parseInt(b));
 
+      console.log(
+        "🔍 normalizeHistoricoToArray - Chaves numéricas:",
+        numericKeys
+      );
+
       if (numericKeys.length > 0) {
         // Converter objeto com chaves numéricas para array
-        return numericKeys.map((key) => historicoObj[key] as IHistoricoEntry);
+        const result = numericKeys.map(
+          (key) => historicoObj[key] as IHistoricoEntry
+        );
+        console.log(
+          "🔍 normalizeHistoricoToArray - Convertido para array:",
+          result
+        );
+        return result;
       }
     }
 
+    console.log(
+      "🔍 normalizeHistoricoToArray - Formato não reconhecido, retornando array vazio"
+    );
     return [];
   };
 
@@ -165,12 +190,20 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
 
     // 1. Primeiro, tentar em formData.metadata.historicoStatusChange (estrutura completa do JSON)
     if (formDataExtended.metadata?.historicoStatusChange) {
+      console.log(
+        "🔍 FlowTimeline - Histórico encontrado em metadata:",
+        formDataExtended.metadata.historicoStatusChange
+      );
       historicoField = normalizeHistoricoToArray(
         formDataExtended.metadata.historicoStatusChange
       );
     }
     // 2. Segundo, tentar em formData.historicoStatusChange (interface IHSEFormData)
     else if (formData.historicoStatusChange) {
+      console.log(
+        "🔍 FlowTimeline - Histórico encontrado em root:",
+        formData.historicoStatusChange
+      );
       historicoField = normalizeHistoricoToArray(
         formData.historicoStatusChange
       );

@@ -240,24 +240,25 @@ export class SharePointService {
         try {
           const existingData = JSON.parse(currentItem.DadosFormulario);
 
-          // Buscar histórico existente (formato objeto com chaves numéricas)
+          // Buscar histórico existente (manter formato array)
           const historicoExistente =
-            existingData.metadata?.historicoStatusChange || {};
+            existingData.metadata?.historicoStatusChange || [];
 
-          // Encontrar a próxima chave numérica
-          const chaves = Object.keys(historicoExistente);
-          const proximaChave = chaves.length.toString();
+          // Garantir que seja um array
+          const historicoArray = Array.isArray(historicoExistente)
+            ? historicoExistente
+            : Object.values(historicoExistente);
 
-          // Adicionar nova entrada preservando as existentes
-          const novoHistorico = {
-            ...historicoExistente,
-            [proximaChave]: {
+          // Adicionar nova entrada no final do array
+          const novoHistorico = [
+            ...historicoArray,
+            {
               status: evaluationData.status,
               dataAlteracao: new Date().toISOString(),
               usuario: evaluationData.responsavel.name,
               email: evaluationData.responsavel.email,
             },
-          };
+          ];
 
           updatedFormData = {
             ...existingData,
@@ -382,22 +383,23 @@ export class SharePointService {
 
           // Atualizar dados do formulário mantendo histórico
           const historicoExistente =
-            existingData.metadata?.historicoStatusChange || {};
+            existingData.metadata?.historicoStatusChange || [];
 
-          // Encontrar a próxima chave numérica
-          const chaves = Object.keys(historicoExistente);
-          const proximaChave = chaves.length.toString();
+          // Garantir que seja um array
+          const historicoArray = Array.isArray(historicoExistente)
+            ? historicoExistente
+            : Object.values(historicoExistente);
 
-          // Adicionar nova entrada preservando as existentes
-          const novoHistorico = {
-            ...historicoExistente,
-            [proximaChave]: {
+          // Adicionar nova entrada no final do array
+          const novoHistorico = [
+            ...historicoArray,
+            {
               status: evaluationData.statusAvaliacao,
               dataAlteracao: new Date().toISOString(),
               usuario: evaluationData.hseResponsavel,
               email: evaluationData.email,
             },
-          };
+          ];
 
           updatedFormData = {
             ...existingData,
