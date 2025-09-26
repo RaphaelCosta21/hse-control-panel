@@ -327,9 +327,13 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
           <Icon iconName="Attach" className={styles.anexoIcon} />
           <div>
             <Text variant="small">{anexoInfo.nome}</Text>
+          </div>
+          <div>
             <Text variant="xSmall" style={{ color: "#605e5c" }}>
               {anexoInfo.descricao}
             </Text>
+          </div>
+          <div>
             <Text variant="xSmall" style={{ color: "#d13438" }}>
               Arquivo não anexado
             </Text>

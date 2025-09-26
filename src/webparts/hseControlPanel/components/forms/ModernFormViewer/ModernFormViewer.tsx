@@ -17,7 +17,12 @@ import { SharePointService } from "../../../services/SharePointService";
 import DadosGeraisSection from "./sections/DadosGeraisSection";
 import ConformidadeLegalSection from "./sections/ConformidadeLegalSection";
 import ServicosEspeciaisSection from "./sections/ServicosEspeciaisSection";
-import { FormHeader, EvaluationDetails, ReviewDialogs } from "./components";
+import {
+  FormHeader,
+  EvaluationDetails,
+  ReviewDialogs,
+  RevisionHistory,
+} from "./components";
 import { FlowTimeline } from "./components/FlowTimeline";
 import { useEvaluation, useReview, useFormData } from "./hooks";
 import styles from "./ModernFormViewer.module.scss";
@@ -420,6 +425,123 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
 
                 {/* Conteúdo do FlowTimeline */}
                 {formData && <FlowTimeline formData={formData} />}
+              </div>
+            </PivotItem>
+
+            <PivotItem
+              headerText="📜 Histórico de Revisões"
+              itemKey="historico-revisoes"
+              style={{ color: "#495057", fontWeight: "600", fontSize: "16px" }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#ffffff",
+                  padding: "0",
+                  borderRadius: "0 0 8px 8px",
+                  minHeight: "500px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  border: "1px solid #dee2e6",
+                  borderTop: "3px solid rgb(3, 120, 124)",
+                }}
+              >
+                {/* Cabeçalho da seção */}
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
+                    padding: "20px 24px",
+                    borderBottom: "1px solid #e9ecef",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #6f42c1, #5a2d91)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: "18px",
+                      boxShadow: "0 2px 4px rgba(111, 66, 193, 0.3)",
+                    }}
+                  >
+                    📜
+                  </div>
+                  <div>
+                    <h3
+                      style={{
+                        margin: "0",
+                        fontSize: "20px",
+                        fontWeight: "600",
+                        color: "#2c3e50",
+                      }}
+                    >
+                      Histórico de Revisões
+                    </h3>
+                    <p
+                      style={{
+                        margin: "4px 0 0 0",
+                        fontSize: "14px",
+                        color: "#6c757d",
+                      }}
+                    >
+                      Timeline completa de todas as modificações e revisões do
+                      formulário
+                    </p>
+                  </div>
+                </div>
+
+                {/* Conteúdo do Histórico de Revisões */}
+                {(() => {
+                  const formDataWithMetadata = formData as unknown as {
+                    metadata?: {
+                      historicoRevisoes?: Array<{
+                        numeroRevisao: number;
+                        data: string;
+                        usuario: string;
+                        email: string;
+                        tipoOperacao: string;
+                        alteracoes: Array<{
+                          campo: string;
+                          tipo: "adicionado" | "alterado" | "removido";
+                          valorAnterior?: string | boolean;
+                          valorNovo?: string | boolean;
+                        }>;
+                        totalAlteracoes: number;
+                        resumo: string;
+                      }>;
+                    };
+                  };
+
+                  const historicoRevisoes =
+                    formDataWithMetadata?.metadata?.historicoRevisoes;
+
+                  if (historicoRevisoes && historicoRevisoes.length > 0) {
+                    return (
+                      <RevisionHistory historicoRevisoes={historicoRevisoes} />
+                    );
+                  }
+
+                  return (
+                    <div
+                      style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        color: "#6c757d",
+                      }}
+                    >
+                      <p>
+                        Nenhum histórico de revisões encontrado para este
+                        formulário.
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             </PivotItem>
           </Pivot>

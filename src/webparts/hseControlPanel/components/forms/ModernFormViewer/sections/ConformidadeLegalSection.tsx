@@ -737,6 +737,8 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
           <Icon iconName="Attach" className={styles.anexoIcon} />
           <div>
             <Text variant="small">{anexoNome}</Text>
+          </div>
+          <div>
             <Text variant="xSmall" style={{ color: "#d13438" }}>
               Arquivo não anexado (chave: {anexoKey})
             </Text>

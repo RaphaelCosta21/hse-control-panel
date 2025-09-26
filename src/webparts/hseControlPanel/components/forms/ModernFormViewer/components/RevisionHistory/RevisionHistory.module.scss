@@ -1,0 +1,126 @@
+.revisionHistory {
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 500px;
+}
+
+.revisionCounter {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.timeline {
+  position: relative;
+  margin-left: 32px;
+}
+
+.timelineItem {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.timelineLine {
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: -32px;
+  width: 2px;
+  background: linear-gradient(to bottom, #dee2e6, #ced4da);
+  z-index: 1;
+}
+
+.timelineIcon {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid white;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.revisionCard {
+  flex: 1;
+  margin-left: 24px;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.revisionCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.summarySection {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.changesSection {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.changesList {
+  margin-top: 12px;
+}
+
+.changesList :global(.ms-DetailsHeader) {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.changesList :global(.ms-DetailsHeader-cell) {
+  font-weight: 600;
+  color: #495057;
+}
+
+.changesList :global(.ms-DetailsRow) {
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.changesList :global(.ms-DetailsRow:hover) {
+  background-color: #f8f9fa;
+}
+
+.changesList :global(.ms-DetailsRow-cell) {
+  padding: 12px 8px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .revisionHistory {
+    padding: 16px;
+  }
+
+  .timeline {
+    margin-left: 16px;
+  }
+
+  .timelineIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .revisionCard {
+    margin-left: 16px;
+    padding: 16px;
+  }
+}
