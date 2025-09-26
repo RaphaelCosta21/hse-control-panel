@@ -4,8 +4,6 @@ import {
   Text,
   PrimaryButton,
   DefaultButton,
-  CommandBar,
-  ICommandBarItemProps,
   Dialog,
   DialogType,
   DialogFooter,
@@ -85,23 +83,6 @@ export class MembersManagement extends React.Component<
         messageType: MessageBarType.error,
       });
     }
-  }
-
-  private getCommandBarItems(): ICommandBarItemProps[] {
-    return [
-      {
-        key: "addMember",
-        text: "Adicionar Membro",
-        iconProps: { iconName: "AddFriend" },
-        onClick: () => this.setState({ showAddDialog: true }),
-      },
-      {
-        key: "refresh",
-        text: "Atualizar",
-        iconProps: { iconName: "Refresh" },
-        onClick: () => this.loadMembers(),
-      },
-    ];
   }
 
   private teamOptions: IDropdownOption[] = [
@@ -369,8 +350,73 @@ export class MembersManagement extends React.Component<
             </MessageBar>
           )}
 
-          {/* Command Bar */}
-          <CommandBar items={this.getCommandBarItems()} />
+          {/* Ações */}
+          <Stack
+            horizontal
+            horizontalAlign="space-between"
+            verticalAlign="center"
+            styles={{
+              root: {
+                backgroundColor: "white",
+                border: "1px solid #e1e5e9",
+                borderRadius: "8px",
+                padding: "16px 20px",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                marginBottom: "20px",
+              },
+            }}
+          >
+            <Stack horizontal tokens={{ childrenGap: 12 }}>
+              <PrimaryButton
+                text="Adicionar Membro"
+                iconProps={{ iconName: "AddFriend" }}
+                onClick={() => {
+                  console.log("Botão Adicionar Membro clicado!");
+                  this.setState({ showAddDialog: true });
+                }}
+                styles={{
+                  root: {
+                    backgroundColor: "#0078d4",
+                    border: "none",
+                    borderRadius: "6px",
+                    height: "36px",
+                    minWidth: "160px",
+                  },
+                  rootHovered: {
+                    backgroundColor: "#106ebe",
+                  },
+                }}
+              />
+              <DefaultButton
+                text="Atualizar"
+                iconProps={{ iconName: "Refresh" }}
+                onClick={() => this.loadMembers().catch(console.error)}
+                styles={{
+                  root: {
+                    borderRadius: "6px",
+                    height: "36px",
+                    minWidth: "120px",
+                  },
+                }}
+              />
+            </Stack>
+
+            <Text
+              variant="medium"
+              styles={{
+                root: {
+                  color: "#d97706",
+                  fontWeight: "500",
+                  lineHeight: "1.4",
+                  maxWidth: "400px",
+                },
+              }}
+            >
+              ⚠️ Apenas membros ativos receberão e-mails automáticos de
+              atualização do fluxo dos formulários. Apenas membros ativos da
+              Equipe HSE poderão ser avaliadores.
+            </Text>
+          </Stack>
 
           {/* Statistics */}
           <Stack horizontal tokens={{ childrenGap: 20 }}>

@@ -197,9 +197,75 @@ export class SharePointService {
         .update({
           StatusAvaliacao: newStatus,
         });
+
+      // Adicionar registro na lista de suporte para acionar fluxo
+      await this.addStatusChangeRecord(itemId, newStatus);
     } catch (error) {
       console.error("Erro ao atualizar status do formulário:", error);
       throw new Error("Erro ao atualizar status do formulário");
+    }
+  }
+
+  /**
+   * Adiciona um registro na lista de suporte para acionar fluxo de email
+   */
+  private async addStatusChangeRecord(
+    itemId: number,
+    newStatus: string,
+    evaluationData?: {
+      dataFim?: string;
+      comentarios?: string;
+    }
+  ): Promise<void> {
+    try {
+      // Mapear status para o formato correto do Title
+      const statusTitleMap: { [key: string]: string } = {
+        "Em Análise": "Alteracao_Status_EmAnalise",
+        Aprovado: "Alteracao_Status_Aprovado",
+        Rejeitado: "Alteracao_Status_Rejeitado",
+        "Pendente Info.": "Alteracao_Status_PendenteInfo",
+      };
+
+      const title = statusTitleMap[newStatus];
+
+      if (!title) {
+        console.warn(`Status '${newStatus}' não mapeado para lista de suporte`);
+        return;
+      }
+
+      console.log(
+        `🔔 Adicionando registro na lista de suporte para status: ${newStatus}`
+      );
+
+      const recordData: {
+        Title: string;
+        Status: string;
+        IdForm: number;
+        Date?: string;
+        Comment?: string;
+      } = {
+        Title: title,
+        Status: newStatus,
+        IdForm: itemId,
+      };
+
+      // Adicionar Date e Comment se disponíveis
+      if (evaluationData?.dataFim) {
+        recordData.Date = evaluationData.dataFim;
+      }
+
+      if (evaluationData?.comentarios) {
+        recordData.Comment = evaluationData.comentarios;
+      }
+
+      await this.sp.web.lists
+        .getByTitle("hse-new-register-status-email-sup")
+        .items.add(recordData);
+
+      console.log(`✅ Registro adicionado na lista de suporte: ${title}`);
+    } catch (error) {
+      console.error("Erro ao adicionar registro na lista de suporte:", error);
+      // Não lançar erro para não interromper o fluxo principal
     }
   }
 
@@ -311,6 +377,9 @@ export class SharePointService {
         .update(updateData);
 
       console.log("✅ Formulário atualizado com sucesso no SharePoint");
+
+      // Adicionar registro na lista de suporte para acionar fluxo
+      await this.addStatusChangeRecord(itemId, evaluationData.status);
     } catch (error) {
       console.error(
         "❌ Erro detalhado ao atualizar formulário com avaliação:",
@@ -440,6 +509,12 @@ export class SharePointService {
         .update(updateData);
 
       console.log("✅ Avaliação finalizada com sucesso no SharePoint");
+
+      // Adicionar registro na lista de suporte para acionar fluxo
+      await this.addStatusChangeRecord(itemId, evaluationData.statusAvaliacao, {
+        dataFim: new Date().toISOString(),
+        comentarios: evaluationData.comentarios,
+      });
     } catch (error) {
       console.error("❌ Erro ao finalizar avaliação:", {
         error,

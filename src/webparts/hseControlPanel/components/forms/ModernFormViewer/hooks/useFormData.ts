@@ -175,13 +175,26 @@ export const useFormData = ({
         const membersService = new MembersService(context);
         const membersData = await membersService.getTeamMembers();
 
-        const formattedMembers: IPersonaProps[] = membersData.hseMembers.map(
+        // Filtrar apenas membros HSE ativos
+        const activeHSEMembers = membersData.hseMembers.filter(
+          (member: ITeamMember) => member.isActive === true
+        );
+
+        const formattedMembers: IPersonaProps[] = activeHSEMembers.map(
           (member: ITeamMember) => ({
             id: member.id.toString(),
             text: member.name,
             secondaryText: member.email,
             imageUrl: member.photoUrl,
           })
+        );
+
+        console.log(
+          "Membros HSE ativos carregados:",
+          activeHSEMembers.length,
+          "de",
+          membersData.hseMembers.length,
+          "total"
         );
 
         setHseMembersList(formattedMembers);
