@@ -143,21 +143,42 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
             const ultimaAvaliacao = avaliacao[ultimaAvaliacaoIndex];
 
             if (ultimaAvaliacao && ultimaAvaliacao.HSEResponsavel) {
-              // Tentar extrair email do historicoStatusChange
+              // Tentar extrair email do historicoStatusChange da entrada mais recente
               let email = "";
               if (jsonData.metadata.historicoStatusChange) {
                 const historico = jsonData.metadata.historicoStatusChange;
-                // Procurar por entrada "Em Análise"
-                const entries = Object.values(historico) as Array<{
+                let entries: Array<{
                   status: string;
                   usuario?: string;
                   email?: string;
-                }>;
-                const analiseEntry = entries.find(
-                  (entry) => entry.status === "Em Análise"
-                );
-                if (analiseEntry && analiseEntry.email) {
-                  email = analiseEntry.email;
+                  dataAlteracao?: string;
+                }> = [];
+
+                // Converter para array se for objeto ou já é array
+                if (Array.isArray(historico)) {
+                  entries = historico;
+                } else {
+                  entries = Object.values(historico);
+                }
+
+                // Procurar pela ÚLTIMA entrada "Em Análise" que corresponde ao avaliador atual
+                const entradasEmAnalise = entries
+                  .filter(
+                    (entry) =>
+                      entry.status === "Em Análise" &&
+                      entry.usuario === ultimaAvaliacao.HSEResponsavel
+                  )
+                  .sort((a, b) => {
+                    const dateA = new Date(a.dataAlteracao || 0).getTime();
+                    const dateB = new Date(b.dataAlteracao || 0).getTime();
+                    return dateB - dateA; // Mais recente primeiro
+                  });
+
+                if (
+                  entradasEmAnalise.length > 0 &&
+                  entradasEmAnalise[0].email
+                ) {
+                  email = entradasEmAnalise[0].email;
                 }
               }
 

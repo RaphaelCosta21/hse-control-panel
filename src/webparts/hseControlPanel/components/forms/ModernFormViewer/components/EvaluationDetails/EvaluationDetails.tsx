@@ -55,6 +55,43 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     return null;
   }
 
+  // Se o status for "Em Andamento", mostrar apenas mensagem informativa
+  if (formData.status === "Em Andamento") {
+    return (
+      <div className={styles.evaluationSection}>
+        <Stack tokens={{ childrenGap: 20 }}>
+          <Text variant="xLarge" className={styles.evaluationTitle}>
+            📋 Detalhes da Avaliação
+          </Text>
+          <Stack
+            tokens={{ childrenGap: 12 }}
+            style={{
+              padding: "20px",
+              backgroundColor: "#fff8dc",
+              border: "1px solid #ffd700",
+              borderRadius: "4px",
+            }}
+          >
+            <Text
+              variant="mediumPlus"
+              style={{ fontWeight: "bold", color: "#b8860b" }}
+            >
+              ⚠️ Formulário em Andamento
+            </Text>
+            <Text style={{ color: "#8b7355" }}>
+              O formulário precisa ter sido <strong>Enviado</strong> para poder
+              iniciar ou visualizar uma avaliação.
+            </Text>
+            <Text style={{ color: "#8b7355", fontSize: "14px" }}>
+              Aguarde o preenchimento e envio do formulário pelo fornecedor para
+              que a equipe HSE possa dar início ao processo de avaliação.
+            </Text>
+          </Stack>
+        </Stack>
+      </div>
+    );
+  }
+
   // Função para buscar todas as avaliações
   const getAllAvaliacoes = (): Array<{
     indice: string;

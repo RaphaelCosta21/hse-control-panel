@@ -329,7 +329,7 @@ const FormsTable: React.FC<IFormsTableProps> = ({
     },
     {
       key: "assignedReviewer",
-      name: "Revisor",
+      name: "Avaliador HSE",
       fieldName: "assignedReviewer",
       minWidth: 150,
       maxWidth: 200,

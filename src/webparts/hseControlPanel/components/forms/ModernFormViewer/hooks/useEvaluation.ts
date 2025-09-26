@@ -101,12 +101,20 @@ export const useEvaluation = ({
     } | null = null;
 
     if (metadata?.Avaliacao) {
-      const firstEvaluationKey =
-        Object.keys(metadata.Avaliacao).find(
-          (key) => key !== "QuantidadeAvaliacao"
-        ) || "0";
-      avaliacaoData = (metadata.Avaliacao[firstEvaluationKey] ||
-        metadata.Avaliacao["0"]) as {
+      const quantidadeAvaliacao =
+        (metadata.Avaliacao.QuantidadeAvaliacao as number) || 0;
+
+      // Buscar a ÚLTIMA avaliação (mais recente) ao invés da primeira
+      let ultimaAvaliacaoKey = "0";
+      if (quantidadeAvaliacao > 0) {
+        ultimaAvaliacaoKey = (quantidadeAvaliacao - 1).toString();
+      }
+
+      console.log(
+        `🔍 [useEvaluation] Buscando avaliação mais recente - Chave: ${ultimaAvaliacaoKey}, Total: ${quantidadeAvaliacao}`
+      );
+
+      avaliacaoData = metadata.Avaliacao[ultimaAvaliacaoKey] as {
         HSEResponsavel?: string;
         Comentarios?: string;
         Resultado?: string;
