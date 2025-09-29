@@ -1,9 +1,9 @@
 .settingsPage {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--ms-color-neutralLighterAlt);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .loadingContainer {
@@ -51,7 +51,7 @@
 .mainContainer {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  min-height: 0;
 }
 
 .sidebar {
@@ -62,6 +62,7 @@
   overflow-y: auto;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
   position: relative;
+  min-height: 100vh;
 }
 
 .navigation {
@@ -111,7 +112,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   position: relative;
 
   &::before {
@@ -138,7 +138,7 @@
 .content {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .settingsForm {
@@ -236,6 +236,7 @@
 
   .sidebar {
     width: 100%;
+    min-height: auto;
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--ms-color-neutralLight);

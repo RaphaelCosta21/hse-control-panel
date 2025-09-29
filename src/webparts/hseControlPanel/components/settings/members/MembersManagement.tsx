@@ -315,7 +315,7 @@ export class MembersManagement extends React.Component<
     }
 
     return (
-      <div className={styles.settingsPage}>
+      <div className={styles.content}>
         <Stack tokens={{ childrenGap: 20 }}>
           {/* Header */}
           <Stack
