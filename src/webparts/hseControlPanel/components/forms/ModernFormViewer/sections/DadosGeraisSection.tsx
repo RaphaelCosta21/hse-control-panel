@@ -221,20 +221,38 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
             </Text>
           </div>
           {anexoData.map((anexo, index) => (
-            <div key={anexo.id || index} className={styles.documentItem}>
-              <Text variant="small" className={styles.documentName}>
-                📄 {anexo.originalName || anexo.fileName || "Arquivo"}
-              </Text>
-              <Text variant="xSmall" className={styles.documentInfo}>
-                Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
-                {formatUploadDate(anexo.uploadDate || "")}
-              </Text>
+            <div
+              key={anexo.id || index}
+              className={styles.documentItem}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div>
+                <Text variant="small" className={styles.documentName}>
+                  📄 {anexo.originalName || anexo.fileName || "Arquivo"}
+                </Text>
+                <Text variant="xSmall" className={styles.documentInfo}>
+                  Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
+                  {formatUploadDate(anexo.uploadDate || "")}
+                </Text>
+              </div>
               <div className={styles.documentActions}>
                 <DefaultButton
                   iconProps={{ iconName: "View" }}
-                  text="Visualizar"
                   onClick={() => handleAnexoAction(anexo, "view")}
                   className={styles.documentButton}
+                  title="Clique para visualizar o arquivo"
+                  styles={{
+                    root: {
+                      minWidth: "32px",
+                      width: "32px",
+                      height: "32px",
+                      padding: "0",
+                    },
+                  }}
                 />
               </div>
             </div>

@@ -293,28 +293,43 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
                 {anexoInfo.descricao}
               </Text>
               {anexoData.map((anexo, index) => (
-                <div key={anexo.id || index} style={{ marginTop: "4px" }}>
-                  <Text variant="xSmall" style={{ color: "#107c10" }}>
-                    📄 {anexo.originalName || anexo.fileName || "Arquivo"}
-                  </Text>
-                  <Text
-                    variant="xSmall"
-                    style={{ color: "#666", display: "block" }}
-                  >
-                    Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
-                    {formatUploadDate(anexo.uploadDate || "")}
-                  </Text>
+                <div
+                  key={anexo.id || index}
+                  style={{
+                    marginTop: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <Text variant="xSmall" style={{ color: "#107c10" }}>
+                      📄 {anexo.originalName || anexo.fileName || "Arquivo"}
+                    </Text>
+                    <Text
+                      variant="xSmall"
+                      style={{ color: "#666", display: "block" }}
+                    >
+                      Tamanho: {formatFileSize(anexo.fileSize || 0)} | Upload:{" "}
+                      {formatUploadDate(anexo.uploadDate || "")}
+                    </Text>
+                  </div>
+                  <DefaultButton
+                    iconProps={{ iconName: "View" }}
+                    onClick={() => handleAnexoAction(anexo)}
+                    title="Clique para visualizar o arquivo"
+                    styles={{
+                      root: {
+                        minWidth: "32px",
+                        width: "32px",
+                        height: "32px",
+                        padding: "0",
+                      },
+                    }}
+                  />
                 </div>
               ))}
             </div>
-          </div>
-          <div className={styles.anexoActions}>
-            <DefaultButton
-              iconProps={{ iconName: "View" }}
-              text="Visualizar"
-              onClick={() => handleAnexoAction(anexoData[0])}
-              title="Clique para visualizar o arquivo"
-            />
           </div>
         </div>
       );

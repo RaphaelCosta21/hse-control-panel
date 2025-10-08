@@ -40,7 +40,7 @@ export interface IReviewDialogsProps {
   // Send Confirmation Dialog
   showSendConfirmation: boolean;
   setShowSendConfirmation: (show: boolean) => void;
-  evaluationResult: "Aprovado" | "Pendente Info." | "Rejeitado";
+  evaluationResult: "" | "Aprovado" | "Pendente Info." | "Rejeitado";
   handleSendEvaluation: () => Promise<void>;
 }
 
