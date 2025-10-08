@@ -25,9 +25,9 @@ export const useEvaluation = ({
   >;
   evaluationStarted: boolean;
   setEvaluationStarted: React.Dispatch<React.SetStateAction<boolean>>;
-  evaluationResult: "Aprovado" | "Pendente Info." | "Rejeitado";
+  evaluationResult: "" | "Aprovado" | "Pendente Info." | "Rejeitado";
   setEvaluationResult: React.Dispatch<
-    React.SetStateAction<"Aprovado" | "Pendente Info." | "Rejeitado">
+    React.SetStateAction<"" | "Aprovado" | "Pendente Info." | "Rejeitado">
   >;
   evaluationComments: string;
   setEvaluationComments: React.Dispatch<React.SetStateAction<string>>;
@@ -47,8 +47,8 @@ export const useEvaluation = ({
   >(undefined);
   const [evaluationStarted, setEvaluationStarted] = React.useState(false);
   const [evaluationResult, setEvaluationResult] = React.useState<
-    "Aprovado" | "Pendente Info." | "Rejeitado"
-  >("Aprovado");
+    "" | "Aprovado" | "Pendente Info." | "Rejeitado"
+  >("");
   const [evaluationComments, setEvaluationComments] = React.useState("");
   const [startDate, setStartDate] = React.useState<string>("");
   const [showStartConfirmation, setShowStartConfirmation] =

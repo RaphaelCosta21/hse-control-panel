@@ -14,13 +14,13 @@ export interface IEvaluationDetailsProps {
   formData: IHSEFormData;
   evaluationStarted: boolean;
   selectedHSEResponsible: IPersonaProps | undefined;
-  evaluationResult: "Aprovado" | "Pendente Info." | "Rejeitado";
+  evaluationResult: "" | "Aprovado" | "Pendente Info." | "Rejeitado";
   evaluationComments: string;
   startDate: string;
   hseMembersList: IPersonaProps[];
   setSelectedHSEResponsible: (responsible: IPersonaProps | undefined) => void;
   setEvaluationResult: (
-    result: "Aprovado" | "Pendente Info." | "Rejeitado"
+    result: "" | "Aprovado" | "Pendente Info." | "Rejeitado"
   ) => void;
   setEvaluationComments: (comments: string) => void;
   setShowStartConfirmation: (show: boolean) => void;
@@ -481,10 +481,15 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
 
             <Dropdown
               label="Resultado da Avaliação"
+              placeholder="Selecione o Status"
               selectedKey={evaluationResult}
               onChange={(_, option) =>
                 setEvaluationResult(
-                  option?.key as "Aprovado" | "Pendente Info." | "Rejeitado"
+                  option?.key as
+                    | ""
+                    | "Aprovado"
+                    | "Pendente Info."
+                    | "Rejeitado"
                 )
               }
               options={[
