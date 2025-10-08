@@ -51,7 +51,16 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
   const currentStatus = selectedStatus || filters?.status || "";
   const currentCompany = selectedCompany || filters?.empresa || "";
   const currentRevisor = selectedRevisor || filters?.revisor || "";
-
+  const statusOptions: IDropdownOption[] = [
+    { key: "", text: "Todos os Status" },
+    { key: "Em Andamento", text: "🔄 Em Andamento" },
+    { key: "Enviado", text: "📤 Enviado" },
+    { key: "Em Análise", text: "🔍 Em Análise" },
+    { key: "Aprovado", text: "✅ Aprovado" },
+    { key: "Rejeitado", text: "❌ Rejeitado" },
+    { key: "Pendente Info.", text: "⏳ Pendente Info." },
+    { key: "Cancelado", text: "🚫 Cancelado" },
+  ];
   const handleStatusChange = (
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption
@@ -90,15 +99,6 @@ const FormFilters: React.FC<IFormFiltersProps> = ({
       onFiltersChange({ revisor: newRevisor });
     }
   };
-  const statusOptions: IDropdownOption[] = [
-    { key: "", text: "Todos os Status" },
-    { key: "Em Andamento", text: "🔄 Em Andamento" },
-    { key: "Enviado", text: "📤 Enviado" },
-    { key: "Em Análise", text: "� Em Análise" },
-    { key: "Aprovado", text: "✅ Aprovado" },
-    { key: "Rejeitado", text: "❌ Rejeitado" },
-    { key: "Pendente Info.", text: "⏳ Pendente Info." },
-  ];
 
   const companyOptions: IDropdownOption[] = [
     { key: "", text: "Todas as Empresas" },

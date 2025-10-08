@@ -5,6 +5,12 @@ import {
   DetailsListLayoutMode,
   SelectionMode,
   DefaultButton,
+  Dialog,
+  DialogType,
+  DialogFooter,
+  PrimaryButton,
+  MessageBar,
+  MessageBarType,
 } from "@fluentui/react";
 import { StatusBadge, UserCard } from "../../ui";
 import { IFormListItem } from "../../../types/IControlPanelData";
@@ -17,6 +23,7 @@ export interface IFormsTableProps {
   onStartReview?: (form: IFormListItem) => void;
   onDownloadPDF?: (form: IFormListItem) => void;
   onDownloadAttachments?: (form: IFormListItem) => void;
+  onCancelForm?: (form: IFormListItem) => void;
   loading?: boolean;
   className?: string;
 }
@@ -28,9 +35,18 @@ const FormsTable: React.FC<IFormsTableProps> = ({
   onStartReview,
   onDownloadPDF,
   onDownloadAttachments,
+  onCancelForm,
   loading = false,
   className = "",
 }) => {
+  // Estados para gerenciar o modal de cancelamento
+  const [showCancelDialog, setShowCancelDialog] =
+    React.useState<boolean>(false);
+  const [formToCancel, setFormToCancel] = React.useState<IFormListItem | null>(
+    null
+  );
+  const [cancelling, setCancelling] = React.useState<boolean>(false);
+
   const formatDate = (dateString: string): string => {
     try {
       const date = new Date(dateString);
@@ -249,6 +265,34 @@ const FormsTable: React.FC<IFormsTableProps> = ({
     }
   };
 
+  // Funções para gerenciar o cancelamento de formulários
+  const handleCancelClick = (form: IFormListItem): void => {
+    setFormToCancel(form);
+    setShowCancelDialog(true);
+  };
+
+  const handleCancelConfirm = async (): Promise<void> => {
+    if (!formToCancel || !onCancelForm) return;
+
+    setCancelling(true);
+    try {
+      await onCancelForm(formToCancel);
+      setShowCancelDialog(false);
+      setFormToCancel(null);
+    } catch (error) {
+      console.error("Erro ao cancelar formulário:", error);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const handleCancelDialogDismiss = (): void => {
+    if (!cancelling) {
+      setShowCancelDialog(false);
+      setFormToCancel(null);
+    }
+  };
+
   const columns: IColumn[] = [
     {
       key: "company",
@@ -361,9 +405,13 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       name: "Ações",
       fieldName: "actions",
       minWidth: 180,
-      maxWidth: 200,
+      maxWidth: 280,
       isResizable: false,
       onRender: (item: IFormListItem) => {
+        // Verificar se deve mostrar o botão Cancelar
+        const showCancelButton =
+          item.status === "Em Andamento" || item.status === "Pendente Info.";
+
         return (
           <div className={styles.actionsCell}>
             <DefaultButton
@@ -378,7 +426,27 @@ const FormsTable: React.FC<IFormsTableProps> = ({
               iconProps={{ iconName: "PDF" }}
               onClick={() => onDownloadPDF && onDownloadPDF(item)}
               className={styles.actionButton}
+              style={{ marginRight: showCancelButton ? "8px" : "0px" }}
             />
+            {showCancelButton && (
+              <DefaultButton
+                text="Cancelar Form"
+                iconProps={{ iconName: "Cancel" }}
+                onClick={() => handleCancelClick(item)}
+                className={styles.actionButton}
+                styles={{
+                  root: {
+                    backgroundColor: "#fff",
+                    border: "1px solid #dc3545",
+                    color: "#dc3545",
+                  },
+                  rootHovered: {
+                    backgroundColor: "#dc3545",
+                    color: "#fff",
+                  },
+                }}
+              />
+            )}
           </div>
         );
       },
@@ -415,6 +483,68 @@ const FormsTable: React.FC<IFormsTableProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modal de confirmação para cancelamento */}
+      <Dialog
+        hidden={!showCancelDialog}
+        onDismiss={handleCancelDialogDismiss}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: "Cancelar Formulário",
+          closeButtonAriaLabel: "Fechar",
+          subText: "Esta ação não pode ser desfeita.",
+        }}
+        modalProps={{
+          isBlocking: true,
+          styles: { main: { maxWidth: 450 } },
+        }}
+      >
+        {formToCancel && (
+          <div style={{ marginBottom: "20px" }}>
+            <MessageBar messageBarType={MessageBarType.warning}>
+              ⚠️ Atenção! Esta ação não pode ser desfeita.
+            </MessageBar>
+            <div style={{ marginTop: "16px" }}>
+              <p>Você está prestes a cancelar o seguinte formulário:</p>
+              <ul style={{ marginLeft: "20px" }}>
+                <li>
+                  <strong>Empresa:</strong>{" "}
+                  {formToCancel.companyName || formToCancel.empresa}
+                </li>
+                <li>
+                  <strong>CNPJ:</strong> {formatCNPJ(formToCancel.cnpj)}
+                </li>
+              </ul>
+              <p>
+                O formulário não aparecerá mais na listagem padrão após o
+                cancelamento.
+              </p>
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <DefaultButton
+            onClick={handleCancelDialogDismiss}
+            text="Não, voltar"
+            disabled={cancelling}
+          />
+          <PrimaryButton
+            onClick={handleCancelConfirm}
+            text={cancelling ? "Cancelando..." : "Sim, cancelar"}
+            disabled={cancelling}
+            styles={{
+              root: {
+                backgroundColor: "#dc3545",
+                borderColor: "#dc3545",
+              },
+              rootHovered: {
+                backgroundColor: "#c82333",
+                borderColor: "#bd2130",
+              },
+            }}
+          />
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };

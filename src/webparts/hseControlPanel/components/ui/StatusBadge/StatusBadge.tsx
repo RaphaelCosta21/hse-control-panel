@@ -8,7 +8,8 @@ export interface IStatusBadgeProps {
     | "Em Análise"
     | "Aprovado"
     | "Rejeitado"
-    | "Pendente Info.";
+    | "Pendente Info."
+    | "Cancelado";
   className?: string;
 }
 
@@ -30,6 +31,8 @@ const StatusBadge: React.FC<IStatusBadgeProps> = ({
         return styles.rejected;
       case "Pendente Info.":
         return styles.pending;
+      case "Cancelado":
+        return styles.cancelled;
       default:
         return styles.default;
     }
@@ -49,6 +52,8 @@ const StatusBadge: React.FC<IStatusBadgeProps> = ({
         return "❌";
       case "Pendente Info.":
         return "⚠️";
+      case "Cancelado":
+        return "🚫";
       default:
         return "📄";
     }

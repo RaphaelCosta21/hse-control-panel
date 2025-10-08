@@ -287,6 +287,11 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
   React.useEffect(() => {
     let filtered = [...forms];
 
+    // Sempre excluir formulários cancelados (exceto se filtro específico for "Cancelado")
+    if (filters.status !== "Cancelado") {
+      filtered = filtered.filter((form) => form.status !== "Cancelado");
+    }
+
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
@@ -431,6 +436,26 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
     [sharePointService, context]
   );
 
+  const handleCancelForm = React.useCallback(
+    async (form: IFormListItem) => {
+      console.log("🚫 [FormsList] Cancelando formulário:", form.id);
+
+      try {
+        // Atualizar o status do formulário para "Cancelado"
+        await sharePointService.updateFormStatus(form.id, "Cancelado");
+
+        console.log("✅ [FormsList] Formulário cancelado com sucesso");
+
+        // Recarregar a lista de formulários
+        await loadForms();
+      } catch (err) {
+        console.error("❌ [FormsList] Erro ao cancelar formulário:", err);
+        alert(`Erro ao cancelar formulário: ${err.message || err}`);
+      }
+    },
+    [sharePointService, loadForms]
+  );
+
   const handleFormUpdate = React.useCallback(
     (updatedForm: IFormListItem) => {
       // Atualizar o form na lista
@@ -522,6 +547,7 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
           onView={handleView}
           onExport={handleExport}
           onDownloadPDF={handleDownloadPDF}
+          onCancelForm={handleCancelForm}
         />
       </div>
 

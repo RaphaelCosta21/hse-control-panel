@@ -60,6 +60,13 @@
     border: 1px solid rgba(255, 193, 7, 0.2);
   }
 
+  // Status: Cancelado
+  &.cancelled {
+    background: rgba(96, 94, 92, 0.1);
+    color: #605e5c;
+    border: 1px solid rgba(96, 94, 92, 0.2);
+  }
+
   // Status padrão
   &.default {
     background: rgba(96, 94, 92, 0.1);
