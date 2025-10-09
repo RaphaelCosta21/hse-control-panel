@@ -11,6 +11,8 @@ import {
   PrimaryButton,
   MessageBar,
   MessageBarType,
+  Icon,
+  TooltipHost,
 } from "@fluentui/react";
 import { StatusBadge, UserCard } from "../../ui";
 import { IFormListItem } from "../../../types/IControlPanelData";
@@ -265,6 +267,46 @@ const FormsTable: React.FC<IFormsTableProps> = ({
     }
   };
 
+  // Função para verificar se o formulário tem restrições
+  const checkFormHasRestrictions = (form: IFormListItem): boolean => {
+    try {
+      if (!form.DadosFormulario && !form.metadata) return false;
+
+      let formData: any;
+
+      // Tentar fazer parse se for string, ou usar diretamente se já for objeto
+      if (form.DadosFormulario) {
+        if (typeof form.DadosFormulario === "string") {
+          formData = JSON.parse(form.DadosFormulario);
+        } else {
+          formData = form.DadosFormulario;
+        }
+      } else if (form.metadata) {
+        if (typeof form.metadata === "string") {
+          formData = JSON.parse(form.metadata);
+        } else {
+          formData = form.metadata;
+        }
+      }
+
+      if (!formData?.metadata?.Avaliacao) return false;
+
+      // Verificar QuantidadeAvaliacao
+      const avaliacoes = formData.metadata.Avaliacao;
+      const qtdAvaliacoes = Number(avaliacoes.QuantidadeAvaliacao || 0);
+
+      if (qtdAvaliacoes === 0) return false;
+
+      // A última avaliação está no índice (qtdAvaliacoes - 1)
+      const ultimaAvaliacao = avaliacoes[qtdAvaliacoes - 1] || avaliacoes["0"];
+
+      return ultimaAvaliacao?.Restricao === "Sim";
+    } catch (error) {
+      console.error("Erro ao verificar restrições:", error);
+      return false;
+    }
+  };
+
   // Funções para gerenciar o cancelamento de formulários
   const handleCancelClick = (form: IFormListItem): void => {
     setFormToCancel(form);
@@ -316,10 +358,24 @@ const FormsTable: React.FC<IFormsTableProps> = ({
       key: "status",
       name: "Status",
       fieldName: "status",
-      minWidth: 120,
-      maxWidth: 150,
+      minWidth: 140,
+      maxWidth: 180,
       isResizable: true,
-      onRender: (item: IFormListItem) => <StatusBadge status={item.status} />,
+      onRender: (item: IFormListItem) => {
+        const hasRestrictions = checkFormHasRestrictions(item);
+        return (
+          <div className={styles.statusCell}>
+            <StatusBadge status={item.status} />
+            {hasRestrictions && (
+              <TooltipHost content="Este formulário foi aprovado com restrições">
+                <span className={styles.restrictionIndicator}>
+                  <Icon iconName="Warning" className={styles.warningIcon} />
+                </span>
+              </TooltipHost>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "creationDate",

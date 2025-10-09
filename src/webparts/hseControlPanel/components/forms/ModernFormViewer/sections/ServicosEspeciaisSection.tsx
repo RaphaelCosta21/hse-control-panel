@@ -13,6 +13,7 @@ import {
   IAnexos,
   IFileMetadata,
 } from "../../../../types/IHSEFormData";
+import { IFieldRestriction } from "../../../../types/IHSEFormEvaluation";
 import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./ServicosEspeciaisSection.module.scss";
 
@@ -24,6 +25,7 @@ export interface IServicosEspeciaisSectionProps {
   empresa: string;
   id: string;
   sharePointService?: SharePointService;
+  activeRestrictions?: IFieldRestriction[];
 }
 
 interface IAnexoInfo {
@@ -168,6 +170,7 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
   empresa,
   id,
   sharePointService,
+  activeRestrictions = [],
 }) => {
   console.log("🎯 [ServicosEspeciais] Dados recebidos:", {
     data,
@@ -178,6 +181,17 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
   });
 
   const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
+
+  // Helper function to check if a section has restrictions
+  const isSectionRestricted = (
+    sectionId: string
+  ): IFieldRestriction | undefined => {
+    return activeRestrictions.find(
+      (restriction) =>
+        restriction.secao === "servicosEspeciais" &&
+        restriction.campo === sectionId
+    );
+  };
 
   const toggleSection = (sectionId: string): void => {
     setExpandedSections((prev) =>
@@ -377,6 +391,8 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
   const renderSection = (section: ISectionData): React.ReactElement => {
     const isExpanded = expandedSections.indexOf(section.id) !== -1;
     const isSelected = isSectionSelected(section.id);
+    const restriction = isSectionRestricted(section.id);
+    const hasRestriction = !!restriction;
 
     // Atualizar a seção com o status correto
     const sectionWithStatus = {
@@ -389,7 +405,7 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
         key={section.id}
         className={`${styles.servicoCard} ${
           isSelected ? styles.selected : styles.notSelected
-        }`}
+        } ${hasRestriction ? styles.restrictedSection : ""}`}
       >
         <div
           className={styles.servicoHeader}
@@ -399,6 +415,15 @@ const ServicosEspeciaisSection: React.FC<IServicosEspeciaisSectionProps> = ({
             <div>
               <Text variant="medium" className={styles.servicoNome}>
                 {section.titulo}
+                {hasRestriction && (
+                  <Icon
+                    iconName="Warning"
+                    className={styles.restrictionIcon}
+                    title={`Seção com restrição: ${
+                      restriction.motivo || "Correção necessária"
+                    }`}
+                  />
+                )}
               </Text>
             </div>
             <div className={styles.servicoStatus}>

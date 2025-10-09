@@ -2,6 +2,7 @@ import * as React from "react";
 import { IPersonaProps } from "@fluentui/react";
 import { IFormListItem } from "../../../../types/IControlPanelData";
 import { IHSEFormData } from "../../../../types/IHSEFormData";
+import { IFieldRestriction } from "../../../../types/IHSEFormEvaluation";
 import { SharePointService } from "../../../../services/SharePointService";
 
 export interface IEvaluationHookProps {
@@ -31,6 +32,12 @@ export const useEvaluation = ({
   >;
   evaluationComments: string;
   setEvaluationComments: React.Dispatch<React.SetStateAction<string>>;
+  hasRestrictions: boolean;
+  setHasRestrictions: React.Dispatch<React.SetStateAction<boolean>>;
+  fieldRestrictions: IFieldRestriction[];
+  setFieldRestrictions: React.Dispatch<
+    React.SetStateAction<IFieldRestriction[]>
+  >;
   startDate: string;
   setStartDate: React.Dispatch<React.SetStateAction<string>>;
   showStartConfirmation: boolean;
@@ -50,6 +57,10 @@ export const useEvaluation = ({
     "" | "Aprovado" | "Pendente Info." | "Rejeitado"
   >("");
   const [evaluationComments, setEvaluationComments] = React.useState("");
+  const [hasRestrictions, setHasRestrictions] = React.useState(false);
+  const [fieldRestrictions, setFieldRestrictions] = React.useState<
+    IFieldRestriction[]
+  >([]);
   const [startDate, setStartDate] = React.useState<string>("");
   const [showStartConfirmation, setShowStartConfirmation] =
     React.useState(false);
@@ -98,6 +109,14 @@ export const useEvaluation = ({
       Comentarios?: string;
       Resultado?: string;
       DataInicio?: string;
+      Restricao?: string;
+      CamposRestricao?: Array<{
+        id: number;
+        secao: string;
+        campo: string;
+        nomeExibicao: string;
+        motivo: string;
+      }>;
     } | null = null;
 
     if (metadata?.Avaliacao) {
@@ -119,6 +138,14 @@ export const useEvaluation = ({
         Comentarios?: string;
         Resultado?: string;
         DataInicio?: string;
+        Restricao?: string;
+        CamposRestricao?: Array<{
+          id: number;
+          secao: string;
+          campo: string;
+          nomeExibicao: string;
+          motivo: string;
+        }>;
       };
     }
 
@@ -179,6 +206,26 @@ export const useEvaluation = ({
           | "Rejeitado";
         setEvaluationResult(resultado);
         console.log("✅ [useEvaluation] Resultado restaurado:", resultado);
+      }
+
+      // Restaurar restrições
+      if (avaliacaoData.Restricao) {
+        setHasRestrictions(avaliacaoData.Restricao === "Sim");
+        console.log(
+          "🚫 [useEvaluation] Flag de restrições restaurada:",
+          avaliacaoData.Restricao
+        );
+      }
+
+      if (
+        avaliacaoData.CamposRestricao &&
+        Array.isArray(avaliacaoData.CamposRestricao)
+      ) {
+        setFieldRestrictions(avaliacaoData.CamposRestricao);
+        console.log(
+          "📝 [useEvaluation] Campos com restrições restaurados:",
+          avaliacaoData.CamposRestricao
+        );
       }
 
       // Restaurar data de início da Avaliacao
@@ -302,7 +349,7 @@ export const useEvaluation = ({
           email: selectedHSEResponsible.secondaryText || "",
           id: selectedHSEResponsible.id || "",
         },
-        formData: formData,
+        formData: formData as unknown as Record<string, unknown>,
       };
 
       // Atualizar o formulário no SharePoint com a nova estrutura
@@ -361,6 +408,8 @@ export const useEvaluation = ({
         email: selectedHSEResponsible.secondaryText || "",
         comentarios: evaluationComments,
         statusAvaliacao: evaluationResult,
+        restricao: hasRestrictions ? "Sim" : "Não",
+        camposRestricao: hasRestrictions ? fieldRestrictions : [],
       });
 
       console.log("✅ Avaliação enviada com sucesso");
@@ -397,6 +446,8 @@ export const useEvaluation = ({
     selectedHSEResponsible,
     evaluationResult,
     evaluationComments,
+    hasRestrictions,
+    fieldRestrictions,
     sharePointService,
     onFormUpdate,
     reloadFormData,
@@ -413,6 +464,10 @@ export const useEvaluation = ({
     setEvaluationResult,
     evaluationComments,
     setEvaluationComments,
+    hasRestrictions,
+    setHasRestrictions,
+    fieldRestrictions,
+    setFieldRestrictions,
     startDate,
     setStartDate,
     showStartConfirmation,

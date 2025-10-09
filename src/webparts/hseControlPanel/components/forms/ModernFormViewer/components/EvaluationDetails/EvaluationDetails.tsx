@@ -6,8 +6,11 @@ import {
   TextField,
   PrimaryButton,
   IPersonaProps,
+  Toggle,
 } from "@fluentui/react";
 import { IHSEFormData } from "../../../../../types/IHSEFormData";
+import { IFieldRestriction } from "../../../../../types/IHSEFormEvaluation";
+import { FieldRestrictionSelector } from "../../../../FieldRestrictionSelector";
 import styles from "./EvaluationDetails.module.scss";
 
 export interface IEvaluationDetailsProps {
@@ -18,11 +21,15 @@ export interface IEvaluationDetailsProps {
   evaluationComments: string;
   startDate: string;
   hseMembersList: IPersonaProps[];
+  hasRestrictions: boolean;
+  fieldRestrictions: IFieldRestriction[];
   setSelectedHSEResponsible: (responsible: IPersonaProps | undefined) => void;
   setEvaluationResult: (
     result: "" | "Aprovado" | "Pendente Info." | "Rejeitado"
   ) => void;
   setEvaluationComments: (comments: string) => void;
+  setHasRestrictions: (hasRestrictions: boolean) => void;
+  setFieldRestrictions: (restrictions: IFieldRestriction[]) => void;
   setShowStartConfirmation: (show: boolean) => void;
   setShowSendConfirmation: (show: boolean) => void;
 }
@@ -35,9 +42,13 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
   evaluationComments,
   startDate,
   hseMembersList,
+  hasRestrictions,
+  fieldRestrictions,
   setSelectedHSEResponsible,
   setEvaluationResult,
   setEvaluationComments,
+  setHasRestrictions,
+  setFieldRestrictions,
   setShowStartConfirmation,
   setShowSendConfirmation,
 }) => {
@@ -100,6 +111,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
     DataInicio?: string;
     DataFim?: string;
     StatusAvaliacao?: string;
+    Restricao?: string;
+    CamposRestricao?: IFieldRestriction[];
   }> => {
     const metadata = (
       formData as unknown as {
@@ -117,6 +130,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
       DataInicio?: string;
       DataFim?: string;
       StatusAvaliacao?: string;
+      Restricao?: string;
+      CamposRestricao?: IFieldRestriction[];
     }> = [];
 
     if (avaliacaoData) {
@@ -131,6 +146,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
           DataInicio?: string;
           DataFim?: string;
           StatusAvaliacao?: string;
+          Restricao?: string;
+          CamposRestricao?: IFieldRestriction[];
         };
 
         if (avaliacaoAtual) {
@@ -154,6 +171,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
       DataInicio?: string;
       DataFim?: string;
       StatusAvaliacao?: string;
+      Restricao?: string;
+      CamposRestricao?: IFieldRestriction[];
     }>
   ): JSX.Element | null => {
     if (todasAvaliacoes.length === 0) return null;
@@ -235,6 +254,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
       Comentarios?: string;
       DataInicio?: string;
       DataFim?: string;
+      Restricao?: string;
+      CamposRestricao?: IFieldRestriction[];
     } = {};
 
     const todasAvaliacoes: Array<{
@@ -244,6 +265,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
       DataInicio?: string;
       DataFim?: string;
       StatusAvaliacao?: string;
+      Restricao?: string;
+      CamposRestricao?: IFieldRestriction[];
     }> = [];
 
     if (avaliacaoData) {
@@ -258,6 +281,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
           DataInicio?: string;
           DataFim?: string;
           StatusAvaliacao?: string;
+          Restricao?: string;
+          CamposRestricao?: IFieldRestriction[];
         };
 
         if (avaliacaoAtual) {
@@ -276,6 +301,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
           Comentarios?: string;
           DataInicio?: string;
           DataFim?: string;
+          Restricao?: string;
+          CamposRestricao?: IFieldRestriction[];
         };
       }
     }
@@ -363,6 +390,57 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
           <strong>Comentários:</strong> {evaluationData.Comentarios || "N/A"}
         </Text>
 
+        {/* Mostrar restrições se existirem */}
+        {evaluationData.Restricao === "Sim" &&
+          evaluationData.CamposRestricao &&
+          evaluationData.CamposRestricao.length > 0 && (
+            <Stack
+              tokens={{ childrenGap: 8 }}
+              styles={{
+                root: {
+                  padding: 12,
+                  border: "1px solid #f3b90c",
+                  borderRadius: 4,
+                  backgroundColor: "#fffcf0",
+                },
+              }}
+            >
+              <Text
+                variant="medium"
+                styles={{ root: { fontWeight: 600, color: "#d83b01" } }}
+              >
+                ⚠️ Aprovação com Restrições
+              </Text>
+              <Text
+                variant="small"
+                styles={{ root: { color: "#605e5c", marginBottom: 8 } }}
+              >
+                Os seguintes campos precisam ser corrigidos:
+              </Text>
+              {evaluationData.CamposRestricao.map((restricao, index) => (
+                <Stack
+                  key={restricao.id}
+                  tokens={{ childrenGap: 4 }}
+                  styles={{
+                    root: {
+                      padding: 8,
+                      border: "1px solid #edebe9",
+                      borderRadius: 4,
+                      backgroundColor: "white",
+                    },
+                  }}
+                >
+                  <Text variant="small" styles={{ root: { fontWeight: 600 } }}>
+                    {index + 1}. {restricao.nomeExibicao}
+                  </Text>
+                  <Text variant="small" styles={{ root: { color: "#605e5c" } }}>
+                    {restricao.motivo}
+                  </Text>
+                </Stack>
+              ))}
+            </Stack>
+          )}
+
         {/* Mostrar histórico de todas as avaliações se houver mais de uma */}
         {todasAvaliacoes.length > 1 && (
           <Stack tokens={{ childrenGap: 12 }} style={{ marginTop: "20px" }}>
@@ -409,6 +487,40 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
                 <Text>
                   <strong>Comentários:</strong> {avaliacao.Comentarios || "N/A"}
                 </Text>
+
+                {/* Mostrar restrições se existirem no histórico */}
+                {avaliacao.Restricao === "Sim" &&
+                  avaliacao.CamposRestricao &&
+                  avaliacao.CamposRestricao.length > 0 && (
+                    <Stack
+                      tokens={{ childrenGap: 4 }}
+                      styles={{
+                        root: {
+                          padding: 8,
+                          border: "1px solid #f3b90c",
+                          borderRadius: 4,
+                          backgroundColor: "#fffcf0",
+                          marginTop: 8,
+                        },
+                      }}
+                    >
+                      <Text
+                        variant="small"
+                        styles={{ root: { fontWeight: 600, color: "#d83b01" } }}
+                      >
+                        ⚠️ Campos com Restrições:
+                      </Text>
+                      {avaliacao.CamposRestricao.map((restricao, index) => (
+                        <Text
+                          key={restricao.id}
+                          variant="small"
+                          styles={{ root: { color: "#605e5c" } }}
+                        >
+                          • {restricao.nomeExibicao}: {restricao.motivo}
+                        </Text>
+                      ))}
+                    </Stack>
+                  )}
               </Stack>
             ))}
           </Stack>
@@ -510,6 +622,45 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
               onChange={(_, value) => setEvaluationComments(value || "")}
               placeholder="Digite seus comentários sobre a avaliação..."
             />
+
+            {/* Seção de Aprovação com Restrições */}
+            {evaluationResult === "Aprovado" && (
+              <Stack tokens={{ childrenGap: 12 }}>
+                <Toggle
+                  label="Aprovação com Restrições"
+                  inlineLabel
+                  checked={hasRestrictions}
+                  onChange={(_, checked) => {
+                    setHasRestrictions(checked || false);
+                    if (!checked) {
+                      setFieldRestrictions([]);
+                    }
+                  }}
+                  styles={{
+                    root: { marginBottom: 8 },
+                  }}
+                />
+
+                {hasRestrictions && (
+                  <Stack tokens={{ childrenGap: 8 }}>
+                    <Text
+                      variant="small"
+                      styles={{
+                        root: { color: "#605e5c", fontStyle: "italic" },
+                      }}
+                    >
+                      💡 Selecione até 3 campos específicos que precisam ser
+                      corrigidos pelo fornecedor
+                    </Text>
+                    <FieldRestrictionSelector
+                      restrictions={fieldRestrictions}
+                      onRestrictionsChange={setFieldRestrictions}
+                      maxRestrictions={3}
+                    />
+                  </Stack>
+                )}
+              </Stack>
+            )}
 
             <Stack
               horizontal

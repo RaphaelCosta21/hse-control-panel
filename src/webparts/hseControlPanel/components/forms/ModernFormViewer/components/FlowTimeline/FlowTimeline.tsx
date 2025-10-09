@@ -13,6 +13,8 @@ export interface ITimelineStep {
   email: string;
   duration?: string;
   isCurrentStatus?: boolean;
+  hasRestrictions?: boolean;
+  restrictionsCount?: number;
 }
 
 interface IHistoricoEntry {
@@ -34,6 +36,80 @@ const statusColors: { [key: string]: string } = {
 const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
   const [timelineSteps, setTimelineSteps] = React.useState<ITimelineStep[]>([]);
   const [totalProcessTime, setTotalProcessTime] = React.useState<string>("");
+
+  // Função para verificar se uma avaliação tem restrições
+  const checkEvaluationRestrictions = (
+    timestamp: string
+  ): { hasRestrictions: boolean; restrictionsCount: number } => {
+    try {
+      console.log("🔍 Verificando restrições para timestamp:", timestamp);
+
+      const formDataWithMetadata = formData as unknown as {
+        metadata?: {
+          Avaliacao?: {
+            [key: string]: {
+              HSEResponsavel?: string;
+              DataInicio?: string;
+              DataFim?: string;
+              Comentarios?: string;
+              StatusAvaliacao?: string;
+              Restricao?: string; // "Sim" ou "Não"
+              CamposRestricao?: Array<{
+                id: number;
+                secao: string;
+                campo: string;
+                nomeExibicao: string;
+                motivo?: string;
+              }>;
+            };
+          } & {
+            QuantidadeAvaliacao?: number;
+          };
+        };
+      };
+
+      const avaliacaoObj = formDataWithMetadata?.metadata?.Avaliacao;
+      console.log("🔍 Objeto Avaliacao encontrado:", avaliacaoObj);
+
+      if (!avaliacaoObj) {
+        console.log("🔍 Nenhuma avaliação encontrada");
+        return { hasRestrictions: false, restrictionsCount: 0 };
+      }
+
+      // Percorrer as chaves numéricas do objeto de avaliação
+      const avaliacaoKeys = Object.keys(avaliacaoObj).filter(
+        (key) => key !== "QuantidadeAvaliacao"
+      );
+      console.log("🔍 Chaves de avaliação encontradas:", avaliacaoKeys);
+
+      for (const key of avaliacaoKeys) {
+        const avaliacao = avaliacaoObj[key];
+        console.log(`🔍 Verificando avaliação [${key}]:`, avaliacao);
+
+        // Verificar se Restricao é "Sim" e há campos de restrição
+        if (
+          avaliacao.Restricao === "Sim" &&
+          avaliacao.CamposRestricao &&
+          avaliacao.CamposRestricao.length > 0
+        ) {
+          console.log(
+            "🔍 Restrições encontradas:",
+            avaliacao.CamposRestricao.length
+          );
+          return {
+            hasRestrictions: true,
+            restrictionsCount: avaliacao.CamposRestricao.length,
+          };
+        }
+      }
+
+      console.log("🔍 Nenhuma restrição encontrada");
+      return { hasRestrictions: false, restrictionsCount: 0 };
+    } catch (error) {
+      console.error("Erro ao verificar restrições de avaliação:", error);
+      return { hasRestrictions: false, restrictionsCount: 0 };
+    }
+  };
 
   // Função para normalizar historicoStatusChange sempre para array
   const normalizeHistoricoToArray = (historico: unknown): IHistoricoEntry[] => {
@@ -159,6 +235,15 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
           duration = calculateDuration(currentTime, now);
         }
 
+        // Verificar se é uma aprovação com restrições
+        let hasRestrictions = false;
+        let restrictionsCount = 0;
+        if (entry.status === "Aprovado") {
+          const restrictions = checkEvaluationRestrictions(entry.dataAlteracao);
+          hasRestrictions = restrictions.hasRestrictions;
+          restrictionsCount = restrictions.restrictionsCount;
+        }
+
         steps.push({
           status: entry.status,
           timestamp: entry.dataAlteracao,
@@ -166,6 +251,8 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
           email: entry.email || "",
           duration: duration,
           isCurrentStatus: entry.status === currentStatus,
+          hasRestrictions: hasRestrictions,
+          restrictionsCount: restrictionsCount,
         });
       });
 
@@ -302,7 +389,22 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
                 }}
               >
                 <div className={styles.stepNumber}>{index + 1}</div>
-                <div className={styles.stepStatus}>{step.status}</div>
+                <div className={styles.stepStatus}>
+                  {step.status}{" "}
+                  {step.hasRestrictions && (
+                    <span
+                      className={styles.restrictionBadge}
+                      title={`Aprovação com ${
+                        step.restrictionsCount
+                      } restrição${step.restrictionsCount !== 1 ? "ões" : ""}`}
+                    >
+                      ⚠️ {step.restrictionsCount}{" "}
+                      {step.restrictionsCount !== 1
+                        ? "restrições"
+                        : "restrição"}
+                    </span>
+                  )}
+                </div>
                 <div className={styles.stepDate}>
                   {formatDate(step.timestamp)}
                 </div>

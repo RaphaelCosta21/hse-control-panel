@@ -65,7 +65,7 @@ export class SharePointService {
   /**
    * Obtém lista de formulários HSE
    */
-  public async getFormsList(): Promise<any[]> {
+  public async getFormsList(): Promise<Record<string, unknown>[]> {
     try {
       const items = await this.sp.web.lists
         .getByTitle(this.listName)
@@ -287,7 +287,7 @@ export class SharePointService {
         usuario: string;
         email: string;
       }>;
-      formData?: any;
+      formData?: Record<string, unknown>;
     }
   ): Promise<void> {
     let updateData: Record<string, unknown> = {};
@@ -416,6 +416,14 @@ export class SharePointService {
       email: string;
       comentarios: string;
       statusAvaliacao: string;
+      restricao?: string;
+      camposRestricao?: Array<{
+        id: number;
+        secao: string;
+        campo: string;
+        nomeExibicao: string;
+        motivo: string;
+      }>;
     }
   ): Promise<void> {
     let updateData: Record<string, unknown> = {};
@@ -448,6 +456,10 @@ export class SharePointService {
             DataFim: new Date().toISOString(),
             Comentarios: evaluationData.comentarios,
             StatusAvaliacao: evaluationData.statusAvaliacao,
+            ...(evaluationData.restricao && {
+              Restricao: evaluationData.restricao,
+              CamposRestricao: evaluationData.camposRestricao || [],
+            }),
           };
 
           // Atualizar dados do formulário mantendo histórico

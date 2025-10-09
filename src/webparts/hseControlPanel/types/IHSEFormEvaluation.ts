@@ -1,3 +1,12 @@
+// Interfaces para Restrições de Campos
+export interface IFieldRestriction {
+  id: number;
+  secao: string;
+  campo: string;
+  nomeExibicao: string;
+  motivo: string;
+}
+
 // Interfaces para Avaliação de Formulários HSE
 export interface IHSEFormEvaluation {
   id?: number;
@@ -11,6 +20,8 @@ export interface IHSEFormEvaluation {
   dataAvaliacao: Date;
   prioridade?: "Alta" | "Média" | "Baixa";
   notificacaoEnviada?: boolean;
+  restricao?: "Sim" | "Não";
+  camposRestricao?: IFieldRestriction[];
 }
 
 export interface IEvaluationHistory {

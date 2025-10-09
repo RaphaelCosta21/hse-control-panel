@@ -73,13 +73,15 @@ export const RevalidationReport: React.FC<IRevalidationReportProps> = ({
       // Buscar apenas formulários aprovados
       const rawItems = await sharePointService.getFormsList();
       const approvedForms = rawItems.filter(
-        (item) => item.StatusAvaliacao === "Aprovado"
+        (item) =>
+          (item as Record<string, unknown>).StatusAvaliacao === "Aprovado"
       );
 
       const revalidationData: IRevalidationItem[] = approvedForms.map(
         (item) => {
+          const typedItem = item as Record<string, unknown>;
           // Data de aprovação (usar Modified como proxy)
-          const approvalDate = new Date(item.Modified);
+          const approvalDate = new Date(typedItem.Modified as string);
 
           // Próxima revalidação: 1 ano após aprovação
           const nextRevalidationDate = new Date(approvalDate);
@@ -105,15 +107,20 @@ export const RevalidationReport: React.FC<IRevalidationReportProps> = ({
           }
 
           return {
-            id: item.Id,
-            companyName: item.Title || "",
-            cnpj: item.CNPJ || "",
+            id: typedItem.Id as number,
+            companyName: (typedItem.Title as string) || "",
+            cnpj: (typedItem.CNPJ as string) || "",
             approvalDate,
             nextRevalidationDate,
             daysUntilExpiration,
             status,
-            riskLevel: parseInt(item.GrauRisco || "1", 10) as 1 | 2 | 3 | 4,
-            responsibleTechnician: item.NomePreenchimento || "N/A",
+            riskLevel: parseInt((typedItem.GrauRisco as string) || "1", 10) as
+              | 1
+              | 2
+              | 3
+              | 4,
+            responsibleTechnician:
+              (typedItem.NomePreenchimento as string) || "N/A",
             approvedBy: "Sistema", // Pode ser extraído do JSON DadosFormulario se necessário
           };
         }

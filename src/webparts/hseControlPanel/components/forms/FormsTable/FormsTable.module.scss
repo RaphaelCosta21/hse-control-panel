@@ -254,3 +254,52 @@
     }
   }
 }
+
+// Estilos para indicativo de restrições
+.statusCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.restrictionIndicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff6b35;
+  border: 2px solid #ff4500;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: help;
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+  animation: pulseWarning 2s infinite;
+
+  &:hover {
+    background-color: #ff4500;
+    border-color: #cc3700;
+    transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(255, 107, 53, 0.5);
+  }
+}
+
+@keyframes pulseWarning {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.warningIcon {
+  color: inherit;
+  font-size: 14px;
+  font-weight: bold;
+}

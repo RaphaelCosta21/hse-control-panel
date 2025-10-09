@@ -14,6 +14,7 @@ import {
   IAnexos,
   IFileMetadata,
 } from "../../../../types/IHSEFormData";
+import { IFieldRestriction } from "../../../../types/IHSEFormEvaluation";
 import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./DadosGeraisSection.module.scss";
 
@@ -25,6 +26,7 @@ export interface IDadosGeraisSectionProps {
   formId?: number;
   cnpj?: string;
   empresa?: string;
+  activeRestrictions?: IFieldRestriction[];
 }
 
 const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
@@ -35,6 +37,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
   formId,
   cnpj,
   empresa,
+  activeRestrictions = [],
 }) => {
   const formatNumber = (value: number | undefined | null): string => {
     if (value === undefined || value === null || isNaN(value))
@@ -179,29 +182,72 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
     </div>
   );
 
+  // Helper function to check if a field has restrictions
+  const isFieldRestricted = (
+    fieldId: string
+  ): IFieldRestriction | undefined => {
+    return activeRestrictions.find(
+      (restriction) =>
+        restriction.secao === "dadosGerais" && restriction.campo === fieldId
+    );
+  };
+
   const renderField = (
     label: string,
     value: string | number | boolean | undefined | null,
+    fieldId?: string,
     type: "text" | "number" | "boolean" = "text"
-  ): React.ReactElement => (
-    <div className={styles.field}>
-      <Label className={styles.fieldLabel}>{label}</Label>
-      <div className={styles.fieldValue}>
-        {type === "boolean" ? (
-          <span
-            className={`${styles.booleanValue} ${
-              value ? styles.positive : styles.negative
-            }`}
-          >
-            <Icon iconName={value ? "CheckMark" : "Cancel"} />
-            {value ? "Sim" : "Não"}
-          </span>
-        ) : (
-          <Text variant="medium">{value?.toString() || "Não informado"}</Text>
-        )}
+  ): React.ReactElement => {
+    const restriction = fieldId ? isFieldRestricted(fieldId) : undefined;
+    const hasRestriction = !!restriction;
+
+    return (
+      <div
+        className={`${styles.field} ${
+          hasRestriction ? styles.restrictedField : ""
+        }`}
+      >
+        <Label className={styles.fieldLabel}>
+          {label}
+          {hasRestriction && (
+            <Icon
+              iconName="Warning"
+              className={styles.restrictionIcon}
+              title={`Campo com restrição: ${
+                restriction.motivo || "Correção necessária"
+              }`}
+            />
+          )}
+        </Label>
+        <div
+          className={`${styles.fieldValue} ${
+            hasRestriction ? styles.restrictedValue : ""
+          }`}
+        >
+          {type === "boolean" ? (
+            <span
+              className={`${styles.booleanValue} ${
+                value ? styles.positive : styles.negative
+              }`}
+            >
+              <Icon iconName={value ? "CheckMark" : "Cancel"} />
+              {value ? "Sim" : "Não"}
+            </span>
+          ) : (
+            <Text variant="medium">{value?.toString() || "Não informado"}</Text>
+          )}
+          {hasRestriction && (
+            <div className={styles.restrictionMessage}>
+              <Icon iconName="Info" />
+              <Text variant="xSmall" className={styles.restrictionText}>
+                {restriction.motivo || "Correção necessária"}
+              </Text>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderAnexo = (
     titulo: string,
@@ -300,10 +346,18 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
           <Stack tokens={{ childrenGap: 16 }}>
             <Stack horizontal tokens={{ childrenGap: 32 }}>
               <Stack.Item grow>
-                {renderField("Razão Social", data.empresa as string)}
+                {renderField(
+                  "Razão Social",
+                  data.empresa as string,
+                  "informacoesEmpresa"
+                )}
               </Stack.Item>
               <Stack.Item>
-                {renderField("CNPJ", formatCNPJ(data.cnpj as string))}
+                {renderField(
+                  "CNPJ",
+                  formatCNPJ(data.cnpj as string),
+                  "informacoesEmpresa"
+                )}
               </Stack.Item>
             </Stack>
 
@@ -311,13 +365,38 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
               <Stack.Item grow>
                 {renderField(
                   "Atividade Principal (CNAE)",
-                  data.atividadePrincipalCNAE as string
+                  data.atividadePrincipalCNAE as string,
+                  "informacoesEmpresa"
                 )}
               </Stack.Item>
               <Stack.Item>
-                <div className={styles.field}>
-                  <Label className={styles.fieldLabel}>Grau de Risco</Label>
-                  <div className={styles.fieldValue}>
+                <div
+                  className={`${styles.field} ${
+                    isFieldRestricted("informacoesEmpresa")
+                      ? styles.restrictedField
+                      : ""
+                  }`}
+                >
+                  <Label className={styles.fieldLabel}>
+                    Grau de Risco
+                    {isFieldRestricted("informacoesEmpresa") && (
+                      <Icon
+                        iconName="Warning"
+                        className={styles.restrictionIcon}
+                        title={`Campo com restrição: ${
+                          isFieldRestricted("informacoesEmpresa")?.motivo ||
+                          "Correção necessária"
+                        }`}
+                      />
+                    )}
+                  </Label>
+                  <div
+                    className={`${styles.fieldValue} ${
+                      isFieldRestricted("informacoesEmpresa")
+                        ? styles.restrictedValue
+                        : ""
+                    }`}
+                  >
                     <span
                       className={styles.grauRisco}
                       style={{
@@ -328,6 +407,18 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                     >
                       {getGrauRiscoText(data.grauRisco as string)}
                     </span>
+                    {isFieldRestricted("informacoesEmpresa") && (
+                      <div className={styles.restrictionMessage}>
+                        <Icon iconName="Info" />
+                        <Text
+                          variant="xSmall"
+                          className={styles.restrictionText}
+                        >
+                          {isFieldRestricted("informacoesEmpresa")?.motivo ||
+                            "Correção necessária"}
+                        </Text>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Stack.Item>
@@ -335,7 +426,11 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
 
             <Separator />
 
-            {renderField("Escopo do Serviço", data.escopoServico as string)}
+            {renderField(
+              "Escopo do Serviço",
+              data.escopoServico as string,
+              "informacoesEmpresa"
+            )}
           </Stack>,
           true
         )}
@@ -349,6 +444,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 {renderField(
                   "Total de Empregados",
                   formatNumber(data.totalEmpregados as number),
+                  "recursosHumanos",
                   "number"
                 )}
               </Stack.Item>
@@ -356,13 +452,15 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 {renderField(
                   "Empregados para o Serviço",
                   formatNumber(data.empregadosParaServico as number),
+                  "recursosHumanos",
                   "number"
                 )}
               </Stack.Item>
               <Stack.Item grow>
                 {renderField(
                   "Responsável Técnico",
-                  data.responsavelTecnico as string
+                  data.responsavelTecnico as string,
+                  "recursosHumanos"
                 )}
               </Stack.Item>
             </Stack>
@@ -382,6 +480,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 {renderField(
                   "Possui SESMT",
                   data.possuiSESMT as boolean,
+                  "sesmt",
                   "boolean"
                 )}
               </Stack.Item>
@@ -390,6 +489,7 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                   {renderField(
                     "Número de Componentes",
                     formatNumber(data.numeroComponentesSESMT as number),
+                    "sesmt",
                     "number"
                   )}
                 </Stack.Item>
@@ -403,9 +503,22 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
             {/* <Icon iconName="FileTemplate" className={styles.cardIcon} /> */}
             <Text variant="large" className={styles.cardTitle}>
               📊 Resumo Estatístico Mensal de Acidentes
+              {isFieldRestricted("rem") && (
+                <Icon
+                  iconName="Warning"
+                  className={styles.restrictionIcon}
+                  title={`Campo com restrição: ${
+                    isFieldRestricted("rem")?.motivo || "Correção necessária"
+                  }`}
+                />
+              )}
             </Text>
           </div>
-          <div className={styles.cardContent}>
+          <div
+            className={`${styles.cardContent} ${
+              isFieldRestricted("rem") ? styles.restrictedField : ""
+            }`}
+          >
             <Stack tokens={{ childrenGap: 16 }}>
               {anexos.rem &&
                 anexos.rem.length > 0 &&
@@ -417,6 +530,14 @@ const DadosGeraisSection: React.FC<IDadosGeraisSectionProps> = ({
                 >
                   ⚠️ REM (Resumo Estatístico Mensal) não foi anexado.
                 </MessageBar>
+              )}
+              {isFieldRestricted("rem") && (
+                <div className={styles.restrictionMessage}>
+                  <Icon iconName="Info" />
+                  <Text variant="xSmall" className={styles.restrictionText}>
+                    {isFieldRestricted("rem")?.motivo || "Correção necessária"}
+                  </Text>
+                </div>
               )}
             </Stack>
           </div>

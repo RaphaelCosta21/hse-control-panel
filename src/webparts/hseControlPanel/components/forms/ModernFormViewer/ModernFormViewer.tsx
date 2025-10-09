@@ -14,6 +14,7 @@ import {
 } from "@fluentui/react";
 import { IFormListItem } from "../../../types/IControlPanelData";
 import { SharePointService } from "../../../services/SharePointService";
+import { IFieldRestriction } from "../../../types/IHSEFormEvaluation";
 import DadosGeraisSection from "./sections/DadosGeraisSection";
 import ConformidadeLegalSection from "./sections/ConformidadeLegalSection";
 import ServicosEspeciaisSection from "./sections/ServicosEspeciaisSection";
@@ -100,6 +101,10 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
     setEvaluationResult,
     evaluationComments,
     setEvaluationComments,
+    hasRestrictions,
+    setHasRestrictions,
+    fieldRestrictions,
+    setFieldRestrictions,
     startDate,
     showStartConfirmation,
     setShowStartConfirmation,
@@ -114,6 +119,56 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
     onFormUpdate,
     reloadFormData: loadFormData,
   });
+
+  // Função para obter restrições da avaliação mais recente
+  const getActiveRestrictions = React.useCallback((): IFieldRestriction[] => {
+    if (!formData) return [];
+
+    try {
+      const formDataWithMetadata = formData as unknown as {
+        metadata?: {
+          Avaliacao?: Record<string, unknown>;
+        };
+      };
+
+      const metadata = formDataWithMetadata?.metadata;
+      if (!metadata?.Avaliacao) return [];
+
+      const quantidadeAvaliacao =
+        (metadata.Avaliacao.QuantidadeAvaliacao as number) || 0;
+
+      if (quantidadeAvaliacao === 0) return [];
+
+      // Buscar a ÚLTIMA avaliação (mais recente)
+      const ultimaAvaliacaoKey = (quantidadeAvaliacao - 1).toString();
+      const ultimaAvaliacao = metadata.Avaliacao[ultimaAvaliacaoKey] as {
+        CamposRestricao?: Array<{
+          id: number;
+          secao: string;
+          campo: string;
+          nomeExibicao: string;
+          motivo: string;
+        }>;
+        Restricao?: string;
+      };
+
+      // Só retorna restrições se a flag estiver como "Sim" E existirem campos
+      if (
+        ultimaAvaliacao?.Restricao === "Sim" &&
+        ultimaAvaliacao?.CamposRestricao &&
+        Array.isArray(ultimaAvaliacao.CamposRestricao)
+      ) {
+        return ultimaAvaliacao.CamposRestricao;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Erro ao processar restrições:", error);
+      return [];
+    }
+  }, [formData]);
+
+  const activeRestrictions = getActiveRestrictions();
 
   const getCommandBarItems = React.useCallback((): ICommandBarItemProps[] => {
     if (!formData) return [];
@@ -188,9 +243,13 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
           evaluationComments={evaluationComments}
           startDate={startDate}
           hseMembersList={hseMembersList}
+          hasRestrictions={hasRestrictions}
+          fieldRestrictions={fieldRestrictions}
           setSelectedHSEResponsible={setSelectedHSEResponsible}
           setEvaluationResult={setEvaluationResult}
           setEvaluationComments={setEvaluationComments}
+          setHasRestrictions={setHasRestrictions}
+          setFieldRestrictions={setFieldRestrictions}
           setShowStartConfirmation={setShowStartConfirmation}
           setShowSendConfirmation={setShowSendConfirmation}
         />
@@ -314,6 +373,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                           cnpj={formData.dadosGerais?.cnpj || ""}
                           empresa={formData.dadosGerais?.empresa || ""}
                           sharePointService={sharePointService}
+                          activeRestrictions={activeRestrictions}
                         />
                       </div>
                     </PivotItem>
@@ -330,6 +390,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                           empresa={formData.dadosGerais?.empresa || ""}
                           id={formData.id?.toString() || ""}
                           sharePointService={sharePointService}
+                          activeRestrictions={activeRestrictions}
                         />
                       </div>
                     </PivotItem>
@@ -348,6 +409,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
                           )}
                           id={String(formData.dadosGerais?.id || "")}
                           sharePointService={sharePointService}
+                          activeRestrictions={activeRestrictions}
                         />
                       </div>
                     </PivotItem>

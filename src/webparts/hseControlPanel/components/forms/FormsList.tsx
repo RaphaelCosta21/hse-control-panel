@@ -239,31 +239,48 @@ const FormsList: React.FC<IFormsListProps> = ({ context, serviceConfig }) => {
       const rawItems = await sharePointService.getFormsList();
 
       // Convert SharePoint items to IFormListItem format
-      const convertedForms: IFormListItem[] = rawItems.map((item) => ({
-        id: item.Id,
-        empresa: item.Title || "",
-        cnpj: item.CNPJ || "",
-        status: item.StatusAvaliacao || "Em Andamento",
-        dataSubmissao: new Date(item.Created),
-        percentualConclusao: item.PercentualConclusao || 0,
-        emailPreenchimento: item.EmailPreenchimento || "",
-        nomePreenchimento: item.NomePreenchimento || "",
-        anexosCount: item.AnexosCount || 0,
-        dataAvaliacao: item.Modified ? new Date(item.Modified) : undefined,
-        criadoPor: item.NomePreenchimento || "Sistema",
-        // Adicionar o campo DadosFormulario do SharePoint
-        DadosFormulario: item.DadosFormulario || null,
-        // Deprecated fields for backward compatibility
-        prioridade: "Média", // Default value since we removed PrioridadeAvaliacao
-        companyName: item.Title || "",
-        submissionDate: item.Created,
-        riskLevel: parseInt(item.GrauRisco || "1", 10) as 1 | 2 | 3 | 4,
-        completionPercentage: item.PercentualConclusao || 0,
-        // Novo campo: dados do avaliador atribuído
-        avaliadorAtribuido: extractAssignedReviewer(item),
-        // Novo campo: usuário responsável pela análise atual
-        usuarioAnalise: extractAnalysisUser(item.DadosFormulario),
-      }));
+      const convertedForms: IFormListItem[] = rawItems.map((rawItem) => {
+        const item = rawItem as Record<string, unknown>;
+        return {
+          id: item.Id as number,
+          empresa: (item.Title as string) || "",
+          cnpj: (item.CNPJ as string) || "",
+          status:
+            (item.StatusAvaliacao as
+              | "Em Análise"
+              | "Em Andamento"
+              | "Enviado"
+              | "Aprovado"
+              | "Rejeitado"
+              | "Pendente Info."
+              | "Cancelado") || "Em Andamento",
+          dataSubmissao: new Date(item.Created as string),
+          percentualConclusao: (item.PercentualConclusao as number) || 0,
+          emailPreenchimento: (item.EmailPreenchimento as string) || "",
+          nomePreenchimento: (item.NomePreenchimento as string) || "",
+          anexosCount: (item.AnexosCount as number) || 0,
+          dataAvaliacao: item.Modified
+            ? new Date(item.Modified as string)
+            : undefined,
+          criadoPor: (item.NomePreenchimento as string) || "Sistema",
+          // Adicionar o campo DadosFormulario do SharePoint
+          DadosFormulario: (item.DadosFormulario as string) || null,
+          // Deprecated fields for backward compatibility
+          prioridade: "Média", // Default value since we removed PrioridadeAvaliacao
+          companyName: (item.Title as string) || "",
+          submissionDate: item.Created as string,
+          riskLevel: parseInt((item.GrauRisco as string) || "1", 10) as
+            | 1
+            | 2
+            | 3
+            | 4,
+          completionPercentage: (item.PercentualConclusao as number) || 0,
+          // Novo campo: dados do avaliador atribuído
+          avaliadorAtribuido: extractAssignedReviewer(item),
+          // Novo campo: usuário responsável pela análise atual
+          usuarioAnalise: extractAnalysisUser(item.DadosFormulario as string),
+        };
+      });
 
       setForms(convertedForms);
       setFilteredForms(convertedForms);

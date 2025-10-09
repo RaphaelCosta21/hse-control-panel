@@ -13,6 +13,7 @@ import {
   IAnexos,
   IFileMetadata,
 } from "../../../../types/IHSEFormData";
+import { IFieldRestriction } from "../../../../types/IHSEFormEvaluation";
 import { SharePointService } from "../../../../services/SharePointService";
 import styles from "./ConformidadeLegalSection.module.scss";
 
@@ -24,6 +25,7 @@ export interface IConformidadeLegalSectionProps {
   empresa: string;
   id: string;
   sharePointService?: SharePointService;
+  activeRestrictions?: IFieldRestriction[];
 }
 
 interface IQuestao {
@@ -433,6 +435,7 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
   empresa,
   id,
   sharePointService,
+  activeRestrictions = [],
 }) => {
   console.log("🎯 [ConformidadeLegal] Dados recebidos:", {
     data,
@@ -490,6 +493,17 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
   }
 
   const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
+
+  // Helper function to check if a section has restrictions
+  const isSectionRestricted = (
+    sectionId: string
+  ): IFieldRestriction | undefined => {
+    return activeRestrictions.find(
+      (restriction) =>
+        restriction.secao === "conformidadeLegal" &&
+        restriction.campo === sectionId
+    );
+  };
 
   const toggleSection = (sectionId: string): void => {
     setExpandedSections((prev) =>
@@ -772,17 +786,48 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     );
   };
 
+  // Função para calcular a numeração global das questões
+  const getGlobalQuestionNumber = (
+    sectionId: string,
+    questaoId: string
+  ): number => {
+    let contador = 0;
+
+    // Percorrer todas as categorias em ordem
+    const categoriesOrder = ["obrigatorias", "opcionais", "outros"];
+
+    for (const categoria of categoriesOrder) {
+      const sectionsInCategory = conformidadeSections.filter(
+        (section: ISectionData) => section.categoria === categoria
+      );
+
+      for (const section of sectionsInCategory) {
+        for (const questao of section.questoes) {
+          contador++;
+
+          // Se encontrou a questão atual, retorna o contador
+          if (section.id === sectionId && questao.id === questaoId) {
+            return contador;
+          }
+        }
+      }
+    }
+
+    return contador;
+  };
+
   const renderQuestao = (
     sectionId: string,
     questao: IQuestao
   ): React.ReactElement => {
     const resposta = getQuestaoResposta(sectionId, questao.id);
+    const numeroGlobal = getGlobalQuestionNumber(sectionId, questao.id);
 
     return (
       <div key={questao.id} className={styles.field}>
         <div>
           <Text variant="small" style={{ fontWeight: 600, color: "#0078d4" }}>
-            {questao.id.charAt(0).toUpperCase() + questao.id.slice(1)}
+            Questão {numeroGlobal}
           </Text>
         </div>
         <Text variant="small" style={{ marginBottom: "8px" }}>
@@ -844,13 +889,15 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
     const isExpanded = expandedSections.indexOf(section.id) !== -1;
     const status = getSectionStatus(section.id);
     const isSelected = isSectionSelected(section.id);
+    const restriction = isSectionRestricted(section.id);
+    const hasRestriction = !!restriction;
 
     return (
       <div
         key={section.id}
         className={`${styles.nrCard} ${
           isSelected ? styles.selected : styles.notSelected
-        }`}
+        } ${hasRestriction ? styles.restrictedSection : ""}`}
       >
         <div
           className={styles.nrHeader}
@@ -860,6 +907,15 @@ const ConformidadeLegalSection: React.FC<IConformidadeLegalSectionProps> = ({
             <div>
               <Text variant="medium" className={styles.nrName}>
                 {section.titulo}
+                {hasRestriction && (
+                  <Icon
+                    iconName="Warning"
+                    className={styles.restrictionIcon}
+                    title={`Seção com restrição: ${
+                      restriction.motivo || "Correção necessária"
+                    }`}
+                  />
+                )}
               </Text>
               {section.obrigatoria && (
                 <div
