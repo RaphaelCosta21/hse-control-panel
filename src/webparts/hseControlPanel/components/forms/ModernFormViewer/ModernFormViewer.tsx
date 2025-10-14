@@ -112,6 +112,8 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
     setShowSendConfirmation,
     handleStartEvaluation,
     handleSendEvaluation,
+    isEvaluationValid,
+    setIsRestrictionFormOpen,
   } = useEvaluation({
     form,
     formData,
@@ -120,7 +122,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
     reloadFormData: loadFormData,
   });
 
-  // Função para obter restrições da avaliação mais recente
+  // Hooks para gerenciar revisão
   const getActiveRestrictions = React.useCallback((): IFieldRestriction[] => {
     if (!formData) return [];
 
@@ -245,6 +247,7 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
           hseMembersList={hseMembersList}
           hasRestrictions={hasRestrictions}
           fieldRestrictions={fieldRestrictions}
+          activeRestrictions={activeRestrictions}
           setSelectedHSEResponsible={setSelectedHSEResponsible}
           setEvaluationResult={setEvaluationResult}
           setEvaluationComments={setEvaluationComments}
@@ -252,6 +255,8 @@ const ModernFormViewer: React.FC<IModernFormViewerProps> = ({
           setFieldRestrictions={setFieldRestrictions}
           setShowStartConfirmation={setShowStartConfirmation}
           setShowSendConfirmation={setShowSendConfirmation}
+          isEvaluationValid={isEvaluationValid}
+          setIsRestrictionFormOpen={setIsRestrictionFormOpen}
         />
 
         {/* Navegação principal entre páginas */}

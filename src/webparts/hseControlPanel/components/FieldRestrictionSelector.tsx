@@ -11,6 +11,8 @@ import {
   MessageBarType,
   Dropdown,
   IDropdownOption,
+  PrimaryButton,
+  DefaultButton,
 } from "@fluentui/react";
 import { IFieldRestriction } from "../types/IHSEFormEvaluation";
 import {
@@ -23,14 +25,35 @@ interface IFieldRestrictionSelectorProps {
   restrictions: IFieldRestriction[];
   onRestrictionsChange: (restrictions: IFieldRestriction[]) => void;
   maxRestrictions?: number;
+  onFormStateChange?: (isFormOpen: boolean) => void;
 }
 
 export const FieldRestrictionSelector: React.FC<
   IFieldRestrictionSelectorProps
-> = ({ restrictions, onRestrictionsChange, maxRestrictions = 3 }) => {
+> = ({
+  restrictions,
+  onRestrictionsChange,
+  maxRestrictions = 3,
+  onFormStateChange,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
   const [motivo, setMotivo] = useState<string>("");
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+
+  // Mostrar automaticamente o formulário quando não há restrições
+  React.useEffect(() => {
+    if (restrictions.length === 0) {
+      setShowAddForm(true);
+    }
+  }, [restrictions.length]);
+
+  // Notificar o componente pai quando o estado do formulário mudar
+  React.useEffect(() => {
+    if (onFormStateChange) {
+      onFormStateChange(showAddForm);
+    }
+  }, [showAddForm, onFormStateChange]);
 
   // Opções de categoria para o dropdown
   const categoryOptions: IDropdownOption[] = getCategories().map((cat) => ({
@@ -80,6 +103,9 @@ export const FieldRestrictionSelector: React.FC<
     setSelectedField("");
     setMotivo("");
     setSelectedCategory("");
+
+    // Ocultar o formulário após adicionar
+    setShowAddForm(false);
   }, [
     selectedField,
     motivo,
@@ -158,8 +184,21 @@ export const FieldRestrictionSelector: React.FC<
         </Stack>
       ))}
 
-      {/* Adicionar nova restrição */}
-      {restrictions.length < maxRestrictions && (
+      {/* Botão para adicionar nova restrição (só mostra se há restrições e não atingiu o limite) */}
+      {restrictions.length > 0 &&
+        restrictions.length < maxRestrictions &&
+        !showAddForm && (
+          <Stack horizontal horizontalAlign="start">
+            <PrimaryButton
+              text="Adicionar outra restrição"
+              iconProps={{ iconName: "Add" }}
+              onClick={() => setShowAddForm(true)}
+            />
+          </Stack>
+        )}
+
+      {/* Formulário para adicionar nova restrição */}
+      {showAddForm && restrictions.length < maxRestrictions && (
         <Stack
           tokens={{ childrenGap: 12 }}
           styles={{
@@ -172,7 +211,9 @@ export const FieldRestrictionSelector: React.FC<
           }}
         >
           <Text variant="medium" styles={{ root: { fontWeight: 600 } }}>
-            Adicionar Nova Restrição
+            {restrictions.length === 0
+              ? "Adicionar Restrição"
+              : "Adicionar Nova Restrição"}
           </Text>
 
           <Dropdown
@@ -212,19 +253,23 @@ export const FieldRestrictionSelector: React.FC<
             required
           />
 
-          <Stack horizontal horizontalAlign="end">
-            <IconButton
-              iconProps={{ iconName: "Add" }}
+          <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 8 }}>
+            {restrictions.length > 0 && (
+              <DefaultButton
+                text="Cancelar"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setSelectedCategory("");
+                  setSelectedField("");
+                  setMotivo("");
+                }}
+              />
+            )}
+            <PrimaryButton
               text="Adicionar Restrição"
+              iconProps={{ iconName: "Add" }}
               onClick={handleAddRestriction}
               disabled={!canAddRestriction}
-              primary
-              styles={{
-                root: {
-                  backgroundColor: canAddRestriction ? "#0078d4" : "#f3f2f1",
-                  color: canAddRestriction ? "white" : "#a19f9d",
-                },
-              }}
             />
           </Stack>
         </Stack>

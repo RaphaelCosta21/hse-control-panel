@@ -82,28 +82,65 @@ const FlowTimeline: React.FC<IFlowTimelineProps> = ({ formData }) => {
       );
       console.log("🔍 Chaves de avaliação encontradas:", avaliacaoKeys);
 
+      // Converter o timestamp da entrada para comparação
+      const entryTimestamp = new Date(timestamp).getTime();
+      console.log("🔍 Timestamp da entrada (ms):", entryTimestamp);
+
+      // Tolerância de 1 minuto (60000ms) para possíveis pequenas diferenças
+      const tolerance = 60000;
+
       for (const key of avaliacaoKeys) {
         const avaliacao = avaliacaoObj[key];
         console.log(`🔍 Verificando avaliação [${key}]:`, avaliacao);
 
-        // Verificar se Restricao é "Sim" e há campos de restrição
-        if (
-          avaliacao.Restricao === "Sim" &&
-          avaliacao.CamposRestricao &&
-          avaliacao.CamposRestricao.length > 0
-        ) {
-          console.log(
-            "🔍 Restrições encontradas:",
-            avaliacao.CamposRestricao.length
-          );
-          return {
-            hasRestrictions: true,
-            restrictionsCount: avaliacao.CamposRestricao.length,
-          };
+        // Verificar se esta avaliação corresponde ao timestamp
+        // Comparar com DataFim ou DataInicio para identificar a avaliação específica
+        const avaliacaoTimestampFim = avaliacao.DataFim
+          ? new Date(avaliacao.DataFim).getTime()
+          : 0;
+        const avaliacaoTimestampInicio = avaliacao.DataInicio
+          ? new Date(avaliacao.DataInicio).getTime()
+          : 0;
+
+        // Verificamos se a DataFim ou DataInicio está próxima do timestamp da entrada
+        const isMatchingTimestamp =
+          (avaliacaoTimestampFim > 0 &&
+            Math.abs(avaliacaoTimestampFim - entryTimestamp) < tolerance) ||
+          (avaliacaoTimestampInicio > 0 &&
+            Math.abs(avaliacaoTimestampInicio - entryTimestamp) < tolerance);
+
+        console.log(
+          `🔍 [${key}] Comparando timestamps: entry=${entryTimestamp}, avaliacao fim=${avaliacaoTimestampFim}, avaliacao inicio=${avaliacaoTimestampInicio}, matching=${isMatchingTimestamp}`
+        );
+
+        // Se for a avaliação correta E tiver restrição, retorne verdadeiro
+        if (isMatchingTimestamp) {
+          console.log(`🔍 Avaliação correspondente encontrada [${key}]`);
+
+          // Verificar se Restricao é "Sim" e há campos de restrição
+          if (
+            avaliacao.Restricao === "Sim" &&
+            avaliacao.CamposRestricao &&
+            avaliacao.CamposRestricao.length > 0
+          ) {
+            console.log(
+              "🔍 Restrições encontradas:",
+              avaliacao.CamposRestricao.length
+            );
+            return {
+              hasRestrictions: true,
+              restrictionsCount: avaliacao.CamposRestricao.length,
+            };
+          } else {
+            console.log("🔍 Avaliação encontrada, mas sem restrições");
+            return { hasRestrictions: false, restrictionsCount: 0 };
+          }
         }
       }
 
-      console.log("🔍 Nenhuma restrição encontrada");
+      console.log(
+        "🔍 Nenhuma avaliação correspondente ao timestamp encontrada"
+      );
       return { hasRestrictions: false, restrictionsCount: 0 };
     } catch (error) {
       console.error("Erro ao verificar restrições de avaliação:", error);

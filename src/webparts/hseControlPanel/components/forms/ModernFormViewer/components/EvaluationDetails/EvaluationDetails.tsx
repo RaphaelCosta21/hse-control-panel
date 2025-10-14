@@ -23,6 +23,7 @@ export interface IEvaluationDetailsProps {
   hseMembersList: IPersonaProps[];
   hasRestrictions: boolean;
   fieldRestrictions: IFieldRestriction[];
+  activeRestrictions?: IFieldRestriction[];
   setSelectedHSEResponsible: (responsible: IPersonaProps | undefined) => void;
   setEvaluationResult: (
     result: "" | "Aprovado" | "Pendente Info." | "Rejeitado"
@@ -32,6 +33,8 @@ export interface IEvaluationDetailsProps {
   setFieldRestrictions: (restrictions: IFieldRestriction[]) => void;
   setShowStartConfirmation: (show: boolean) => void;
   setShowSendConfirmation: (show: boolean) => void;
+  isEvaluationValid: () => boolean;
+  setIsRestrictionFormOpen: (isOpen: boolean) => void;
 }
 
 const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
@@ -44,6 +47,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
   hseMembersList,
   hasRestrictions,
   fieldRestrictions,
+  activeRestrictions = [],
   setSelectedHSEResponsible,
   setEvaluationResult,
   setEvaluationComments,
@@ -51,6 +55,8 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
   setFieldRestrictions,
   setShowStartConfirmation,
   setShowSendConfirmation,
+  isEvaluationValid,
+  setIsRestrictionFormOpen,
 }) => {
   // Removido a verificação showEvaluationDetails pois a seção deve sempre aparecer
 
@@ -220,6 +226,64 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
             <Text>
               <strong>Comentários:</strong> {avaliacao.Comentarios || "N/A"}
             </Text>
+
+            {/* Mostrar restrições se existirem */}
+            {avaliacao.Restricao === "Sim" &&
+              avaliacao.CamposRestricao &&
+              avaliacao.CamposRestricao.length > 0 && (
+                <Stack
+                  tokens={{ childrenGap: 8 }}
+                  styles={{
+                    root: {
+                      padding: 12,
+                      border: "1px solid #f3b90c",
+                      borderRadius: 4,
+                      backgroundColor: "#fffcf0",
+                      marginTop: 8,
+                    },
+                  }}
+                >
+                  <Text
+                    variant="small"
+                    styles={{ root: { fontWeight: 600, color: "#d83b01" } }}
+                  >
+                    ⚠️ Aprovação com Restrições
+                  </Text>
+                  <Text
+                    variant="small"
+                    styles={{ root: { color: "#605e5c", marginBottom: 4 } }}
+                  >
+                    Campos que precisam ser corrigidos:
+                  </Text>
+                  {avaliacao.CamposRestricao.map((restricao, idx) => (
+                    <Stack
+                      key={restricao.id}
+                      tokens={{ childrenGap: 2 }}
+                      styles={{
+                        root: {
+                          padding: 8,
+                          border: "1px solid #edebe9",
+                          borderRadius: 4,
+                          backgroundColor: "white",
+                        },
+                      }}
+                    >
+                      <Text
+                        variant="small"
+                        styles={{ root: { fontWeight: 600 } }}
+                      >
+                        {idx + 1}. {restricao.nomeExibicao}
+                      </Text>
+                      <Text
+                        variant="small"
+                        styles={{ root: { color: "#605e5c" } }}
+                      >
+                        {restricao.motivo}
+                      </Text>
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
           </Stack>
         ))}
       </Stack>
@@ -621,6 +685,12 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
               value={evaluationComments}
               onChange={(_, value) => setEvaluationComments(value || "")}
               placeholder="Digite seus comentários sobre a avaliação..."
+              required
+              errorMessage={
+                evaluationComments.trim() === ""
+                  ? "Comentários são obrigatórios"
+                  : undefined
+              }
             />
 
             {/* Seção de Aprovação com Restrições */}
@@ -656,6 +726,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
                       restrictions={fieldRestrictions}
                       onRestrictionsChange={setFieldRestrictions}
                       maxRestrictions={3}
+                      onFormStateChange={setIsRestrictionFormOpen}
                     />
                   </Stack>
                 )}
@@ -671,6 +742,7 @@ const EvaluationDetails: React.FC<IEvaluationDetailsProps> = ({
                 text="Enviar Avaliação"
                 iconProps={{ iconName: "Send" }}
                 onClick={() => setShowSendConfirmation(true)}
+                disabled={!isEvaluationValid()}
               />
             </Stack>
           </Stack>

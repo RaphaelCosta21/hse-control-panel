@@ -46,8 +46,11 @@ export const useEvaluation = ({
   setShowSendConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
   submittingReview: boolean;
   setSubmittingReview: React.Dispatch<React.SetStateAction<boolean>>;
+  isRestrictionFormOpen: boolean;
+  setIsRestrictionFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleStartEvaluation: () => Promise<void>;
   handleSendEvaluation: () => Promise<void>;
+  isEvaluationValid: () => boolean;
 } => {
   const [selectedHSEResponsible, setSelectedHSEResponsible] = React.useState<
     IPersonaProps | undefined
@@ -66,6 +69,37 @@ export const useEvaluation = ({
     React.useState(false);
   const [showSendConfirmation, setShowSendConfirmation] = React.useState(false);
   const [submittingReview, setSubmittingReview] = React.useState(false);
+  const [isRestrictionFormOpen, setIsRestrictionFormOpen] =
+    React.useState(false);
+
+  // Função de validação para verificar se a avaliação pode ser enviada
+  const isEvaluationValid = React.useCallback((): boolean => {
+    // Resultado da avaliação é obrigatório
+    if (!evaluationResult) {
+      return false;
+    }
+
+    // Comentários são obrigatórios
+    if (!evaluationComments || evaluationComments.trim() === "") {
+      return false;
+    }
+
+    // Se "Aprovado" com restrições marcado, precisa ter pelo menos uma restrição
+    if (evaluationResult === "Aprovado" && hasRestrictions) {
+      // Se não há restrições OU formulário de adição está aberto, não é válido
+      if (fieldRestrictions.length === 0 || isRestrictionFormOpen) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [
+    evaluationResult,
+    evaluationComments,
+    hasRestrictions,
+    fieldRestrictions,
+    isRestrictionFormOpen,
+  ]);
 
   // useEffect para resgatar dados de avaliação salvos no SharePoint
   React.useEffect(() => {
@@ -338,6 +372,12 @@ export const useEvaluation = ({
       console.log("⏳ Iniciando processo de avaliação...");
       setSubmittingReview(true);
 
+      // Resetar campos da avaliação para começar uma nova avaliação limpa
+      setEvaluationResult("");
+      setEvaluationComments("");
+      setHasRestrictions(false);
+      setFieldRestrictions([]);
+
       // Criar dados da avaliação (o SharePointService vai gerenciar o histórico)
       const statusAtual = "Em Análise";
 
@@ -476,9 +516,14 @@ export const useEvaluation = ({
     setShowSendConfirmation,
     submittingReview,
     setSubmittingReview,
+    isRestrictionFormOpen,
+    setIsRestrictionFormOpen,
 
     // Handlers
     handleStartEvaluation,
     handleSendEvaluation,
+
+    // Validation
+    isEvaluationValid,
   };
 };
