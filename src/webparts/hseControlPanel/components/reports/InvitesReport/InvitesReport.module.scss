@@ -14,6 +14,55 @@
   margin-top: 8px;
 }
 
+.metricsContainer {
+  margin: 20px 0;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.metricsStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.metricCard {
+  flex: 1;
+  min-width: 220px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+.metricIcon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+.metricTitle {
+  font-weight: 600;
+  color: #333;
+}
+
+.metricValue {
+  font-weight: 700;
+  margin: 12px 0 8px;
+  color: #0078d4;
+}
+
+.metricDescription {
+  color: #666;
+  line-height: 1.4;
+}
+
 .commandBar {
   margin-bottom: 16px;
 }
@@ -74,6 +123,14 @@
 @media (max-width: 768px) {
   .invitesReport {
     padding: 12px;
+  }
+
+  .metricsContainer {
+    padding: 12px;
+  }
+
+  .metricCard {
+    min-width: 100%;
   }
 
   .tableContainer {

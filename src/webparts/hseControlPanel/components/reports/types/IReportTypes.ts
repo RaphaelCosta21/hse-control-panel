@@ -20,6 +20,7 @@ export interface IInviteItem {
   FornecedorEmail: string;
   ConvidadoPor: string;
   DataEnvio: Date;
+  hasStarted?: boolean; // Indica se a empresa já iniciou o processo
 }
 
 export interface IReportComponentProps {
