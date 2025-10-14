@@ -72,6 +72,7 @@ export class EmailTemplatesPage extends React.Component<
       "email_reminder",
       "email_formsent",
       "email_approval",
+      "email_approval_restriction",
       "email_rejection",
       "email_pendente",
     ];
@@ -176,6 +177,38 @@ Parabéns! Sua empresa está apta para prestação de serviços.
 
 Atenciosamente,
 Equipe HSE - Marine`,
+          footer:
+            "Este é um email automático do sistema HSE Control Panel.\nPor favor, não responda este email.",
+        },
+      },
+      email_approval_restriction: {
+        key: "email_approval_restriction",
+        title: "Aprovação com Restrição",
+        description:
+          "Notificação de aprovação com restrições que precisam ser corrigidas",
+        icon: "Warning",
+        color: "#f3b90c",
+        sampleData: {
+          subject: "Formulário HSE Aprovado com Restrições - {empresa}",
+          body: `Olá {nome},
+
+Seu formulário HSE foi APROVADO, porém foram identificadas algumas restrições que precisam ser corrigidas.
+
+Empresa: {empresa}
+CNPJ: {cnpj}
+Data de aprovação: {data_aprovacao}
+Avaliador: {avaliador}
+
+Restrições aplicadas:
+{lista_restricoes}
+
+Por favor, acesse o link abaixo para visualizar o seu formulário, conferir as restrições e realizar as correções necessárias o mais rápido possível:
+{link}
+
+Após corrigir as restrições, submeta novamente o formulário para uma nova avaliação.
+
+Atenciosamente,
+Equipe HSE - Oceaneering Macaé - Brasil`,
           footer:
             "Este é um email automático do sistema HSE Control Panel.\nPor favor, não responda este email.",
         },
@@ -564,6 +597,7 @@ Equipe HSE - Marine`,
                 "{link}",
                 "{prazo}",
                 "{comentarios_avaliacao}",
+                "{lista_restricoes}",
               ].map((variable) => (
                 <span key={variable} className={styles.variable}>
                   {variable}
@@ -740,6 +774,7 @@ Equipe HSE - Marine`,
                     "{prazo_resposta}",
                     "{comentarios_avaliacao}",
                     "{link}",
+                    "{lista_restricoes}",
                   ].map((variable) => (
                     <span key={variable} className={styles.variable}>
                       {variable}

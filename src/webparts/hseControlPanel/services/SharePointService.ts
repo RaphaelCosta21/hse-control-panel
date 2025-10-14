@@ -215,6 +215,14 @@ export class SharePointService {
     evaluationData?: {
       dataFim?: string;
       comentarios?: string;
+      restricao?: string;
+      camposRestricao?: Array<{
+        id?: number;
+        secao: string;
+        campo: string;
+        nomeExibicao: string;
+        motivo?: string;
+      }>;
     }
   ): Promise<void> {
     try {
@@ -243,6 +251,8 @@ export class SharePointService {
         IdForm: number;
         Date?: string;
         Comment?: string;
+        Restriction?: boolean; // Toggle do SharePoint é booleano
+        Restriction_comment?: string;
       } = {
         Title: title,
         Status: newStatus,
@@ -256,6 +266,37 @@ export class SharePointService {
 
       if (evaluationData?.comentarios) {
         recordData.Comment = evaluationData.comentarios;
+      }
+
+      // Adicionar Restriction e Restriction_comment se for "Sim"
+      if (evaluationData?.restricao === "Sim") {
+        recordData.Restriction = true; // Campo Toggle do SharePoint espera booleano
+
+        // Adicionar o JSON formatado das restrições
+        if (
+          evaluationData?.camposRestricao &&
+          evaluationData.camposRestricao.length > 0
+        ) {
+          // Formatar restrições em JSON estruturado
+          const restrictionsFormatted = {
+            totalRestricoes: evaluationData.camposRestricao.length,
+            restricoes: evaluationData.camposRestricao.map(
+              (restricao, index) => ({
+                numero: index + 1,
+                secao: restricao.secao || "",
+                campo: restricao.campo || "",
+                nomeExibicao: restricao.nomeExibicao || "",
+                motivo: restricao.motivo || "Não especificado",
+              })
+            ),
+          };
+
+          recordData.Restriction_comment = JSON.stringify(
+            restrictionsFormatted,
+            null,
+            2
+          );
+        }
       }
 
       await this.sp.web.lists
@@ -526,6 +567,8 @@ export class SharePointService {
       await this.addStatusChangeRecord(itemId, evaluationData.statusAvaliacao, {
         dataFim: new Date().toISOString(),
         comentarios: evaluationData.comentarios,
+        restricao: evaluationData.restricao,
+        camposRestricao: evaluationData.camposRestricao,
       });
     } catch (error) {
       console.error("❌ Erro ao finalizar avaliação:", {

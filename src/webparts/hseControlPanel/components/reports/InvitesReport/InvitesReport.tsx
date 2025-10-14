@@ -253,7 +253,7 @@ const InvitesReport: React.FC<IReportComponentProps> = ({
 
       const sp = spfi().using(SPFx(context));
 
-      // Buscar convites
+      // 1. Buscar convites originais
       const items = await sp.web.lists
         .getByTitle("hse-control-panel-invites")
         .items.select(
@@ -265,7 +265,13 @@ const InvitesReport: React.FC<IReportComponentProps> = ({
         )
         .orderBy("DataEnvio", false)();
 
-      // Buscar formulários para verificar quais empresas já iniciaram
+      // 2. Buscar reenvios de convites
+      const reinviteItems = await sp.web.lists
+        .getByTitle("hse-control-panel-reinvites")
+        .items.select("Id", "FornecedorEmail", "DataEnvio")
+        .orderBy("DataEnvio", false)();
+
+      // 3. Buscar formulários para verificar quais empresas já iniciaram
       const formsItems = await sp.web.lists
         .getByTitle("hse-new-register")
         .items.select("Id", "EmailPreenchimento")
@@ -284,24 +290,88 @@ const InvitesReport: React.FC<IReportComponentProps> = ({
           )
       );
 
-      const mappedItems: IInviteItem[] = items.map(
+      // 4. Processar reenvios para criar um mapa de datas mais recentes por email
+      const mostRecentInviteByEmail: Record<string, Date> = {};
+
+      // Inicializar com as datas dos convites originais
+      items.forEach(
+        (item: { FornecedorEmail?: string; DataEnvio?: string }) => {
+          if (item.FornecedorEmail && item.DataEnvio) {
+            const email = item.FornecedorEmail.toLowerCase();
+            mostRecentInviteByEmail[email] = new Date(item.DataEnvio);
+          }
+        }
+      );
+
+      // Atualizar com datas de reenvios se forem mais recentes
+      reinviteItems.forEach(
+        (reinvite: { FornecedorEmail?: string; DataEnvio?: string }) => {
+          if (reinvite.FornecedorEmail && reinvite.DataEnvio) {
+            const email = reinvite.FornecedorEmail.toLowerCase();
+            const reinviteDate = new Date(reinvite.DataEnvio);
+
+            // Se já existe uma data para este email, comparar e usar a mais recente
+            if (mostRecentInviteByEmail[email]) {
+              if (reinviteDate > mostRecentInviteByEmail[email]) {
+                mostRecentInviteByEmail[email] = reinviteDate;
+              }
+            } else {
+              // Se não existe, usar a data do reenvio
+              mostRecentInviteByEmail[email] = reinviteDate;
+            }
+          }
+        }
+      );
+
+      // 5. Criar mapa para armazenar apenas o registro mais recente por email
+      const uniqueInvitesByEmail: Record<string, IInviteItem> = {};
+
+      // Processar todos os convites originais
+      items.forEach(
         (item: {
           Id: number;
           Title?: string;
           FornecedorEmail?: string;
           ConvidadoPor?: string;
           DataEnvio?: string;
-        }) => ({
-          id: item.Id,
-          Title: item.Title || "Sem título",
-          FornecedorEmail: item.FornecedorEmail || "",
-          ConvidadoPor: item.ConvidadoPor || "",
-          DataEnvio: item.DataEnvio ? new Date(item.DataEnvio) : new Date(),
-          hasStarted: item.FornecedorEmail
-            ? startedEmails.has(item.FornecedorEmail.toLowerCase())
-            : false,
-        })
+        }) => {
+          if (!item.FornecedorEmail) return;
+
+          const email = item.FornecedorEmail.toLowerCase();
+
+          // Verificar a data mais recente para este email
+          let mostRecentDate = item.DataEnvio
+            ? new Date(item.DataEnvio)
+            : new Date();
+
+          if (mostRecentInviteByEmail[email]) {
+            mostRecentDate = mostRecentInviteByEmail[email];
+          }
+
+          const inviteItem: IInviteItem = {
+            id: item.Id,
+            Title: item.Title || "Sem título",
+            FornecedorEmail: item.FornecedorEmail,
+            ConvidadoPor: item.ConvidadoPor || "",
+            DataEnvio: mostRecentDate, // Usar a data mais recente
+            hasStarted: startedEmails.has(email),
+          };
+
+          // Se já existe esse email, manter apenas o registro com data mais recente
+          if (uniqueInvitesByEmail[email]) {
+            if (mostRecentDate > uniqueInvitesByEmail[email].DataEnvio) {
+              uniqueInvitesByEmail[email] = inviteItem;
+            }
+          } else {
+            uniqueInvitesByEmail[email] = inviteItem;
+          }
+        }
       );
+
+      // 6. Converter o mapa em array e ordenar por data (mais recente primeiro)
+      const mappedItems: IInviteItem[] = Object.values(
+        uniqueInvitesByEmail
+      ).sort((a, b) => b.DataEnvio.getTime() - a.DataEnvio.getTime());
 
       setInvites(mappedItems);
 
